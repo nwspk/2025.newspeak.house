@@ -1,0 +1,14 @@
+<script lang="ts">
+	import favicon from '$lib/assets/favicon.jpeg';
+	import '$lib/styles/main.css';
+
+	let { children } = $props();
+</script>
+
+<svelte:head>
+	<link rel="icon" href={favicon} />
+	<title>NWSPK 25/26</title>
+	<meta name="description" content="Newspeak House Fellowship 2025/26" />
+</svelte:head>
+
+{@render children?.()}

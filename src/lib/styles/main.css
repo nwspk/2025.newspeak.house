@@ -1,0 +1,47 @@
+@font-face {
+	font-family: 'Chalk';
+	src: url('/fonts/chalk.ttf') format('truetype');
+}
+
+h1 {
+	font-size: 3rem;
+	margin: 0 0 2rem 0;
+	color: hsl(200, 24%, 85%);
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	width: fit-content;
+}
+
+li {
+	list-style: none;
+	padding: 0.4rem 0;
+}
+
+body {
+	font-size: 1.6rem;
+	color: #e8e8e8;
+	font-family: 'Chalk';
+	margin: 30px auto 0 auto;
+	width: 90%;
+	background-color: #000000;
+	background-image: url('https://www.transparenttextures.com/patterns/concrete-wall-2.png');
+	background-repeat: repeat;
+}
+
+@media (min-width: 600px) {
+	body {
+		max-width: 800px;
+		margin: 50px auto 0 auto;
+	}
+}
+
+a {
+	color: hsl(50, 63%, 79%);
+}
+
+a:hover {
+	opacity: 0.7;
+}
