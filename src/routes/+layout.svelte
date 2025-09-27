@@ -11,4 +11,6 @@
 	<meta name="description" content="Newspeak House Fellowship 2025/26" />
 </svelte:head>
 
+<h1>NWSPK 25/26</h1>
+
 {@render children?.()}
