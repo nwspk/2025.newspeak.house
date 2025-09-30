@@ -42,4 +42,4 @@
 	{/each}
 </ul>
 
-<p>Watch this space.</p>
+<p>Watch this space. Or <a href="library">browse the library</a>. As you like.</p>

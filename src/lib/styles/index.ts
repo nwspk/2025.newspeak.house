@@ -1,0 +1,21 @@
+export const genreColors: Record<string, string> = {
+	Art: '#ffb3c1',
+	'Biography & Autobiography': '#ffdfba',
+	'Business & Economics': '#ffffba',
+	'Comics & Graphic Novels': '#baffc9',
+	'Design & System theory': '#bae1ff',
+	Education: '#ffb3f0',
+	Fiction: '#ffb3c1',
+	'Games & Lifestyle': '#ffdfba',
+	Geography: '#ffffba',
+	History: '#baffc9',
+	Law: '#bae1ff',
+	Mathematics: '#ffb3f0',
+	Philosophy: '#ffb3c1',
+	'Political Science': '#ffdfba',
+	'Psychology & Medicine': '#ffffba',
+	Religion: '#baffc9',
+	Science: '#bae1ff',
+	'Social Science': '#ffb3f0',
+	'Technology & Engineering': '#ffb3c1'
+};
