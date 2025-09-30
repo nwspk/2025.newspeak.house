@@ -22,8 +22,6 @@
 	const cohortShuffled = cohort.sort(() => Math.random() - 0.5);
 </script>
 
-<h1>NWSPK 25/26</h1>
-
 <p>
 	The <a href="https://newspeak.house">Newspeak House</a> fellowship programme is designed to support
 	mid-career technologists to develop a holistic understanding of the civic landscape in the UK, in order
@@ -44,4 +42,4 @@
 	{/each}
 </ul>
 
-<p>Watch this space.</p>
+<p>Watch this space. Or <a href="library">browse the library</a>. As you like.</p>
