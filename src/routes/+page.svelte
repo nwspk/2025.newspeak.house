@@ -43,3 +43,25 @@
 </ul>
 
 <p>Watch this space. Or <a href="library">browse the library</a>. As you like.</p>
+
+<style>
+	* {
+		font-family: 'Chalk', cursive;
+		font-size: 1.6rem;
+		color: hsl(200, 24%, 85%);
+	}
+	ul {
+		margin: 0 0 2rem 0;
+		padding: 0;
+		width: fit-content;
+	}
+
+	li {
+		list-style: none;
+		padding: 0.4rem 0;
+	}
+	a {
+		color: hsl(68, 59%, 82%);
+		text-decoration: underline;
+	}
+</style>
