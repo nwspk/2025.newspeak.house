@@ -1,45 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
 @font-face {
 	font-family: 'Chalk';
 	src: url('/fonts/chalk.ttf') format('truetype');
 }
 
-h1 {
-	font-size: 3rem;
-	margin: 0 0 2rem 0;
-	color: hsl(200, 24%, 85%);
-}
-
-ul {
-	margin: 0;
-	padding: 0;
-	width: fit-content;
-}
-
-li {
-	list-style: none;
-	padding: 0.4rem 0;
-}
-
-body {
-	font-size: 1.6rem;
-	color: #e8e8e8;
-	font-family: 'Chalk';
-	margin: 30px auto 0 auto;
-	width: 90%;
+.chalkboard {
 	background-color: #000000;
 	background-image: url('https://www.transparenttextures.com/patterns/concrete-wall-2.png');
 	background-repeat: repeat;
 }
 
-@media (min-width: 600px) {
-	body {
-		max-width: 800px;
-		margin: 50px auto 0 auto;
-	}
+p {
+	margin: 0 0 1.5rem 0;
+	line-height: 1.4;
+}
+
+body {
+	font-family: 'Space Grotesk', sans-serif;
+	font-size: 1.4rem;
 }
 
 a {
-	color: hsl(50, 63%, 79%);
+	color: hsl(245, 42%, 43%);
 }
 
 a:hover {

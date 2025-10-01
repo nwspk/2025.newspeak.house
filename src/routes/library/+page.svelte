@@ -79,7 +79,7 @@
 				role="button"
 				style="background-color: {selectedGenre === genre ? genreColors[genre] : 'transparent'};
 		border: 3px solid {genreColors[genre]};
-		color: {selectedGenre === genre ? 'black' : genreColors[genre]};
+		color: {selectedGenre === genre ? 'white' : genreColors[genre]};
 		"
 			>
 				{genre}
@@ -103,7 +103,9 @@
 				<div class="book-info-container">
 					<h3>{book.title}</h3>
 					<!-- <div>{book.description}</div> -->
-					<div>By {book.authors}</div>
+					{#if book.authors.length > 0}
+						<div>By {book.authors}</div>
+					{/if}
 					<div style="color: {genreColors[book.genre]}">{book.genre}</div>
 				</div>
 			</li>
@@ -112,11 +114,10 @@
 {/if}
 
 <style>
-	h2 {
-		color: #a0c4ff;
-	}
 	h3 {
 		margin: 0;
+		line-height: 1.2;
+		font-style: italic;
 	}
 	.toggle-genre-filters {
 		cursor: pointer;
@@ -124,7 +125,7 @@
 		width: fit-content;
 		margin-bottom: 2rem;
 		padding: 0.4rem 0.5rem;
-		border: 3px solid #ffffff99;
+		border: 3px solid #39393999;
 		border-radius: 8px;
 	}
 	.genre-filters-container {
@@ -137,18 +138,16 @@
 		background: transparent;
 		border: none;
 		border-bottom: 2px solid rgba(189, 189, 189, 0.736);
-		color: rgba(255, 255, 255, 0.729);
 		font-size: 1.2rem;
 		padding: 0.5rem;
 		margin-bottom: 2rem;
-		font-family: 'Chalk';
 	}
 	input:focus {
 		outline: none;
 	}
-	input::placeholder {
-		font-family: 'Chalk';
-		color: #ffffff99;
+	ul {
+		padding: 0;
+		list-style: none;
 	}
 	li {
 		max-width: 100%;
@@ -161,7 +160,7 @@
 		gap: 0.5rem;
 	}
 	.book-count {
-		color: #ff77a8;
+		color: #d4356f;
 	}
 	.search-preamble {
 		margin-bottom: 2rem;
