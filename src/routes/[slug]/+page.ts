@@ -3,8 +3,6 @@ import type { Component } from 'svelte';
 export const load = async ({ params }) => {
 	const page = await import(`../../lib/static-pages/${params.slug}.md`);
 
-	console.log('Loaded page module:', page);
-
 	if (!page) {
 		return {
 			status: 404,

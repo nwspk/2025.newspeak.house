@@ -2,8 +2,6 @@
 	import ContentBlock from '$lib/components/ContentBlock.svelte';
 
 	let { data } = $props();
-
-	console.log('Here is the page data:', data);
 </script>
 
 <svelte:head>
