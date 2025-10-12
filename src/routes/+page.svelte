@@ -22,33 +22,39 @@
 	const cohortShuffled = cohort.sort(() => Math.random() - 0.5);
 </script>
 
-<p>
-	The <a href="https://newspeak.house">Newspeak House</a> fellowship programme is designed to support
-	mid-career technologists to develop a holistic understanding of the civic landscape in the UK, in order
-	to found groundbreaking new projects or seek strategic positions in key institutions.
-</p>
+<div class="content">
+	<p>
+		The <a href="https://newspeak.house">Newspeak House</a> fellowship programme is designed to support
+		mid-career technologists to develop a holistic understanding of the civic landscape in the UK, in
+		order to found groundbreaking new projects or seek strategic positions in key institutions.
+	</p>
 
-<p>This year's candidates:</p>
+	<p>This year's candidates:</p>
 
-<ul>
-	{#each cohortShuffled as human}
-		<li
-			style="transform: rotate({Math.random() * 4 - 2}deg); 
+	<ul>
+		{#each cohortShuffled as human}
+			<li
+				style="transform: rotate({Math.random() * 4 - 2}deg); 
             padding-left: {(Math.random() * 2) / 3}rem;
             color: hsl({Math.random() * 360}, 70%, 90%)"
-		>
-			{human}
-		</li>
-	{/each}
-</ul>
+			>
+				{human}
+			</li>
+		{/each}
+	</ul>
 
-<p>Watch this space. Or <a href="library">browse the library</a>. As you like.</p>
+	<p>Watch this space. Or <a href="library">browse the library</a>. As you like.</p>
+</div>
 
 <style>
 	* {
 		font-family: 'Chalk', cursive;
 		font-size: 1.6rem;
 		color: hsl(200, 24%, 85%);
+	}
+	.content {
+		max-width: 800px;
+		margin: 0 auto;
 	}
 	ul {
 		margin: 0 0 2rem 0;
