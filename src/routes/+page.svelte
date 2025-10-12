@@ -43,7 +43,10 @@
 		{/each}
 	</ul>
 
-	<p>Watch this space. Or <a href="library">browse the library</a>. As you like.</p>
+	<p>
+		Watch this space. Or <a href="library">browse the library</a>. Or learn more about
+		<a href="/guest-room">how to stay at the house as a guest</a>. As you like.
+	</p>
 </div>
 
 <style>
