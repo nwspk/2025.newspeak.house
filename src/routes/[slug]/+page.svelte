@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.pageTitle} · Soli</title>
+	<title>{data.pageTitle} · Newspeak House 25/26</title>
 	<meta name="description" content={data.pageDescription} />
 </svelte:head>
 
