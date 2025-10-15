@@ -32,11 +32,7 @@
 
 	<ul>
 		{#each cohort as human}
-			<li
-				style="transform: rotate({Math.random() * 4 - 2}deg); 
-            padding-left: {(Math.random() * 2) / 3}rem;
-            color: hsl({Math.random() * 360}, 70%, 90%)"
-			>
+			<li>
 				{#if human.pageSlug === null}
 					{human.name}
 				{:else}
@@ -53,27 +49,16 @@
 </div>
 
 <style>
-	* {
-		font-family: 'Chalk', cursive;
-		font-size: 1.6rem;
-		color: hsl(200, 24%, 85%);
-	}
 	.content {
 		max-width: 800px;
 		margin: 0 auto;
 	}
 	ul {
-		margin: 0 0 2rem 0;
+		margin: 0 0 2rem 1.5rem;
 		padding: 0;
 		width: fit-content;
 	}
-
-	li {
-		list-style: none;
-		padding: 0.4rem 0;
-	}
 	a {
-		color: hsl(68, 59%, 82%);
 		text-decoration: underline;
 	}
 </style>
