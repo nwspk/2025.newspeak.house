@@ -1,25 +1,24 @@
 <script lang="ts">
 	const cohort = [
-		'Aadi Kulkarni',
-		'Alex Pedori',
-		'Alexandra Ciocanel',
-		'Asil Sidahmed',
-		'Chris Owen',
-		'Connor Dunlop',
-		'David Powell',
-		'Davit Jintcharadze',
-		'Emily Mayhew',
-		'Fatima Sarah Khalid',
-		'Francesca Galli',
-		"Fred O'Brien",
-		'Gamithra Marga',
-		'Huda Abdirahim',
-		'Jamie Coombes',
-		'Martina Orlea',
-		'Nick Botti',
-		'Tuna Acisu'
+		{ name: 'Aadi Kulkarni', pageSlug: null },
+		{ name: 'Alex Pedori', pageSlug: null },
+		{ name: 'Alexandra Ciocanel', pageSlug: null },
+		{ name: 'Asil Sidahmed', pageSlug: null },
+		{ name: 'Chris Owen', pageSlug: null },
+		{ name: 'Connor Dunlop', pageSlug: null },
+		{ name: 'David Powell', pageSlug: null },
+		{ name: 'Davit Jintcharadze', pageSlug: null },
+		{ name: 'Emily Mayhew', pageSlug: null },
+		{ name: 'Fatima Sarah Khalid', pageSlug: null },
+		{ name: 'Francesca Galli', pageSlug: null },
+		{ name: "Fred O'Brien", pageSlug: null },
+		{ name: 'Gamithra Marga', pageSlug: null },
+		{ name: 'Huda Abdirahim', pageSlug: null },
+		{ name: 'Jamie Coombes', pageSlug: null },
+		{ name: 'Martina Orlea', pageSlug: null },
+		{ name: 'Nick Botti', pageSlug: null },
+		{ name: 'Tuna Acisu', pageSlug: null }
 	];
-	const cohortShuffled = cohort.sort(() => Math.random() - 0.5);
 </script>
 
 <div class="content">
@@ -32,13 +31,17 @@
 	<p>This year's candidates:</p>
 
 	<ul>
-		{#each cohortShuffled as human}
+		{#each cohort as human}
 			<li
 				style="transform: rotate({Math.random() * 4 - 2}deg); 
             padding-left: {(Math.random() * 2) / 3}rem;
             color: hsl({Math.random() * 360}, 70%, 90%)"
 			>
-				{human}
+				{#if human.pageSlug === null}
+					{human.name}
+				{:else}
+					<a href={`/cohort/${human.pageSlug}`}>{human.name}</a>
+				{/if}
 			</li>
 		{/each}
 	</ul>
