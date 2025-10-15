@@ -7,6 +7,7 @@ Website for the 2025/26 cohort of the Newspeak House fellowship programme.
 1. Clone this repository
 2. `npm install`
 3. `npm run dev`
+4. Go to http://localhost:5173/
 
 ## Deployment
 
