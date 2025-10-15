@@ -6,7 +6,7 @@
 		{ name: 'Asil Sidahmed', pageSlug: null },
 		{ name: 'Chris Owen', pageSlug: null },
 		{ name: 'Connor Dunlop', pageSlug: null },
-		{ name: 'David Powell', pageSlug: null },
+		{ name: 'David Powell', pageSlug: 'david-powell' },
 		{ name: 'Davit Jintcharadze', pageSlug: null },
 		{ name: 'Emily Mayhew', pageSlug: null },
 		{ name: 'Fatima Sarah Khalid', pageSlug: null },
