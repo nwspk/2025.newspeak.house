@@ -14,7 +14,7 @@ We keep a guest room at Newspeak House for visiting speakers, faculty, collabora
 
 **How to request a stay:** 
 
-Please email [Connor](mailto:c.dunlop@proton.me) or [Aadi](mailto:akuls23@gmail.com) with:
+Please email [Connor](mailto:c.dunlop@proton.me) and [Aadi](mailto:akuls23@gmail.com) with:
 
 * Your name  
 * The dates you’d like to stay (even if flexible)  
