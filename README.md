@@ -12,3 +12,13 @@ Website for the 2025/26 cohort of the Newspeak House fellowship programme.
 ## Deployment
 
 Deployment is handled through Github Actions and it is hosted using Github pages. All you should need to do to deploy changes is push to `main`.
+
+# Adding a profile page
+
+To add a profile page about yourself, create a new file `src/lib/static-pages/cohort-profiles/[your-name].md` and do whatever you want with it.
+
+Then add a a page slug to `src/routes/+page.svelte`
+
+Then visit /cohort/[your-name]
+
+See https://github.com/nwspk/2025.newspeak.house/pull/10 for an example.
