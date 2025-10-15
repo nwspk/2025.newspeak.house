@@ -5,16 +5,6 @@
 	src: url('/fonts/chalk.ttf') format('truetype');
 }
 
-.chalkboard {
-	background-color: #000000;
-	background-image: url('https://www.transparenttextures.com/patterns/concrete-wall-2.png');
-	background-repeat: repeat;
-}
-
-h1,
-h2 {
-	font-family: 'Chalk', sans-serif;
-}
 
 h1,
 h2,

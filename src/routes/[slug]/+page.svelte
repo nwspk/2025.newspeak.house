@@ -15,9 +15,3 @@
 		<data.pageContent />
 	</ContentBlock>
 </div>
-
-<style>
-	.main {
-		margin: 2rem 0;
-	}
-</style>
