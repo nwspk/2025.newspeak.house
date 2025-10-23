@@ -17,7 +17,7 @@
 		{ name: 'Jamie Coombes', pageSlug: null },
 		{ name: 'Martina Orlea', pageSlug: null },
 		{ name: 'Nick Botti', pageSlug: null },
-		{ name: 'Tuna Acisu', pageSlug: null }
+		{ name: 'Tuna Acisu', pageSlug: 'tuna-acisu' }
 	];
 </script>
 
