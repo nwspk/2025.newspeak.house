@@ -36,6 +36,10 @@ jobs:
 
       - name: Build site
         run: npm run build
+        env:
+          MATRIX_HOMESERVER: ${{ secrets.MATRIX_HOMESERVER }}
+          MATRIX_ACCESS_TOKEN: ${{ secrets.MATRIX_ACCESS_TOKEN }}
+          MATRIX_ROOM: ${{ secrets.MATRIX_ROOM }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
