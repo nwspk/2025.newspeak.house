@@ -245,6 +245,7 @@ export const countries = [
 	"Viet Nam",
 	"Virgin Islands (British)",
 	"Virgin Islands (U.S.)",
+	"Wakanda",
 	"Wallis and Futuna",
 	"Western Sahara",
 	"Yemen",
