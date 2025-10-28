@@ -3,8 +3,11 @@
 	import '$lib/styles/main.css';
 
 	import favicon from '$lib/assets/favicon.jpeg';
+	import { page } from '$app/state';
 
 	let { children } = $props();
+
+	let isHome = $derived(page.url.pathname === '/');
 </script>
 
 <svelte:head>
@@ -18,7 +21,6 @@
 	<nav>
 		<a href="/library">Library</a>
 		<a href="/guest-room">Book the guest room</a>
-		<a href="/contact">Contact us</a>
 	</nav>
 </header>
 
@@ -47,7 +49,7 @@
 		text-decoration: none;
 	}
 	main {
-		padding: 1rem;
+		padding: 2rem;
 		margin: 0 auto;
 	}
 	nav {
