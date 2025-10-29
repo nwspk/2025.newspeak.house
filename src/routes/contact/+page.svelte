@@ -16,23 +16,23 @@
 	<form method="POST">
 		<label>
 			Name
-			<input name="name" type="text" />
+			<input name="name" type="text" required />
 		</label>
 		<label>
 			Email
-			<input name="email" type="email" />
+			<input name="email" type="email" required />
 		</label>
 		<label>
 			WhatsApp
-			<input name="whatsApp" type="text" />
+			<input name="whatsApp" type="text" required />
 		</label>
 		<label>
 			Subject
-			<input name="subject" type="text" />
+			<input name="subject" type="text" required />
 		</label>
 		<label>
 			Reason for getting in touch
-			<select name="reason">
+			<select name="reason" required>
 				<option value="" disabled selected>Select a reason</option>
 				{#each reasonOptions as option}
 					<option value={option}>{option}</option>
@@ -45,7 +45,7 @@
 		</label>
 		<label>
 			Country
-			<select name="country">
+			<select name="country" required>
 				<option value="" disabled selected>Select a country</option>
 				{#each countries as option}
 					<option value={option}>{option}</option>
@@ -56,6 +56,9 @@
 	</form>
 	{#if form?.success}
 		<p>Form successfully submitted! We'll be in touch.</p>
+	{/if}
+	{#if form?.error}
+		<p>There was an error submitting the form: {form.error}</p>
 	{/if}
 </div>
 

@@ -22,6 +22,25 @@ export const actions = {
 		const reason = data.get('reason')?.toString();
 		const country = data.get('country')?.toString();
 
+		const isValidEmail = (email: string | undefined): boolean => {
+			if (!email) return false;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			return emailRegex.test(email);
+		};
+
+		if (
+			!name ||
+			name.length < 1 ||
+			!email ||
+			!isValidEmail(email) ||
+			!subject ||
+			subject.length < 1 ||
+			!message ||
+			message.length < 1
+		) {
+			return { success: false, error: 'Invalid form submission' };
+		}
+
 		function escapeHtml(str: string): string {
 			return str
 				.replace(/&/g, '&amp;')
