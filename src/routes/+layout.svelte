@@ -18,7 +18,11 @@
 	<nav>
 		<a href="/library">Library</a>
 		<a href="/guest-room">Book the guest room</a>
+<<<<<<< HEAD
+		<a href="/contact">Contact</a>
+=======
 		<a href="/contact">Contact us</a>
+>>>>>>> e726657f458fce3bd3114828ecf2302365a26b00
 	</nav>
 </header>
 

@@ -1,8 +1,13 @@
+<<<<<<< HEAD
+<script>
+	import ContactForm from '$lib/components/ContactForm.svelte';
+=======
 <script lang="ts">
 	import { countries, reasonOptions } from '$lib/contact-form-options';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
+>>>>>>> e726657f458fce3bd3114828ecf2302365a26b00
 </script>
 
 <div class="container">
@@ -12,6 +17,9 @@
 		We'd love to hear from you! Whether you have questions, feedback, or just want to say hello,
 		please fill out the form below and we'll get back to you as soon as possible.
 	</p>
+<<<<<<< HEAD
+	<ContactForm />
+=======
 
 	<form method="POST">
 		<label>
@@ -60,6 +68,7 @@
 	{#if form?.error}
 		<p>There was an error submitting the form: {form.error}</p>
 	{/if}
+>>>>>>> e726657f458fce3bd3114828ecf2302365a26b00
 </div>
 
 <style>
@@ -68,6 +77,9 @@
 		margin: 0 auto;
 		padding: 16px;
 	}
+<<<<<<< HEAD
+</style>
+=======
 	:root {
 		--max-width: 720px;
 		--accent: #0b72b9;
@@ -146,3 +158,4 @@
 		border: 0;
 	}
 </style>
+>>>>>>> e726657f458fce3bd3114828ecf2302365a26b00
