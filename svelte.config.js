@@ -6,16 +6,12 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	preprocess: [vitePreprocess, mdsvex({ extensions: ['.md'] })],
 	kit: {
-<<<<<<< HEAD
 		adapter: adapter({
 			fallback: '200.html'
 		}),
 		experimental: {
 			remoteFunctions: true
 		}
-=======
-		adapter: adapter()
->>>>>>> e726657f458fce3bd3114828ecf2302365a26b00
 	},
 	extensions: ['.svelte', '.svx', '.md'],
 	compilerOptions: {
