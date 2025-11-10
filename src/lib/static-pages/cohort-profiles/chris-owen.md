@@ -92,12 +92,18 @@ description: still here, still vibing, still me
     // Set age as simplified fraction
     age = `${years} and <sup>${simplifiedNumerator}</sup>/<sub>${simplifiedDenominator}</sub>`;
 
-    // Make words hoverable
+    // Make words hoverable (but skip age display and already wrapped content)
     const textElements = document.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6');
     textElements.forEach(element => {
+      // Skip if element contains the age display
+      if (element.querySelector('.age-display')) return;
+
       const text = element.innerHTML;
-      const wrappedText = text.replace(/\b(\w{3,})\b/g, '<span class="hoverable-word">$1</span>');
-      element.innerHTML = wrappedText;
+      // Only wrap if not already wrapped
+      if (!text.includes('hoverable-word')) {
+        const wrappedText = text.replace(/\b(\w{3,})\b/g, '<span class="hoverable-word">$1</span>');
+        element.innerHTML = wrappedText;
+      }
     });
 
     // Add event listeners
@@ -110,7 +116,7 @@ description: still here, still vibing, still me
 
 ## About Me
 
-Hi, I'm Chris and I'm {@html age} years old.
+Hi, I'm Chris and I'm <span class="age-display">{@html age}</span> years old.
 
 I work as a teacher and coder.
 
