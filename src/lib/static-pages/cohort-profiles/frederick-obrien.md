@@ -7,5 +7,5 @@ Hallo hallo. My name's Fred. I'm a software engineer and occasional journalist a
 
 A few links:
 
-- [Website]('https://frederickobrien.com')
-- [Gonzo Engineering]('https://gonzo.engineering')
+- [Website](https://frederickobrien.com)
+- [Gonzo Engineering](https://gonzo.engineering)
