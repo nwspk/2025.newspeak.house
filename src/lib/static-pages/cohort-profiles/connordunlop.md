@@ -1,5 +1,5 @@
 ---
-  title: Connor Dunlop
+title: Connor Dunlop
 description: my profile
 ---
 # Hello, my name is Connor 
