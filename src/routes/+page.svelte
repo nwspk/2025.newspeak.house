@@ -15,7 +15,7 @@
 		{ name: 'Gamithra Marga', pageSlug: null },
 		{ name: 'Huda Abdirahim', pageSlug: null },
 		{ name: 'Jamie Coombes', pageSlug: null },
-		{ name: 'Martina Orlea', pageSlug: null },
+		{ name: 'Martina Orlea', pageSlug: 'martina-orlea' },
 		{ name: 'Nick Botti', pageSlug: null },
 		{ name: 'Tuna Acisu', pageSlug: 'tuna-acisu' }
 	];
