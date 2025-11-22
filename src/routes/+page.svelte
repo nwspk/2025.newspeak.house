@@ -483,7 +483,6 @@
 			0 0 0 1px rgba(0, 0, 0, 0.4),
 			0 20px 40px rgba(0, 0, 0, 0.85),
 			inset 0 0 80px rgba(0, 0, 0, 0.7);
-		padding: 1.75rem 1.75rem 2.5rem;
 		color: #f5f5f5;
 		position: relative;
 		overflow: hidden;
@@ -530,7 +529,6 @@
 			0 0 0 1px rgba(0, 0, 0, 0.4),
 			0 20px 40px rgba(0, 0, 0, 0.85),
 			inset 0 0 80px rgba(0, 0, 0, 0.7);
-		padding: 1.75rem 1.75rem 2.5rem;
 		color: #f5f5f5;
 		position: relative;
 		overflow: hidden;
