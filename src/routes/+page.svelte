@@ -2,7 +2,7 @@
 	const cohort = [
 		{ name: 'Aadi Kulkarni', pageSlug: null },
 		{ name: 'Alex Pedori', pageSlug: null },
-		{ name: 'Alexandra Ciocanel', pageSlug: null },
+		{ name: 'Alexandra Ciocanel', pageSlug: 'alexandra-ciocanel' },
 		{ name: 'Asil Sidahmed', pageSlug: 'asil-sidahmed' },
 		{ name: 'Chris Owen', pageSlug: 'chris-owen' },
 		{ name: 'Connor Dunlop', pageSlug: 'connordunlop' },
