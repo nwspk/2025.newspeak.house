@@ -2,7 +2,7 @@
 	import { countries, reasonOptions } from '$lib/remote-functions/contact-options';
 	import { contactForm } from '$lib/remote-functions/form.remote';
 
-	const {name, email, whatsApp, subject, message, reason, country} = contactForm.fields;
+	const { name, email, whatsApp, subject, message, reason, country } = contactForm.fields;
 </script>
 
 <form {...contactForm}>

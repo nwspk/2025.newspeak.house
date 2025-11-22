@@ -2,11 +2,12 @@
 title: Connor Dunlop
 description: my profile
 ---
-# Hello, my name is Connor 
+
+# Hello, my name is Connor
 
 I work on techinical AI governance at a start up 🚀🚀
 
-Some things I've (co-)written: 
+Some things I've (co-)written:
 
 👉 [Safety Frameworks and Standards: A comparative analysis to advance risk management of frontier AI](https://aigi.ox.ac.uk/publications/safety-frameworks-and-standards-a-comparative-analysis-to-advance-risk-management-of-frontier-ai/)
 
