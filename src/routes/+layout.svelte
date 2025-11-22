@@ -18,6 +18,7 @@
 	<nav>
 		<a href="/library">Library</a>
 		<a href="/guest-room">Book the guest room</a>
+		<!-- <a href="/weblog">Weblog</a> -->
 		<a href="/contact">Contact us</a>
 	</nav>
 </header>
