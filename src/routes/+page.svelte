@@ -3,11 +3,8 @@
 
 	let selectedPerson = $state<(typeof cohort)[0] | null>(null);
 
-	let scrollPosition = $state(0);
-
 	function openPanel(person: (typeof cohort)[0]) {
 		selectedPerson = person;
-		scrollPosition = window.scrollY;
 		document.body.style.overflow = 'hidden';
 	}
 
@@ -219,13 +216,36 @@
 	</div>
 
 	{#if selectedPerson}
-		<button class="page-overlay" onclick={closePanel} aria-label="Close panel"></button>
-	{/if}
+		<div class="side-panel">
+			<div class="cohort-profile">
+				{#if selectedPerson.photoUrl}
+					<div class="photo-clip">
+						<img src={selectedPerson.photoUrl} alt={selectedPerson.name} class="panel-photo" />
+						<div class="clip-top"></div>
+						<div class="clip-bottom"></div>
+					</div>
+				{/if}
+				<button class="close-button" onclick={closePanel}>✕</button>
+				<div class="panel-content">
+					<h2>{selectedPerson.name}</h2>
+					<p class="panel-description">{selectedPerson.description}</p>
 
-	{#if selectedPerson}
-		<div class="media-overflow" style="top: {scrollPosition}px;">
+					<div class="panel-details">
+						<p>Full profile content would load here from the markdown file...</p>
+						<p>
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+							incididunt ut labore et dolore magna aliqua.
+						</p>
+						<p>
+							Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+							ea commodo consequat.
+						</p>
+					</div>
+				</div>
+			</div>
+
 			{#if selectedPerson.mediaType}
-				<div class="media-showcase media-desktop-only">
+				<div class="media-showcase">
 					<div class="media-label">/// VISUAL CONTENT</div>
 					{#if selectedPerson.mediaType === 'video'}
 						<div class="video-container">
@@ -245,54 +265,6 @@
 				</div>
 			{/if}
 		</div>
-
-		<div class="side-panel" style="top: {scrollPosition}px;">
-			{#if selectedPerson.photoUrl}
-				<div class="photo-clip">
-					<img src={selectedPerson.photoUrl} alt={selectedPerson.name} class="panel-photo" />
-					<div class="clip-top"></div>
-					<div class="clip-bottom"></div>
-				</div>
-			{/if}
-			<button class="close-button" onclick={closePanel}>✕</button>
-			<div class="panel-content">
-				<h2>{selectedPerson.name}</h2>
-				<p class="panel-description">{selectedPerson.description}</p>
-
-				<div class="panel-details">
-					<p>Full profile content would load here from the markdown file...</p>
-					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-						incididunt ut labore et dolore magna aliqua.
-					</p>
-					<p>
-						Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-						commodo consequat.
-					</p>
-				</div>
-
-				{#if selectedPerson.mediaType}
-					<div class="media-showcase media-mobile-only">
-						<div class="media-label">/// VISUAL CONTENT</div>
-						{#if selectedPerson.mediaType === 'video'}
-							<div class="video-container">
-								<iframe
-									src={selectedPerson.mediaUrl}
-									title="Video content"
-									frameborder="0"
-									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-									allowfullscreen
-								></iframe>
-							</div>
-						{:else if selectedPerson.mediaType === 'image'}
-							<div class="image-showcase">
-								<img src={selectedPerson.mediaUrl} alt="Showcase content" />
-							</div>
-						{/if}
-					</div>
-				{/if}
-			</div>
-		</div>
 	{/if}
 </div>
 
@@ -302,58 +274,33 @@
 		width: 100%;
 		min-height: 100vh;
 		transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-		position: relative;
-	}
-
-	.page-wrapper.panel-open {
-		transform: translateX(-40%);
 	}
 
 	.main-content {
 		width: 100%;
 		min-width: 100%;
 		flex-shrink: 0;
-		position: relative;
-	}
-
-	.page-overlay {
-		position: fixed;
-		left: 0;
-		top: 0;
-		width: 60%;
-		height: 100vh;
-		background: transparent;
-		border: none;
-		padding: 0;
-		cursor: pointer;
-		z-index: 900;
-	}
-
-	.media-overflow {
-		position: absolute;
-		right: -40vw;
-		width: 40vw;
-		height: 100vh;
-		z-index: 500;
 	}
 
 	.side-panel {
-		position: absolute;
-		left: 100%;
-		width: 40vw;
-		height: 100vh;
+		position: fixed;
+		right: 0;
+		top: 100px;
+		width: 60vw;
 		background: rgba(232, 232, 220, 0.98);
 		backdrop-filter: blur(20px);
 		border-left: 3px solid #d62828;
-		overflow-y: auto;
-		z-index: 1000;
-		padding: 3rem;
 		transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 		box-sizing: border-box;
+		height: calc(100vh - 100px);
+		overflow-y: auto;
+		display: flex;
 	}
 
-	.page-wrapper.panel-open .side-panel {
-		left: 60%;
+	.cohort-profile {
+		padding: 3rem;
+		position: relative;
+		flex-basis: 50%;
 	}
 
 	.close-button {
@@ -447,8 +394,11 @@
 	}
 
 	.media-showcase {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		width: 100%;
-		height: 100vh;
+		height: 100%;
 		border-left: 3px solid #d62828;
 		background:
 			radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 55%),
@@ -461,6 +411,7 @@
 		position: relative;
 		overflow: hidden;
 		box-sizing: border-box;
+		flex-basis: 50%;
 	}
 
 	.media-label {
@@ -492,23 +443,6 @@
 		border: none;
 	}
 
-	.media-showcase {
-		width: 100%;
-		height: 100vh;
-		border-left: 3px solid #d62828;
-		background:
-			radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 55%),
-			linear-gradient(120deg, #101010, #1a1a1a 40%, #151515 70%, #050505);
-		box-shadow:
-			0 0 0 1px rgba(0, 0, 0, 0.4),
-			0 20px 40px rgba(0, 0, 0, 0.85),
-			inset 0 0 80px rgba(0, 0, 0, 0.7);
-		color: #f5f5f5;
-		position: relative;
-		overflow: hidden;
-		box-sizing: border-box;
-	}
-
 	.panel-details {
 		font-size: 0.95rem;
 		line-height: 1.7;
@@ -522,53 +456,20 @@
 		width: 100%;
 	}
 
-	/* Desktop: only show overflow media, hide in-panel version */
-	.media-desktop-only {
-		display: block;
-	}
-
-	.media-mobile-only {
-		display: none;
-	}
-
 	@media (max-width: 1024px) {
 		/* Stop shifting the underlying page on tablet/mobile */
 		.page-wrapper.panel-open {
 			transform: none;
 		}
 
-		/* Tablet: keep desktop behavior (page + visual column + panel) but without transform */
 		.side-panel {
-			width: 40vw;
-			position: absolute;
-			left: 60vw;
-			top: 0;
-		}
-
-		.page-wrapper.panel-open .side-panel {
-			left: 60vw;
-		}
-
-		.media-overflow {
-			display: block;
-		}
-
-		.media-desktop-only {
-			display: block;
-		}
-
-		.media-mobile-only {
-			display: none;
+			width: 100vw;
+			flex-direction: column;
 		}
 	}
 
 	@media (max-width: 768px) {
-		.side-panel {
-			position: fixed;
-			inset: 0;
-			width: 100vw;
-			height: 100vh;
-			overflow-y: auto;
+		.cohort-profile {
 			padding: 2rem 1.5rem;
 		}
 
@@ -586,19 +487,8 @@
 			padding-top: 130px;
 		}
 
-		/* Hide the overflow media column entirely on mobile */
-		.media-overflow {
-			display: none;
-		}
-
-		/* And show the in-panel media instead */
-		.media-desktop-only {
-			display: none;
-		}
-
-		.media-mobile-only {
+		.media-showcase {
 			display: block;
-			margin-top: 2rem;
 			height: auto;
 			border-left: none;
 			padding: 0;
@@ -607,8 +497,8 @@
 			transform: translateX(-50%);
 		}
 
-		.media-mobile-only iframe,
-		.media-mobile-only img {
+		.media-showcase iframe,
+		.media-showcase img {
 			width: 100%;
 			height: auto;
 			display: block;
@@ -682,20 +572,6 @@
 
 	.hero-link:hover {
 		color: #d62828;
-	}
-
-	.stamp {
-		position: absolute;
-		top: 0;
-		right: 0;
-		font-size: 0.7rem;
-		font-weight: 700;
-		letter-spacing: 0.2em;
-		color: #d62828;
-		border: 2px solid #d62828;
-		padding: 0.5rem 1rem;
-		font-family: 'IBM Plex Mono', monospace;
-		background: rgba(255, 255, 255, 0.6);
 	}
 
 	.hero h1 {
