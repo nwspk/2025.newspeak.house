@@ -1,10 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import CohortCard from '$lib/components/CohortCard.svelte';
 
-	let mouseX = $state(0);
-	let mouseY = $state(0);
-	let time = $state(0);
 	let selectedPerson = $state<(typeof cohort)[0] | null>(null);
 
 	let scrollPosition = $state(0);
@@ -19,28 +15,6 @@
 		selectedPerson = null;
 		document.body.style.overflow = '';
 	}
-
-	onMount(() => {
-		const handleMouseMove = (e: MouseEvent) => {
-			mouseX = e.clientX / window.innerWidth;
-			mouseY = e.clientY / window.innerHeight;
-		};
-
-		window.addEventListener('mousemove', handleMouseMove);
-
-		// Animate background
-		let animationFrame: number;
-		const animate = () => {
-			time += 0.001;
-			animationFrame = requestAnimationFrame(animate);
-		};
-		animate();
-
-		return () => {
-			window.removeEventListener('mousemove', handleMouseMove);
-			cancelAnimationFrame(animationFrame);
-		};
-	});
 
 	const cohort = [
 		{
@@ -190,7 +164,7 @@
 	];
 </script>
 
-<div class="background" style="--mouse-x: {mouseX}; --mouse-y: {mouseY}; --time: {time};"></div>
+<!-- <div class="background" style="--mouse-x: {mouseX}; --mouse-y: {mouseY}; --time: {time};"></div> -->
 
 <div class="page-wrapper" class:panel-open={selectedPerson}>
 	<div class="main-content">
@@ -641,51 +615,6 @@
 		}
 	}
 
-	.background {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		background:
-			radial-gradient(
-				circle at calc(var(--mouse-x) * 100%) calc(var(--mouse-y) * 100%),
-				rgba(232, 232, 220, 0.8) 0%,
-				rgba(220, 220, 208, 0.6) 30%,
-				rgba(208, 208, 196, 0.4) 60%,
-				transparent 100%
-			),
-			radial-gradient(
-				ellipse at calc(30% + var(--time) * 20%) calc(70% - var(--time) * 15%),
-				rgba(200, 200, 180, 0.3) 0%,
-				transparent 50%
-			),
-			radial-gradient(
-				ellipse at calc(70% - var(--time) * 25%) calc(30% + var(--time) * 20%),
-				rgba(180, 180, 160, 0.2) 0%,
-				transparent 50%
-			),
-			linear-gradient(to bottom, #d8d8cc 0%, #ccccc0 50%, #c0c0b4 100%);
-		transition: background 0.3s ease;
-	}
-
-	.background::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: repeating-linear-gradient(
-			0deg,
-			transparent,
-			transparent 2px,
-			rgba(0, 0, 0, 0.03) 2px,
-			rgba(0, 0, 0, 0.03) 4px
-		);
-		opacity: 0.4;
-		animation: scanlines 15s linear infinite;
-		pointer-events: none;
-	}
-
 	@keyframes scanlines {
 		0% {
 			transform: translateY(0);
@@ -879,12 +808,6 @@
 		.hero-nav {
 			padding-top: 1.5rem;
 			border-top: 1px solid rgba(26, 26, 26, 0.15);
-		}
-
-		.stamp {
-			top: 0;
-			right: 0;
-			font-size: 0.6rem;
 		}
 
 		.section-header {
