@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import CohortCard from '$lib/components/CohortCard.svelte';
 	import DavidPowellPhoto from '$lib/assets/david-powell.png';
+	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -98,7 +99,10 @@
 			profileSlug: 'frederick-obrien'
 		},
 		{
-			name: 'Gamithra Marga'
+			name: 'Gamithra Marga',
+			profileSlug: 'gamithra',
+			photo: GamithraMargaPhoto,
+			description: '☀︎ a solarpunk technologist'
 		},
 		{
 			name: 'Huda Abdirahim'
