@@ -168,10 +168,10 @@
 		<div class="hero">
 			<div class="hero-content">
 				<div class="hero-main">
-					<h1>Fellowship Programme<br />2025/26 Cohort</h1>
+					<h1>London College of Political Technology<br />2025/26 cohort</h1>
 					<p class="mission-statement">
 						Mid-career technologists developing a holistic understanding of the civic landscape in
-						the UK—to found groundbreaking projects or seek strategic positions in key institutions.
+						the UK and beyond, to found groundbreaking projects or seek strategic positions in key institutions.
 					</p>
 					<div class="meta">
 						<span class="label">STATUS:</span>
@@ -194,7 +194,7 @@
 
 		<div class="section-header">
 			<div class="line"></div>
-			<h2>/// REGISTERED PARTICIPANTS</h2>
+			<h2>/// FELLOWSHIP CANDIDATES</h2>
 		</div>
 
 		<div class="grid">
@@ -211,7 +211,9 @@
 		</div>
 
 		<div class="footer">
-			<p>© 2025 Newspeak House</p>
+			<p>
+				Visit the <a href="https://newspeak.house" class="hero-link" target="_blank" rel="noopener noreferrer">Newspeak House website</a> and join us for the next <a href="https://newspeak.house/events" class="hero-link" target="_blank" rel="noopener noreferrer">Ration Club</a>.
+			</p>
 		</div>
 	</div>
 
@@ -246,7 +248,7 @@
 
 			{#if selectedPerson.mediaType}
 				<div class="media-showcase">
-					<div class="media-label">/// VISUAL CONTENT</div>
+					<div class="media-label">///</div>
 					{#if selectedPerson.mediaType === 'video'}
 						<div class="video-container">
 							<iframe
@@ -403,10 +405,6 @@
 		background:
 			radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 55%),
 			linear-gradient(120deg, #101010, #1a1a1a 40%, #151515 70%, #050505);
-		box-shadow:
-			0 0 0 1px rgba(0, 0, 0, 0.4),
-			0 20px 40px rgba(0, 0, 0, 0.85),
-			inset 0 0 80px rgba(0, 0, 0, 0.7);
 		color: #f5f5f5;
 		position: relative;
 		overflow: hidden;
