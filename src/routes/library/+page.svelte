@@ -87,43 +87,106 @@
 	.info-and-interface-container {
 		max-width: 800px;
 		margin: 0 auto;
+		padding: 3rem 2.5rem 2.5rem;
 	}
+
+	.info-and-interface-container h2 {
+		font-size: clamp(2rem, 5vw, 3rem);
+		font-weight: 600;
+		margin: 0 0 1.5rem 0;
+		color: #0a0a0a;
+		letter-spacing: -0.01em;
+		line-height: 1.1;
+		font-family: 'Stack Sans Notch', 'Crimson Pro', serif;
+	}
+
+	.info-and-interface-container p {
+		font-size: 1rem;
+		line-height: 1.7;
+		color: #1a1a1a;
+		margin-bottom: 2rem;
+		font-weight: 400;
+	}
+
 	.toggle-genre-filters {
 		cursor: pointer;
 		user-select: none;
 		width: fit-content;
 		margin-bottom: 2rem;
-		padding: 0.4rem 0.5rem;
-		border: 2px solid rgba(189, 189, 189, 0.736);
-		border-radius: 8px;
+		padding: 0.5rem 1rem;
+		border: 2px solid #1a1a1a;
+		background: rgba(255, 255, 255, 0.6);
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.85rem;
+		font-weight: 500;
+		transition: all 0.2s ease;
 	}
+
+	.toggle-genre-filters:hover {
+		background: #1a1a1a;
+		color: white;
+	}
+
 	.genre-filters-container {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
 		margin-bottom: 2rem;
 	}
+
 	input {
 		background: transparent;
 		border: none;
-		border-bottom: 2px solid rgba(189, 189, 189, 0.736);
+		border-bottom: 2px solid #1a1a1a;
 		font-size: 1.2rem;
-		padding: 0.5rem;
+		padding: 0.5rem 0;
 		margin-bottom: 2rem;
+		font-family: 'IBM Plex Mono', monospace;
+		width: 100%;
+		color: #1a1a1a;
 	}
+
+	input::placeholder {
+		color: rgba(26, 26, 26, 0.4);
+	}
+
 	input:focus {
 		outline: none;
+		border-bottom-color: #d62828;
 	}
+
 	.results-container {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
 		gap: 1rem;
+		padding: 0 2.5rem 3rem;
 	}
+
 	.book-count {
-		color: #d4356f;
+		color: #d62828;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
 	}
+
 	.search-preamble {
 		margin-bottom: 2rem;
 		font-style: italic;
+		padding: 0 2.5rem;
+		color: #555;
+		font-size: 0.95rem;
+	}
+
+	@media (max-width: 768px) {
+		.info-and-interface-container {
+			padding: 2rem 1.5rem;
+		}
+
+		.results-container {
+			padding: 0 1.5rem 2rem;
+		}
+
+		.search-preamble {
+			padding: 0 1.5rem;
+		}
 	}
 </style>
