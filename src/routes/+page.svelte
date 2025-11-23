@@ -292,21 +292,12 @@
 			0deg,
 			transparent,
 			transparent 2px,
-			rgba(0, 0, 0, 0.03) 2px,
-			rgba(0, 0, 0, 0.03) 4px
+			rgba(0, 0, 0, 0.035) 2px,
+			rgba(0, 0, 0, 0.035) 4px
 		);
 		opacity: 0.4;
-		animation: scanlines 15s linear infinite;
 		pointer-events: none;
-	}
-
-	@keyframes scanlines {
-		0% {
-			transform: translateY(0);
-		}
-		100% {
-			transform: translateY(100px);
-		}
+		will-change: auto;
 	}
 
 	.page-wrapper {
