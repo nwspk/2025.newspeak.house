@@ -20,7 +20,7 @@
 			description: 'Building tools for collective intelligence and decision-making',
 			photoUrl: 'https://i.pravatar.cc/400?img=12',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Alex Pedori',
@@ -52,7 +52,7 @@
 			description: 'Working on civic technology and open data initiatives',
 			photoUrl: 'https://i.pravatar.cc/400?img=15',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf'
+			mediaUrl: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&autoplay=1&mute=1&controls=0'
 		},
 		{
 			name: 'Connor Dunlop',
@@ -84,7 +84,7 @@
 			description: 'Studying digital infrastructure and urban systems',
 			photoUrl: 'https://i.pravatar.cc/400?img=44',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Fatima Sarah Khalid',
@@ -116,7 +116,7 @@
 			description: 'Designing systems for public accountability',
 			photoUrl: 'https://i.pravatar.cc/400?img=31',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Huda Abdirahim',
@@ -148,7 +148,7 @@
 			description: 'Building tools for transparency in government',
 			photoUrl: 'https://i.pravatar.cc/400?img=59',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Tuna Acisu',
@@ -255,7 +255,7 @@
 								src={selectedPerson.mediaUrl}
 								title="Video content"
 								frameborder="0"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allow="autoplay; encrypted-media"
 								allowfullscreen
 							></iframe>
 						</div>
@@ -433,12 +433,29 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		overflow: hidden;
 	}
 
 	.video-container iframe {
 		width: 100%;
 		height: 100%;
 		border: none;
+		object-fit: cover;
+	}
+
+	.image-showcase {
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.image-showcase img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.panel-details {
