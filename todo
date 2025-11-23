@@ -1,7 +1,1 @@
-- The "visual content" should be full width and height of its parent.
-- The visual content videos stopped showing.
 - The people should wrap into a column when the drawer is open on desktop.
-- On mobile, the "visual content" should be full screen width, and the side panel should be full screen height and scrollable.
-- Something made the page quite slow, maybe the scanline animations?
-- The various strings and texts should be updated.
-- The people's face photo grayscale filter should be removed on hover.
