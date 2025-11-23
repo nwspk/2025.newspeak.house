@@ -96,59 +96,6 @@
 		opacity: 1;
 	}
 
-	.placeholder {
-		width: 100%;
-		height: 100%;
-		background:
-			linear-gradient(
-				135deg,
-				transparent 0%,
-				transparent 45%,
-				rgba(214, 40, 40, 0.03) 45%,
-				rgba(214, 40, 40, 0.03) 55%,
-				transparent 55%,
-				transparent 100%
-			),
-			linear-gradient(
-				45deg,
-				transparent 0%,
-				transparent 45%,
-				rgba(26, 26, 26, 0.02) 45%,
-				rgba(26, 26, 26, 0.02) 55%,
-				transparent 55%,
-				transparent 100%
-			),
-			radial-gradient(ellipse at 30% 40%, #e8e8e0 0%, #d8d8d0 50%, #c8c8c0 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		position: relative;
-		mix-blend-mode: multiply;
-	}
-
-	.placeholder::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: repeating-linear-gradient(
-			0deg,
-			transparent,
-			transparent 4px,
-			rgba(0, 0, 0, 0.015) 4px,
-			rgba(0, 0, 0, 0.015) 8px
-		);
-	}
-
-	.initials {
-		font-size: 2.5rem;
-		font-weight: 600;
-		color: rgba(80, 80, 70, 0.6);
-		letter-spacing: 0.05em;
-		font-family: 'IBM Plex Mono', monospace;
-		z-index: 1;
-		mix-blend-mode: multiply;
-	}
-
 	.info {
 		padding: 1.25rem;
 		background: rgba(220, 220, 200, 0.4);
