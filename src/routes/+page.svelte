@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import CohortCard from '$lib/components/CohortCard.svelte';
+	import DavidPowellPhoto from '$lib/assets/david-powell.png';
 
 	type CohortMember = {
 		name: string;
 		pageSlug: string;
-		photoUrl: string;
+		photo?: string;
 		description?: string;
 		mediaType?: 'video' | 'image';
 		mediaUrl?: string;
@@ -52,7 +53,6 @@
 		{
 			name: 'Aadi Kulkarni',
 			pageSlug: 'aadi-kulkarni',
-			photoUrl: 'https://i.pravatar.cc/400?img=12',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
@@ -60,28 +60,24 @@
 		{
 			name: 'Alex Pedori',
 			pageSlug: 'alex-pedori',
-			photoUrl: 'https://i.pravatar.cc/400?img=33',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/alex/900/600'
 		},
 		{
 			name: 'Alexandra Ciocanel',
 			pageSlug: 'alexandra-ciocanel',
-			photoUrl: 'https://i.pravatar.cc/400?img=47',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/800/1200'
 		},
 		{
 			name: 'Asil Sidahmed',
 			pageSlug: 'asil-sidahmed',
-			photoUrl: 'https://i.pravatar.cc/400?img=27',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/asil/1000/1400'
 		},
 		{
 			name: 'Chris Owen',
 			pageSlug: 'chris-owen',
-			photoUrl: 'https://i.pravatar.cc/400?img=15',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&autoplay=1&mute=1&controls=0'
@@ -89,28 +85,25 @@
 		{
 			name: 'Connor Dunlop',
 			pageSlug: 'connordunlop',
-			photoUrl: 'https://i.pravatar.cc/400?img=51',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/connor/800/1000'
 		},
 		{
 			name: 'David Powell',
 			pageSlug: 'david-powell',
-			photoUrl: 'https://i.pravatar.cc/400?img=13',
+			photo: DavidPowellPhoto,
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/david/900/1200'
 		},
 		{
 			name: 'Davit Jintcharadze',
 			pageSlug: 'davit-jintcharadze',
-			photoUrl: 'https://i.pravatar.cc/400?img=60',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/davit/1200/800'
 		},
 		{
 			name: 'Emily Mayhew',
 			pageSlug: 'emily-mayhew',
-			photoUrl: 'https://i.pravatar.cc/400?img=44',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
@@ -118,28 +111,24 @@
 		{
 			name: 'Fatima Sarah Khalid',
 			pageSlug: 'fatima-sarah-khalid',
-			photoUrl: 'https://i.pravatar.cc/400?img=45',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/fatima/700/1000'
 		},
 		{
 			name: 'Francesca Galli',
 			pageSlug: 'francesca-galli',
-			photoUrl: 'https://i.pravatar.cc/400?img=48',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/francesca/1000/600'
 		},
 		{
 			name: "Fred O'Brien",
 			pageSlug: 'frederick-obrien',
-			photoUrl: 'https://i.pravatar.cc/400?img=52',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/fred/800/1100'
 		},
 		{
 			name: 'Gamithra Marga',
 			pageSlug: 'gamithra-marga',
-			photoUrl: 'https://i.pravatar.cc/400?img=31',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
@@ -147,28 +136,24 @@
 		{
 			name: 'Huda Abdirahim',
 			pageSlug: 'huda-abdirahim',
-			photoUrl: 'https://i.pravatar.cc/400?img=38',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/huda/950/700'
 		},
 		{
 			name: 'Jamie Coombes',
 			pageSlug: 'jamie-coombes',
-			photoUrl: 'https://i.pravatar.cc/400?img=56',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/jamie/1100/900'
 		},
 		{
 			name: 'Martina Orlea',
 			pageSlug: 'martina-orlea',
-			photoUrl: 'https://i.pravatar.cc/400?img=49',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/martina/600/900'
 		},
 		{
 			name: 'Nick Botti',
 			pageSlug: 'nick-botti',
-			photoUrl: 'https://i.pravatar.cc/400?img=59',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
@@ -176,7 +161,6 @@
 		{
 			name: 'Tuna Acisu',
 			pageSlug: 'tuna-acisu',
-			photoUrl: 'https://i.pravatar.cc/400?img=32',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/tuna/850/1300'
 		}
@@ -227,7 +211,7 @@
 						name={human.name}
 						pageSlug={human.pageSlug}
 						description={human.description ?? 'Newspeak House Fellowship Candidate'}
-						photoUrl={human.photoUrl}
+						photo={human.photo}
 					/>
 				</button>
 			{/each}
@@ -255,9 +239,9 @@
 	{#if selectedPerson}
 		<div class="side-panel">
 			<div class="cohort-profile">
-				{#if selectedPerson.photoUrl}
+				{#if selectedPerson.photo}
 					<div class="photo-clip">
-						<img src={selectedPerson.photoUrl} alt={selectedPerson.name} class="panel-photo" />
+						<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
 						<div class="clip-top"></div>
 						<div class="clip-bottom"></div>
 					</div>

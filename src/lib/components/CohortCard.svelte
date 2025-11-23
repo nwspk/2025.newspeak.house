@@ -1,12 +1,13 @@
 <script lang="ts">
+	import genericPersonImg from '../assets/generic-person.png';
 	interface Props {
 		name: string;
 		pageSlug: string | null;
 		description?: string;
-		photoUrl?: string;
+		photo?: string;
 	}
 
-	let { name, pageSlug, description, photoUrl }: Props = $props();
+	let { name, pageSlug, description, photo }: Props = $props();
 
 	// Generate placeholder image with initials
 	const initials = name
@@ -19,12 +20,10 @@
 
 <div class="card" class:inactive={!pageSlug}>
 	<div class="photo-container">
-		{#if photoUrl}
-			<img src={photoUrl} alt={name} />
+		{#if photo}
+			<img src={photo} alt={name} />
 		{:else}
-			<div class="placeholder">
-				<span class="initials">{initials}</span>
-			</div>
+			<img src={genericPersonImg} alt={'Generic image of a person'} />
 		{/if}
 	</div>
 	<div class="info">
@@ -101,7 +100,10 @@
 		filter: grayscale(100%) contrast(1.3) brightness(0.85) sepia(0.25);
 		mix-blend-mode: multiply;
 		opacity: 0.95;
-		transition: filter 0.3s ease, mix-blend-mode 0.3s ease, opacity 0.3s ease;
+		transition:
+			filter 0.3s ease,
+			mix-blend-mode 0.3s ease,
+			opacity 0.3s ease;
 	}
 
 	.card:hover .photo-container img {
@@ -113,7 +115,8 @@
 	.placeholder {
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(
+		background:
+			linear-gradient(
 				135deg,
 				transparent 0%,
 				transparent 45%,
