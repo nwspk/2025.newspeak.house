@@ -2,12 +2,21 @@
 	import { onMount } from 'svelte';
 	import CohortCard from '$lib/components/CohortCard.svelte';
 
-	let selectedPerson = $state<(typeof cohort)[0] | null>(null);
+	type CohortMember = {
+		name: string;
+		pageSlug: string;
+		photoUrl: string;
+		description?: string;
+		mediaType?: 'video' | 'image';
+		mediaUrl?: string;
+	};
+
+	let selectedPerson = $state<CohortMember | null>(null);
 	let mouseX = $state(0);
 	let mouseY = $state(0);
 	let time = $state(0);
 
-	function openPanel(person: (typeof cohort)[0]) {
+	function openPanel(person: CohortMember) {
 		selectedPerson = person;
 		document.body.style.overflow = 'hidden';
 	}
@@ -39,19 +48,18 @@
 		};
 	});
 
-	const cohort = [
+	const cohort: CohortMember[] = [
 		{
 			name: 'Aadi Kulkarni',
 			pageSlug: 'aadi-kulkarni',
-			description: 'Building tools for collective intelligence and decision-making',
 			photoUrl: 'https://i.pravatar.cc/400?img=12',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			mediaUrl:
+				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Alex Pedori',
 			pageSlug: 'alex-pedori',
-			description: 'Researching algorithmic accountability in public services',
 			photoUrl: 'https://i.pravatar.cc/400?img=33',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/alex/900/600'
@@ -59,7 +67,6 @@
 		{
 			name: 'Alexandra Ciocanel',
 			pageSlug: 'alexandra-ciocanel',
-			description: 'Exploring digital rights and data governance frameworks',
 			photoUrl: 'https://i.pravatar.cc/400?img=47',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/800/1200'
@@ -67,7 +74,6 @@
 		{
 			name: 'Asil Sidahmed',
 			pageSlug: 'asil-sidahmed',
-			description: 'Designing public interest campaigns and programmes',
 			photoUrl: 'https://i.pravatar.cc/400?img=27',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/asil/1000/1400'
@@ -75,15 +81,14 @@
 		{
 			name: 'Chris Owen',
 			pageSlug: 'chris-owen',
-			description: 'Working on civic technology and open data initiatives',
 			photoUrl: 'https://i.pravatar.cc/400?img=15',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&autoplay=1&mute=1&controls=0'
+			mediaUrl:
+				'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&autoplay=1&mute=1&controls=0'
 		},
 		{
 			name: 'Connor Dunlop',
 			pageSlug: 'connordunlop',
-			description: 'Developing platforms for community organizing',
 			photoUrl: 'https://i.pravatar.cc/400?img=51',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/connor/800/1000'
@@ -91,7 +96,6 @@
 		{
 			name: 'David Powell',
 			pageSlug: 'david-powell',
-			description: 'Investigating AI governance and policy frameworks',
 			photoUrl: 'https://i.pravatar.cc/400?img=13',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/david/900/1200'
@@ -99,7 +103,6 @@
 		{
 			name: 'Davit Jintcharadze',
 			pageSlug: 'davit-jintcharadze',
-			description: 'Creating tools for democratic participation',
 			photoUrl: 'https://i.pravatar.cc/400?img=60',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/davit/1200/800'
@@ -107,15 +110,14 @@
 		{
 			name: 'Emily Mayhew',
 			pageSlug: 'emily-mayhew',
-			description: 'Studying digital infrastructure and urban systems',
 			photoUrl: 'https://i.pravatar.cc/400?img=44',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			mediaUrl:
+				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Fatima Sarah Khalid',
 			pageSlug: 'fatima-sarah-khalid',
-			description: 'Analyzing surveillance technologies and civil liberties',
 			photoUrl: 'https://i.pravatar.cc/400?img=45',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/fatima/700/1000'
@@ -123,7 +125,6 @@
 		{
 			name: 'Francesca Galli',
 			pageSlug: 'francesca-galli',
-			description: 'Building networks for tech policy advocacy',
 			photoUrl: 'https://i.pravatar.cc/400?img=48',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/francesca/1000/600'
@@ -131,7 +132,6 @@
 		{
 			name: "Fred O'Brien",
 			pageSlug: 'frederick-obrien',
-			description: 'Writing about technology, culture, and institutions',
 			photoUrl: 'https://i.pravatar.cc/400?img=52',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/fred/800/1100'
@@ -139,15 +139,14 @@
 		{
 			name: 'Gamithra Marga',
 			pageSlug: 'gamithra-marga',
-			description: 'Designing systems for public accountability',
 			photoUrl: 'https://i.pravatar.cc/400?img=31',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			mediaUrl:
+				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Huda Abdirahim',
 			pageSlug: 'huda-abdirahim',
-			description: 'Researching digital identity and migration tech',
 			photoUrl: 'https://i.pravatar.cc/400?img=38',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/huda/950/700'
@@ -155,7 +154,6 @@
 		{
 			name: 'Jamie Coombes',
 			pageSlug: 'jamie-coombes',
-			description: 'Developing open source civic infrastructure',
 			photoUrl: 'https://i.pravatar.cc/400?img=56',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/jamie/1100/900'
@@ -163,7 +161,6 @@
 		{
 			name: 'Martina Orlea',
 			pageSlug: 'martina-orlea',
-			description: 'Exploring decentralized governance models',
 			photoUrl: 'https://i.pravatar.cc/400?img=49',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/martina/600/900'
@@ -171,15 +168,14 @@
 		{
 			name: 'Nick Botti',
 			pageSlug: 'nick-botti',
-			description: 'Building tools for transparency in government',
 			photoUrl: 'https://i.pravatar.cc/400?img=59',
 			mediaType: 'video',
-			mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			mediaUrl:
+				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Tuna Acisu',
 			pageSlug: 'tuna-acisu',
-			description: 'Investigating platform governance and digital labor',
 			photoUrl: 'https://i.pravatar.cc/400?img=32',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/tuna/850/1300'
@@ -197,7 +193,8 @@
 					<h1>London College of Political Technology<br />2025/26 cohort</h1>
 					<p class="mission-statement">
 						Mid-career technologists developing a holistic understanding of the civic landscape in
-						the UK and beyond, to found groundbreaking projects or seek strategic positions in key institutions.
+						the UK and beyond, to found groundbreaking projects or seek strategic positions in key
+						institutions.
 					</p>
 					<div class="meta">
 						<span class="label">STATUS:</span>
@@ -229,7 +226,7 @@
 					<CohortCard
 						name={human.name}
 						pageSlug={human.pageSlug}
-						description={human.description}
+						description={human.description ?? 'Newspeak House Fellowship Candidate'}
 						photoUrl={human.photoUrl}
 					/>
 				</button>
@@ -238,7 +235,19 @@
 
 		<div class="footer">
 			<p>
-				Visit the <a href="https://newspeak.house" class="hero-link" target="_blank" rel="noopener noreferrer">Newspeak House website</a> and join us for the next <a href="https://newspeak.house/events" class="hero-link" target="_blank" rel="noopener noreferrer">Ration Club</a>.
+				Visit the <a
+					href="https://newspeak.house"
+					class="hero-link"
+					target="_blank"
+					rel="noopener noreferrer">Newspeak House website</a
+				>
+				and join us for the next
+				<a
+					href="https://newspeak.house/events"
+					class="hero-link"
+					target="_blank"
+					rel="noopener noreferrer">Ration Club</a
+				>.
 			</p>
 		</div>
 	</div>
@@ -304,7 +313,8 @@
 		width: 100%;
 		height: 100%;
 		z-index: -1;
-		background: radial-gradient(
+		background:
+			radial-gradient(
 				circle at calc(var(--mouse-x) * 100%) calc(var(--mouse-y) * 100%),
 				rgba(232, 232, 220, 0.8) 0%,
 				rgba(220, 220, 208, 0.6) 30%,
@@ -321,12 +331,7 @@
 				rgba(180, 180, 160, 0.2) 0%,
 				transparent 50%
 			),
-			linear-gradient(
-				to bottom,
-				#d8d8cc 0%,
-				#ccccc0 50%,
-				#c0c0b4 100%
-			);
+			linear-gradient(to bottom, #d8d8cc 0%, #ccccc0 50%, #c0c0b4 100%);
 		transition: background 0.3s ease;
 	}
 
