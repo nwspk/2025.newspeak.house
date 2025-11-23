@@ -16,7 +16,6 @@
 	let selectedPerson = $state<CohortMember | null>(null);
 	let mouseX = $state(0);
 	let mouseY = $state(0);
-	let time = $state(0);
 	let profileContent = $state<any>(null);
 
 	async function openPanel(person: CohortMember) {
@@ -49,17 +48,8 @@
 
 		window.addEventListener('mousemove', handleMouseMove);
 
-		// Animate background
-		let animationFrame: number;
-		const animate = () => {
-			time += 0.001;
-			animationFrame = requestAnimationFrame(animate);
-		};
-		animate();
-
 		return () => {
 			window.removeEventListener('mousemove', handleMouseMove);
-			cancelAnimationFrame(animationFrame);
 		};
 	});
 
@@ -130,7 +120,7 @@
 	];
 </script>
 
-<div class="background" style="--mouse-x: {mouseX}; --mouse-y: {mouseY}; --time: {time};"></div>
+<div class="background" style="--mouse-x: {mouseX}; --mouse-y: {mouseY};"></div>
 
 <div class="page-wrapper" class:panel-open={selectedPerson}>
 	<div class="main-content">
@@ -265,23 +255,22 @@
 		background:
 			radial-gradient(
 				circle at calc(var(--mouse-x) * 100%) calc(var(--mouse-y) * 100%),
-				rgba(232, 232, 220, 0.8) 0%,
-				rgba(220, 220, 208, 0.6) 30%,
-				rgba(208, 208, 196, 0.4) 60%,
+				rgba(232, 232, 220, 0.95) 0%,
+				rgba(220, 220, 208, 0.7) 25%,
+				rgba(208, 208, 196, 0.5) 50%,
 				transparent 100%
 			),
 			radial-gradient(
-				ellipse at calc(30% + var(--time) * 20%) calc(70% - var(--time) * 15%),
+				ellipse at 35% 65%,
 				rgba(200, 200, 180, 0.3) 0%,
 				transparent 50%
 			),
 			radial-gradient(
-				ellipse at calc(70% - var(--time) * 25%) calc(30% + var(--time) * 20%),
+				ellipse at 65% 35%,
 				rgba(180, 180, 160, 0.2) 0%,
 				transparent 50%
 			),
 			linear-gradient(to bottom, #d8d8cc 0%, #ccccc0 50%, #c0c0b4 100%);
-		transition: background 0.3s ease;
 	}
 
 	.background::before {
