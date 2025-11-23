@@ -101,6 +101,13 @@
 		filter: grayscale(100%) contrast(1.3) brightness(0.85) sepia(0.25);
 		mix-blend-mode: multiply;
 		opacity: 0.95;
+		transition: filter 0.3s ease, mix-blend-mode 0.3s ease, opacity 0.3s ease;
+	}
+
+	.card:hover .photo-container img {
+		filter: none;
+		mix-blend-mode: normal;
+		opacity: 1;
 	}
 
 	.placeholder {
