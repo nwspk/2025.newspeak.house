@@ -10,6 +10,7 @@
 		description?: string;
 		mediaType?: 'video' | 'image';
 		mediaUrl?: string;
+		mediaAltText?: string;
 	};
 
 	let selectedPerson = $state<CohortMember | null>(null);
@@ -64,108 +65,67 @@
 
 	const cohort: CohortMember[] = [
 		{
-			name: 'Aadi Kulkarni',
-			mediaType: 'video',
-			mediaUrl:
-				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			name: 'Aadi Kulkarni'
 		},
 		{
-			name: 'Alex Pedori',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/alex/900/600'
+			name: 'Alex Pedori'
 		},
 		{
 			name: 'Alexandra Ciocanel',
-			profileSlug: 'alexandra-ciocanel',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/800/1200'
+			profileSlug: 'alexandra-ciocanel'
 		},
 		{
 			name: 'Asil Sidahmed',
-			profileSlug: 'asil-sidahmed',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/asil/1000/1400'
+			profileSlug: 'asil-sidahmed'
 		},
 		{
 			name: 'Chris Owen',
-			profileSlug: 'chris-owen',
-			mediaType: 'video',
-			mediaUrl:
-				'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&autoplay=1&mute=1&controls=0'
+			profileSlug: 'chris-owen'
 		},
 		{
 			name: 'Connor Dunlop',
-			profileSlug: 'connordunlop',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/connor/800/1000'
+			profileSlug: 'connordunlop'
 		},
 		{
 			name: 'David Powell',
 			profileSlug: 'david-powell',
-			photo: DavidPowellPhoto,
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/david/900/1200'
+			photo: DavidPowellPhoto
 		},
 		{
-			name: 'Davit Jintcharadze',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/davit/1200/800'
+			name: 'Davit Jintcharadze'
 		},
 		{
-			name: 'Emily Mayhew',
-			mediaType: 'video',
-			mediaUrl:
-				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			name: 'Emily Mayhew'
 		},
 		{
-			name: 'Fatima Sarah Khalid',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/fatima/700/1000'
+			name: 'Fatima Sarah Khalid'
 		},
 		{
-			name: 'Francesca Galli',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/francesca/1000/600'
+			name: 'Francesca Galli'
 		},
 		{
 			name: "Fred O'Brien",
-			profileSlug: 'frederick-obrien',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/fred/800/1100'
+			profileSlug: 'frederick-obrien'
 		},
 		{
-			name: 'Gamithra Marga',
-			mediaType: 'video',
-			mediaUrl:
-				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			name: 'Gamithra Marga'
 		},
 		{
-			name: 'Huda Abdirahim',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/huda/950/700'
+			name: 'Huda Abdirahim'
 		},
 		{
-			name: 'Jamie Coombes',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/jamie/1100/900'
+			name: 'Jamie Coombes'
 		},
 		{
 			name: 'Martina Orlea',
-			profileSlug: 'martina-orlea',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/martina/600/900'
+			profileSlug: 'martina-orlea'
 		},
 		{
-			name: 'Nick Botti',
-			mediaType: 'video',
-			mediaUrl:
-				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
+			name: 'Nick Botti'
 		},
 		{
 			name: 'Tuna Acisu',
-			profileSlug: 'tuna-acisu',
-			mediaType: 'image',
-			mediaUrl: 'https://picsum.photos/seed/tuna/850/1300'
+			profileSlug: 'tuna-acisu'
 		}
 	];
 </script>
@@ -265,26 +225,31 @@
 				</div>
 			</div>
 
-			{#if selectedPerson.mediaType}
-				<div class="media-showcase">
-					<div class="media-label">///</div>
-					{#if selectedPerson.mediaType === 'video'}
-						<div class="video-container">
-							<iframe
-								src={selectedPerson.mediaUrl}
-								title="Video content"
-								frameborder="0"
-								allow="autoplay; encrypted-media"
-								allowfullscreen
-							></iframe>
-						</div>
-					{:else if selectedPerson.mediaType === 'image'}
-						<div class="image-showcase">
-							<img src={selectedPerson.mediaUrl} alt="Showcase content" />
-						</div>
-					{/if}
-				</div>
-			{/if}
+			<div class="media-showcase">
+				<div class="media-label">///</div>
+				{#if selectedPerson.mediaType === 'video'}
+					<div class="video-container">
+						<iframe
+							src={selectedPerson.mediaUrl}
+							title="Video content"
+							frameborder="0"
+							allow="autoplay; encrypted-media"
+							allowfullscreen
+						></iframe>
+					</div>
+				{:else if selectedPerson.mediaType === 'image'}
+					<div class="image-showcase">
+						<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
+					</div>
+				{:else}
+					<div class="image-showcase">
+						<img
+							src={'https://picsum.photos/seed/davit/1200/800'}
+							alt="Autumnal leaves on the ground"
+						/>
+					</div>
+				{/if}
+			</div>
 		</div>
 	{/if}
 </div>
