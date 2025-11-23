@@ -5,7 +5,7 @@
 
 	type CohortMember = {
 		name: string;
-		pageSlug: string;
+		profileSlug?: string;
 		photo?: string;
 		description?: string;
 		mediaType?: 'video' | 'image';
@@ -16,14 +16,27 @@
 	let mouseX = $state(0);
 	let mouseY = $state(0);
 	let time = $state(0);
+	let profileContent = $state<any>(null);
 
-	function openPanel(person: CohortMember) {
+	async function openPanel(person: CohortMember) {
 		selectedPerson = person;
 		document.body.style.overflow = 'hidden';
+
+		const slug = person.profileSlug ?? 'profile-under-construction';
+
+		// Load the markdown content for this person
+		try {
+			const module = await import(`$lib/cohort-profiles/${slug}.md`);
+			profileContent = module.default;
+		} catch (error) {
+			console.error(`Failed to load profile for ${slug}:`, error);
+			profileContent = null;
+		}
 	}
 
 	function closePanel() {
 		selectedPerson = null;
+		profileContent = null;
 		document.body.style.overflow = '';
 	}
 
@@ -52,115 +65,105 @@
 	const cohort: CohortMember[] = [
 		{
 			name: 'Aadi Kulkarni',
-			pageSlug: 'aadi-kulkarni',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Alex Pedori',
-			pageSlug: 'alex-pedori',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/alex/900/600'
 		},
 		{
 			name: 'Alexandra Ciocanel',
-			pageSlug: 'alexandra-ciocanel',
+			profileSlug: 'alexandra-ciocanel',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/800/1200'
 		},
 		{
 			name: 'Asil Sidahmed',
-			pageSlug: 'asil-sidahmed',
+			profileSlug: 'asil-sidahmed',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/asil/1000/1400'
 		},
 		{
 			name: 'Chris Owen',
-			pageSlug: 'chris-owen',
+			profileSlug: 'chris-owen',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&autoplay=1&mute=1&controls=0'
 		},
 		{
 			name: 'Connor Dunlop',
-			pageSlug: 'connordunlop',
+			profileSlug: 'connordunlop',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/connor/800/1000'
 		},
 		{
 			name: 'David Powell',
-			pageSlug: 'david-powell',
+			profileSlug: 'david-powell',
 			photo: DavidPowellPhoto,
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/david/900/1200'
 		},
 		{
 			name: 'Davit Jintcharadze',
-			pageSlug: 'davit-jintcharadze',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/davit/1200/800'
 		},
 		{
 			name: 'Emily Mayhew',
-			pageSlug: 'emily-mayhew',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Fatima Sarah Khalid',
-			pageSlug: 'fatima-sarah-khalid',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/fatima/700/1000'
 		},
 		{
 			name: 'Francesca Galli',
-			pageSlug: 'francesca-galli',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/francesca/1000/600'
 		},
 		{
 			name: "Fred O'Brien",
-			pageSlug: 'frederick-obrien',
+			profileSlug: 'frederick-obrien',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/fred/800/1100'
 		},
 		{
 			name: 'Gamithra Marga',
-			pageSlug: 'gamithra-marga',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Huda Abdirahim',
-			pageSlug: 'huda-abdirahim',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/huda/950/700'
 		},
 		{
 			name: 'Jamie Coombes',
-			pageSlug: 'jamie-coombes',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/jamie/1100/900'
 		},
 		{
 			name: 'Martina Orlea',
-			pageSlug: 'martina-orlea',
+			profileSlug: 'martina-orlea',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/martina/600/900'
 		},
 		{
 			name: 'Nick Botti',
-			pageSlug: 'nick-botti',
 			mediaType: 'video',
 			mediaUrl:
 				'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&controls=0&loop=1&playlist=dQw4w9WgXcQ'
 		},
 		{
 			name: 'Tuna Acisu',
-			pageSlug: 'tuna-acisu',
+			profileSlug: 'tuna-acisu',
 			mediaType: 'image',
 			mediaUrl: 'https://picsum.photos/seed/tuna/850/1300'
 		}
@@ -209,7 +212,6 @@
 				<button class="card-button" onclick={() => openPanel(human)}>
 					<CohortCard
 						name={human.name}
-						pageSlug={human.pageSlug}
 						description={human.description ?? 'Newspeak House Fellowship Candidate'}
 						photo={human.photo}
 					/>
@@ -249,18 +251,16 @@
 				<button class="close-button" onclick={closePanel}>✕</button>
 				<div class="panel-content">
 					<h2>{selectedPerson.name}</h2>
-					<p class="panel-description">{selectedPerson.description}</p>
+					{#if selectedPerson.description}
+						<p class="panel-description">{selectedPerson.description}</p>
+					{/if}
 
 					<div class="panel-details">
-						<p>Full profile content would load here from the markdown file...</p>
-						<p>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua.
-						</p>
-						<p>
-							Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-							ea commodo consequat.
-						</p>
+						{#if profileContent}
+							<svelte:component this={profileContent} />
+						{:else}
+							<p>Loading profile...</p>
+						{/if}
 					</div>
 				</div>
 			</div>

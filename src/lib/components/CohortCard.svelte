@@ -2,12 +2,11 @@
 	import genericPersonImg from '../assets/generic-person.png';
 	interface Props {
 		name: string;
-		pageSlug: string | null;
 		description?: string;
 		photo?: string;
 	}
 
-	let { name, pageSlug, description, photo }: Props = $props();
+	let { name, description, photo }: Props = $props();
 
 	// Generate placeholder image with initials
 	const initials = name
@@ -18,7 +17,7 @@
 		.slice(0, 2);
 </script>
 
-<div class="card" class:inactive={!pageSlug}>
+<div class="card">
 	<div class="photo-container">
 		{#if photo}
 			<img src={photo} alt={name} />
@@ -67,21 +66,6 @@
 
 	.card:hover::before {
 		transform: scaleX(1);
-	}
-
-	.card.inactive {
-		opacity: 0.45;
-		cursor: default;
-	}
-
-	.card.inactive:hover {
-		border-color: #e0e0e0;
-		transform: none;
-		box-shadow: none;
-	}
-
-	.card.inactive::before {
-		display: none;
 	}
 
 	.photo-container {
@@ -186,9 +170,5 @@
 		margin: 0.5rem 0 0 0;
 		color: #555;
 		font-weight: 400;
-	}
-
-	.card.inactive .name {
-		color: #999;
 	}
 </style>
