@@ -404,6 +404,7 @@
 
 	.panel-content {
 		padding-top: 160px;
+		padding-bottom: 1rem;
 	}
 
 	.panel-content h2 {
