@@ -3,6 +3,7 @@
 	import CohortCard from '$lib/components/CohortCard.svelte';
 	import DavidPowellPhoto from '$lib/assets/david-powell.png';
 	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
+	import FatimaSarahKhalidPhoto from '$lib/assets/fatima-sarah-khalid.png';
 
 	type CohortMember = {
 		name: string;
@@ -89,7 +90,10 @@
 			name: 'Emily Mayhew'
 		},
 		{
-			name: 'Fatima Sarah Khalid'
+			name: 'Fatima Sarah Khalid',
+			profileSlug: 'fatima-sarah-khalid',
+			photo: FatimaSarahKhalidPhoto,
+			description: '✧ ai engineer & civic hacker'
 		},
 		{
 			name: 'Francesca Galli'
