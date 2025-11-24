@@ -198,55 +198,57 @@
 
 	{#if selectedPerson}
 		<div class="side-panel">
-			<div class="cohort-profile">
-				{#if selectedPerson.photo}
-					<div class="photo-clip">
-						<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
-						<div class="clip-top"></div>
-						<div class="clip-bottom"></div>
-					</div>
-				{/if}
-				<button class="close-button" onclick={closePanel}>✕</button>
-				<div class="panel-content">
-					<h2>{selectedPerson.name}</h2>
-					{#if selectedPerson.description}
-						<p class="panel-description">{selectedPerson.description}</p>
+			<div class="side-panel-inner">
+				<div class="cohort-profile">
+					{#if selectedPerson.photo}
+						<div class="photo-clip">
+							<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
+							<div class="clip-top"></div>
+							<div class="clip-bottom"></div>
+						</div>
 					{/if}
-
-					<div class="panel-details">
-						{#if profileContent}
-							<svelte:component this={profileContent} />
-						{:else}
-							<p>Loading profile...</p>
+					<button class="close-button" onclick={closePanel}>✕</button>
+					<div class="panel-content">
+						<h2>{selectedPerson.name}</h2>
+						{#if selectedPerson.description}
+							<p class="panel-description">{selectedPerson.description}</p>
 						{/if}
+
+						<div class="panel-details">
+							{#if profileContent}
+								<svelte:component this={profileContent} />
+							{:else}
+								<p>Loading profile...</p>
+							{/if}
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div class="media-showcase">
-				<div class="media-label">///</div>
-				{#if selectedPerson.mediaType === 'video'}
-					<div class="video-container">
-						<iframe
-							src={selectedPerson.mediaUrl}
-							title="Video content"
-							frameborder="0"
-							allow="autoplay; encrypted-media"
-							allowfullscreen
-						></iframe>
-					</div>
-				{:else if selectedPerson.mediaType === 'image'}
-					<div class="image-showcase">
-						<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
-					</div>
-				{:else}
-					<div class="image-showcase">
-						<img
-							src={'https://picsum.photos/seed/davit/1200/800'}
-							alt="Autumnal leaves on the ground"
-						/>
-					</div>
-				{/if}
+				<div class="media-showcase">
+					<div class="media-label">///</div>
+					{#if selectedPerson.mediaType === 'video'}
+						<div class="video-container">
+							<iframe
+								src={selectedPerson.mediaUrl}
+								title="Video content"
+								frameborder="0"
+								allow="autoplay; encrypted-media"
+								allowfullscreen
+							></iframe>
+						</div>
+					{:else if selectedPerson.mediaType === 'image'}
+						<div class="image-showcase">
+							<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
+						</div>
+					{:else}
+						<div class="image-showcase">
+							<img
+								src={'https://picsum.photos/seed/davit/1200/800'}
+								alt="Autumnal leaves on the ground"
+							/>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -268,16 +270,8 @@
 				rgba(208, 208, 196, 0.5) 50%,
 				transparent 100%
 			),
-			radial-gradient(
-				ellipse at 35% 65%,
-				rgba(200, 200, 180, 0.3) 0%,
-				transparent 50%
-			),
-			radial-gradient(
-				ellipse at 65% 35%,
-				rgba(180, 180, 160, 0.2) 0%,
-				transparent 50%
-			),
+			radial-gradient(ellipse at 35% 65%, rgba(200, 200, 180, 0.3) 0%, transparent 50%),
+			radial-gradient(ellipse at 65% 35%, rgba(180, 180, 160, 0.2) 0%, transparent 50%),
 			linear-gradient(to bottom, #d8d8cc 0%, #ccccc0 50%, #c0c0b4 100%);
 	}
 
@@ -322,7 +316,11 @@
 		box-sizing: border-box;
 		height: calc(100vh - 100px);
 		overflow-y: auto;
+	}
+
+	.side-panel-inner {
 		display: flex;
+		min-height: 100%;
 	}
 
 	.cohort-profile {
@@ -507,16 +505,17 @@
 		.side-panel {
 			width: 100vw;
 			flex-direction: column;
+			border-left: none;
+		}
+
+		.side-panel-inner {
+			flex-direction: column;
 		}
 	}
 
 	@media (max-width: 768px) {
 		.cohort-profile {
 			padding: 2rem 1.5rem;
-		}
-
-		.page-wrapper.panel-open .side-panel {
-			left: 0;
 		}
 
 		.photo-clip {
@@ -535,8 +534,6 @@
 			border-left: none;
 			padding: 0;
 			width: 100vw;
-			margin-left: 50%;
-			transform: translateX(-50%);
 		}
 
 		.media-showcase iframe,
