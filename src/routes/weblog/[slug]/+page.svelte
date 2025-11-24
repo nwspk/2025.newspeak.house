@@ -27,7 +27,7 @@
 			<h2>{data.postTitle}</h2>
 			<div class="standfirst">{data.postStandfirst}</div>
 			<div>
-				By <a href={`/cohort/${data.postAuthorSlug}`}>{data.postAuthorName}</a>
+				By {data.postAuthorName}
 			</div>
 		</div>
 		<data.postContent />

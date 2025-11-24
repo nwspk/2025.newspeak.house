@@ -48,20 +48,19 @@
 </form>
 
 <style>
-	:root {
-		--max-width: 720px;
-		--accent: #0b72b9;
-	}
-
 	form {
 		display: grid;
-		gap: 12px;
+		gap: 1.5rem;
 	}
 
 	label {
 		display: block;
 		font-weight: 600;
-		margin-bottom: 6px;
+		margin-bottom: 0.5rem;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.85rem;
+		color: #1a1a1a;
+		letter-spacing: 0.02em;
 	}
 
 	input[type='text'],
@@ -69,61 +68,67 @@
 	textarea,
 	select {
 		width: 100%;
-		padding: 10px;
-		border: 1px solid #d7dbe0;
-		border-radius: 6px;
-		font-size: 14px;
+		padding: 0.75rem;
+		border: 2px solid rgba(26, 26, 26, 0.15);
+		background: rgba(255, 255, 255, 0.6);
+		font-size: 0.95rem;
+		font-family: 'IBM Plex Mono', monospace;
+		transition: all 0.2s ease;
+		color: #1a1a1a;
+	}
+
+	input[type='text']:focus,
+	input[type='email']:focus,
+	textarea:focus,
+	select:focus {
+		outline: none;
+		border-color: #d62828;
+		background: rgba(255, 255, 255, 0.9);
+	}
+
+	input[type='text']::placeholder,
+	input[type='email']::placeholder,
+	textarea::placeholder {
+		color: rgba(26, 26, 26, 0.4);
 	}
 
 	textarea {
 		min-height: 140px;
 		resize: vertical;
+		font-family: 'IBM Plex Mono', monospace;
 	}
 
-	.row {
-		display: flex;
-		gap: 12px;
-	}
-
-	.row > * {
-		flex: 1;
-	}
-
-	.checkboxes {
-		display: flex;
-		gap: 12px;
-		flex-wrap: wrap;
-	}
-
-	.hint {
-		font-size: 13px;
-		color: #556;
-	}
-
-	.actions {
-		display: flex;
-		gap: 8px;
-		align-items: center;
-	}
-
-	button {
-		background: var(--accent);
-		color: #fff;
-		padding: 10px 16px;
-		border-radius: 8px;
-		border: 0;
+	select {
 		cursor: pointer;
 	}
 
+	button {
+		background: #1a1a1a;
+		color: #fff;
+		padding: 0.75rem 2rem;
+		border: 2px solid #1a1a1a;
+		cursor: pointer;
+		font-family: 'IBM Plex Mono', monospace;
+		font-weight: 600;
+		font-size: 0.9rem;
+		letter-spacing: 0.05em;
+		transition: all 0.2s ease;
+		width: fit-content;
+	}
+
+	button:hover {
+		background: #d62828;
+		border-color: #d62828;
+	}
+
 	button[disabled] {
-		opacity: 0.6;
+		opacity: 0.5;
 		cursor: not-allowed;
 	}
 
-	.secondary {
-		background: #eef3f8;
-		color: var(--accent);
-		border: 1px solid #d8e8fb;
+	button[disabled]:hover {
+		background: #1a1a1a;
+		border-color: #1a1a1a;
 	}
 
 	.sr-only {

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Crimson+Pro:wght@400;600;700;900&family=Stack+Sans+Notch:wght@200..700&display=swap');
 
 @font-face {
 	font-family: 'Chalk';
@@ -21,16 +21,42 @@ p {
 }
 
 body {
-	font-family: 'Space Grotesk', sans-serif;
-	font-size: 1.2rem;
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 0.95rem;
+	background: #d0d0c4;
+	color: #1a1a1a;
+	line-height: 1.65;
 }
 
 a {
-	color: hsl(245, 42%, 43%);
+	color: #1a1a1a;
+	text-decoration: none;
 }
 
 a:hover {
+	color: #d62828;
+}
+
+a[href^="http"]::after,
+a[target="_blank"]::after {
+	content: ' ↗';
 	opacity: 0.7;
+}
+
+a[href^="http"],
+a[target="_blank"] {
+	text-decoration: underline dotted rgba(214, 40, 40, 0.4);
+	text-underline-offset: 0.2em;
+}
+
+a[href^="http"]:hover,
+a[target="_blank"]:hover {
+	text-decoration-color: #d62828;
+}
+
+a[href^="http"]:hover::after,
+a[target="_blank"]:hover::after {
+	opacity: 1;
 }
 
 ul {
