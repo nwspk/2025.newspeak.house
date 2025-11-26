@@ -1,7 +1,7 @@
 import { form } from '$app/server';
 import * as z from 'zod';
 import { countries, reasonOptions } from './contact-options';
-import { env } from '$env/dynamic/private';
+import { MATRIX_ACCESS_TOKEN, MATRIX_HOMESERVER, MATRIX_ROOM } from '$env/static/private';
 
 const ContactFormSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
@@ -24,23 +24,6 @@ export const contactForm = form(
 	ContactFormSchema,
 	async ({ name, email, whatsApp, subject, message, reason, country }) => {
 		try {
-			// Validate environment variables
-			const MATRIX_ACCESS_TOKEN = env.MATRIX_ACCESS_TOKEN;
-			const MATRIX_HOMESERVER = env.MATRIX_HOMESERVER;
-			const MATRIX_ROOM = env.MATRIX_ROOM;
-
-			if (!MATRIX_ACCESS_TOKEN || !MATRIX_HOMESERVER || !MATRIX_ROOM) {
-				console.error('Missing Matrix environment variables:', {
-					hasToken: !!MATRIX_ACCESS_TOKEN,
-					hasServer: !!MATRIX_HOMESERVER,
-					hasRoom: !!MATRIX_ROOM
-				});
-				return {
-					success: false,
-					error: 'Server configuration error. Please contact support directly.'
-				};
-			}
-
 			function escapeHtml(str: string): string {
 				return str
 					.replace(/&/g, '&amp;')
@@ -118,8 +101,7 @@ export const contactForm = form(
 				format: 'org.matrix.custom.html',
 				formatted_body: htmlBody
 			});
-			
-			console.log('Contact form submitted successfully:', {
+			console.log('Contact form submitted:', {
 				name,
 				email,
 				whatsApp,
@@ -128,16 +110,10 @@ export const contactForm = form(
 				reason,
 				country
 			});
-
-			return {
-				success: true
-			};
 		} catch (error) {
 			console.error('Contact form submission error:', error);
-			return {
-				success: false,
-				error: error instanceof Error ? error.message : 'An unexpected error occurred. Please try again or contact support directly.'
-			};
+			// Re-throw to let SvelteKit handle it properly
+			throw error;
 		}
 	}
 );
