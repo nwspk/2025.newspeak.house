@@ -6,10 +6,6 @@
 </script>
 
 <form {...contactForm}>
-	<p class="error-note">
-		We are currently experiencing technical issues (500 errors on submit) with the contact form.
-		Please email `sugaroverflow@gmail.com` with your request as we look into this. Thank you!
-	</p>
 	<label>
 		Name
 		<input {...name.as('text')} type="text" />
@@ -145,6 +141,18 @@
 		padding: 0.75rem;
 		background: rgba(214, 40, 40, 0.1);
 		border-left: 3px solid #d62828;
+	}
+
+	.success-note {
+		font-size: 0.9rem;
+		color: #1a5f1a;
+		font-family: 'IBM Plex Mono', monospace;
+		line-height: 1.5;
+		margin-bottom: 0.5rem;
+		font-weight: 600;
+		padding: 0.75rem;
+		background: rgba(26, 95, 26, 0.1);
+		border-left: 3px solid #1a5f1a;
 	}
 
 	.sr-only {
