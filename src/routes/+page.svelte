@@ -313,15 +313,15 @@
 	.side-panel {
 		position: fixed;
 		right: 0;
-		top: 100px;
+		top: 96px;
 		width: 60vw;
 		background: rgba(232, 232, 220, 0.98);
 		backdrop-filter: blur(20px);
 		border-left: 3px solid #d62828;
 		transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 		box-sizing: border-box;
-		height: calc(100vh - 100px);
-		overflow-y: auto;
+		height: calc(100vh - 96px);
+		overflow: hidden;
 		display: flex;
 	}
 
@@ -329,6 +329,8 @@
 		padding: 3rem;
 		position: relative;
 		flex-basis: 50%;
+		overflow-y: auto;
+		height: 100%;
 	}
 
 	.close-button {
@@ -519,6 +521,19 @@
 		.side-panel {
 			width: 100vw;
 			flex-direction: column;
+			overflow-y: auto;
+		}
+
+		.cohort-profile {
+			overflow-y: visible;
+			height: auto;
+			flex-basis: auto;
+		}
+
+		.media-showcase {
+			flex-basis: auto;
+			height: auto;
+			min-height: 50vh;
 		}
 	}
 
