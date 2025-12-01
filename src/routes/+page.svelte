@@ -3,6 +3,7 @@
 	import CohortCard from '$lib/components/CohortCard.svelte';
 	import DavidPowellPhoto from '$lib/assets/david-powell.png';
 	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
+	import GamithraMargaBg from '$lib/assets/gamithra-bg.png';
 
 	type CohortMember = {
 		name: string;
@@ -100,9 +101,12 @@
 		},
 		{
 			name: 'Gamithra Marga',
-			profileSlug: 'gamithra',
 			photo: GamithraMargaPhoto,
-			description: '☀︎ a solarpunk technologist'
+			profileSlug: 'gamithra-marga',
+			description: '☀︎ raves, machines, and dishwashers',
+			mediaType: "image",
+			mediaUrl: GamithraMargaBg,
+			mediaAltText: 'gamithra holding a little drink'
 		},
 		{
 			name: 'Huda Abdirahim'
@@ -485,6 +489,18 @@
 		font-size: 0.95rem;
 		line-height: 1.7;
 		color: #333;
+	}
+
+	.panel-details :global(a) {
+		color: #d62828;
+		text-decoration: underline;
+		text-decoration-color: rgba(214, 40, 40, 0.4);
+		text-underline-offset: 2px;
+		transition: text-decoration-color 0.2s ease;
+	}
+
+	.panel-details :global(a:hover) {
+		text-decoration-color: #d62828;
 	}
 
 	.card-button {
