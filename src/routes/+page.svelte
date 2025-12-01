@@ -197,8 +197,12 @@
 	</div>
 
 	{#if selectedPerson}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="panel-overlay" onclick={closePanel}></div>
 		<div class="side-panel">
 			<div class="cohort-profile">
+				<button class="close-button" onclick={closePanel}>✕</button>
 				{#if selectedPerson.photo}
 					<div class="photo-clip">
 						<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
@@ -206,7 +210,6 @@
 						<div class="clip-bottom"></div>
 					</div>
 				{/if}
-				<button class="close-button" onclick={closePanel}>✕</button>
 				<div class="panel-content">
 					<h2>{selectedPerson.name}</h2>
 					{#if selectedPerson.description}
@@ -323,24 +326,36 @@
 		height: calc(100vh - 96px);
 		overflow: hidden;
 		display: flex;
+		z-index: 100;
 	}
 
 	.cohort-profile {
-		padding: 3rem;
+		padding: 1rem 2rem 3rem 3rem;
 		position: relative;
 		flex-basis: 50%;
 		overflow-y: auto;
 		height: 100%;
 	}
 
+	.panel-overlay {
+		position: fixed;
+		top: 96px;
+		left: 0;
+		width: 100%;
+		height: calc(100vh - 96px);
+		background: rgba(0, 0, 0, 0.3);
+		z-index: 99;
+		cursor: pointer;
+	}
+
 	.close-button {
-		position: absolute;
-		top: 2rem;
-		right: 2rem;
+		position: sticky;
+		top: 1rem;
+		float: right;
 		width: 40px;
 		height: 40px;
 		border: 2px solid #1a1a1a;
-		background: rgba(255, 255, 255, 0.8);
+		background: rgba(255, 255, 255, 0.95);
 		color: #1a1a1a;
 		font-size: 1.5rem;
 		cursor: pointer;
@@ -349,6 +364,7 @@
 		align-items: center;
 		justify-content: center;
 		font-family: 'IBM Plex Mono', monospace;
+		z-index: 10;
 	}
 
 	.close-button:hover {
