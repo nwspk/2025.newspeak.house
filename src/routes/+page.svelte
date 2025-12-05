@@ -68,7 +68,8 @@
 			name: 'Alex Pedori',
 			photo: AlessandroPedoriPhoto,
 			description:
-				'Engineer-life-coach integrating AI, coaching and facilitation to empower human flourishing'
+				'Engineer-life-coach integrating AI, coaching and facilitation to empower human flourishing',
+			profileSlug: 'alex-pedori'
 		},
 		{
 			name: 'Alexandra Ciocanel',
@@ -102,7 +103,8 @@
 		{
 			name: 'Emily Mayhew',
 			photo: EmilyMayhewPhoto,
-			description: 'Making policy at the AI/Creative Industries intersection'
+			description: 'Making policy at the AI/Creative Industries intersection',
+			profileSlug: 'emily-mayhew'
 		},
 		{
 			name: 'Fatima Sarah Khalid',
@@ -113,7 +115,8 @@
 		{
 			name: 'Francesca Galli',
 			photo: FrancescaGalliPhoto,
-			description: 'Analyst-writer-artist exploring how technology can further civic engagement'
+			description: 'Analyst-writer-artist exploring how technology can further civic engagement',
+			profileSlug: 'francesca-galli'
 		},
 		{
 			name: "Fred O'Brien",
