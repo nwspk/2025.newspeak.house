@@ -4,6 +4,11 @@
 	import DavidPowellPhoto from '$lib/assets/david-powell.png';
 	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
 	import FatimaSarahKhalidPhoto from '$lib/assets/fatima-sarah-khalid.png';
+	import AlessandroPedoriPhoto from '$lib/assets/alessandro-pedori.jpg';
+	import AlexandraCiocanelPhoto from '$lib/assets/alexandra-ciocanel.jpg';
+	import ConnorDunlopPhoto from '$lib/assets/connor-dunlop.jpg';
+	import EmilyMayhewPhoto from '$lib/assets/emily-mayhew.jpg';
+	import FrancescaGalliPhoto from '$lib/assets/francesca-galli.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -60,11 +65,17 @@
 			name: 'Aadi Kulkarni'
 		},
 		{
-			name: 'Alex Pedori'
+			name: 'Alex Pedori',
+			photo: AlessandroPedoriPhoto,
+			description:
+				'Engineer-life-coach integrating AI, coaching and facilitation to empower human flourishing',
+			profileSlug: 'alex-pedori'
 		},
 		{
 			name: 'Alexandra Ciocanel',
-			profileSlug: 'alexandra-ciocanel'
+			description: 'Researcher',
+			profileSlug: 'alexandra-ciocanel',
+			photo: AlexandraCiocanelPhoto
 		},
 		{
 			name: 'Asil Sidahmed',
@@ -76,10 +87,13 @@
 		},
 		{
 			name: 'Connor Dunlop',
-			profileSlug: 'connordunlop'
+			description: 'Building technical governance solutions to increase verifiability in AI',
+			profileSlug: 'connordunlop',
+			photo: ConnorDunlopPhoto
 		},
 		{
 			name: 'David Powell',
+			description: 'Building technology for humans',
 			profileSlug: 'david-powell',
 			photo: DavidPowellPhoto
 		},
@@ -87,7 +101,10 @@
 			name: 'Davit Jintcharadze'
 		},
 		{
-			name: 'Emily Mayhew'
+			name: 'Emily Mayhew',
+			photo: EmilyMayhewPhoto,
+			description: 'Making policy at the AI/Creative Industries intersection',
+			profileSlug: 'emily-mayhew'
 		},
 		{
 			name: 'Fatima Sarah Khalid',
@@ -96,7 +113,10 @@
 			description: '✧ ai engineer & civic hacker'
 		},
 		{
-			name: 'Francesca Galli'
+			name: 'Francesca Galli',
+			photo: FrancescaGalliPhoto,
+			description: 'Analyst-writer-artist exploring how technology can further civic engagement',
+			profileSlug: 'francesca-galli'
 		},
 		{
 			name: "Fred O'Brien",
@@ -200,15 +220,15 @@
 		<div class="side-panel">
 			<div class="side-panel-inner">
 				<div class="cohort-profile">
-					{#if selectedPerson.photo}
-						<div class="photo-clip">
-							<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
-							<div class="clip-top"></div>
-							<div class="clip-bottom"></div>
-						</div>
-					{/if}
 					<button class="close-button" onclick={closePanel}>✕</button>
 					<div class="panel-content">
+						{#if selectedPerson.photo}
+							<div class="photo-clip">
+								<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
+								<div class="clip-top"></div>
+								<div class="clip-bottom"></div>
+							</div>
+						{/if}
 						<h2>{selectedPerson.name}</h2>
 						{#if selectedPerson.description}
 							<p class="panel-description">{selectedPerson.description}</p>
@@ -355,12 +375,9 @@
 	}
 
 	.photo-clip {
-		position: absolute;
-		top: 0.5rem;
-		left: 2rem;
 		width: 180px;
-		z-index: 10;
 		transform: rotate(-2deg);
+		margin-bottom: 1.5rem;
 	}
 
 	.panel-photo {
@@ -401,7 +418,6 @@
 	}
 
 	.panel-content {
-		padding-top: 160px;
 		padding-bottom: 1rem;
 	}
 
@@ -520,12 +536,6 @@
 
 		.photo-clip {
 			width: 140px;
-			top: 0.5rem;
-			left: 1.5rem;
-		}
-
-		.panel-content {
-			padding-top: 130px;
 		}
 
 		.media-showcase {
