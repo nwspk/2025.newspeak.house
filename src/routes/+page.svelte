@@ -66,10 +66,13 @@
 		},
 		{
 			name: 'Alex Pedori',
-			photo: AlessandroPedoriPhoto
+			photo: AlessandroPedoriPhoto,
+			description:
+				'Engineer-life-coach integrating AI, coaching and facilitation to empower human flourishing'
 		},
 		{
 			name: 'Alexandra Ciocanel',
+			description: 'Researcher',
 			profileSlug: 'alexandra-ciocanel',
 			photo: AlexandraCiocanelPhoto
 		},
@@ -83,11 +86,13 @@
 		},
 		{
 			name: 'Connor Dunlop',
+			description: 'Building technical governance solutions to increase verifiability in AI',
 			profileSlug: 'connordunlop',
 			photo: ConnorDunlopPhoto
 		},
 		{
 			name: 'David Powell',
+			description: 'Building technology for humans',
 			profileSlug: 'david-powell',
 			photo: DavidPowellPhoto
 		},
@@ -96,7 +101,8 @@
 		},
 		{
 			name: 'Emily Mayhew',
-			photo: EmilyMayhewPhoto
+			photo: EmilyMayhewPhoto,
+			description: 'Making policy at the AI/Creative Industries intersection'
 		},
 		{
 			name: 'Fatima Sarah Khalid',
@@ -106,7 +112,8 @@
 		},
 		{
 			name: 'Francesca Galli',
-			photo: FrancescaGalliPhoto
+			photo: FrancescaGalliPhoto,
+			description: 'Analyst-writer-artist exploring how technology can further civic engagement'
 		},
 		{
 			name: "Fred O'Brien",
