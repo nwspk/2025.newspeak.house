@@ -4,6 +4,11 @@
 	import DavidPowellPhoto from '$lib/assets/david-powell.png';
 	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
 	import FatimaSarahKhalidPhoto from '$lib/assets/fatima-sarah-khalid.png';
+	import AlessandroPedoriPhoto from '$lib/assets/alessandro-pedori.jpg';
+	import AlexandraCiocanelPhoto from '$lib/assets/alexandra-ciocanel.jpg';
+	import ConnorDunlopPhoto from '$lib/assets/connor-dunlop.jpg';
+	import EmilyMayhewPhoto from '$lib/assets/emily-mayhew.jpg';
+	import FrancescaGalliPhoto from '$lib/assets/francesca-galli.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -60,11 +65,13 @@
 			name: 'Aadi Kulkarni'
 		},
 		{
-			name: 'Alex Pedori'
+			name: 'Alex Pedori',
+			photo: AlessandroPedoriPhoto
 		},
 		{
 			name: 'Alexandra Ciocanel',
-			profileSlug: 'alexandra-ciocanel'
+			profileSlug: 'alexandra-ciocanel',
+			photo: AlexandraCiocanelPhoto
 		},
 		{
 			name: 'Asil Sidahmed',
@@ -76,7 +83,8 @@
 		},
 		{
 			name: 'Connor Dunlop',
-			profileSlug: 'connordunlop'
+			profileSlug: 'connordunlop',
+			photo: ConnorDunlopPhoto
 		},
 		{
 			name: 'David Powell',
@@ -87,7 +95,8 @@
 			name: 'Davit Jintcharadze'
 		},
 		{
-			name: 'Emily Mayhew'
+			name: 'Emily Mayhew',
+			photo: EmilyMayhewPhoto
 		},
 		{
 			name: 'Fatima Sarah Khalid',
@@ -96,7 +105,8 @@
 			description: '✧ ai engineer & civic hacker'
 		},
 		{
-			name: 'Francesca Galli'
+			name: 'Francesca Galli',
+			photo: FrancescaGalliPhoto
 		},
 		{
 			name: "Fred O'Brien",
