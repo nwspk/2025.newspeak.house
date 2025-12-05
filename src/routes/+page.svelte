@@ -220,15 +220,15 @@
 		<div class="side-panel">
 			<div class="side-panel-inner">
 				<div class="cohort-profile">
-					{#if selectedPerson.photo}
-						<div class="photo-clip">
-							<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
-							<div class="clip-top"></div>
-							<div class="clip-bottom"></div>
-						</div>
-					{/if}
 					<button class="close-button" onclick={closePanel}>✕</button>
 					<div class="panel-content">
+						{#if selectedPerson.photo}
+							<div class="photo-clip">
+								<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
+								<div class="clip-top"></div>
+								<div class="clip-bottom"></div>
+							</div>
+						{/if}
 						<h2>{selectedPerson.name}</h2>
 						{#if selectedPerson.description}
 							<p class="panel-description">{selectedPerson.description}</p>
@@ -375,12 +375,9 @@
 	}
 
 	.photo-clip {
-		position: absolute;
-		top: 0.5rem;
-		left: 2rem;
 		width: 180px;
-		z-index: 10;
 		transform: rotate(-2deg);
+		margin-bottom: 1.5rem;
 	}
 
 	.panel-photo {
@@ -421,7 +418,6 @@
 	}
 
 	.panel-content {
-		padding-top: 160px;
 		padding-bottom: 1rem;
 	}
 
@@ -540,12 +536,6 @@
 
 		.photo-clip {
 			width: 140px;
-			top: 0.5rem;
-			left: 1.5rem;
-		}
-
-		.panel-content {
-			padding-top: 130px;
 		}
 
 		.media-showcase {
