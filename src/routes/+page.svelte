@@ -3,6 +3,7 @@
 	import CohortCard from '$lib/components/CohortCard.svelte';
 	import DavidPowellPhoto from '$lib/assets/david-powell.png';
 	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
+	import GamithraMargaBg from '$lib/assets/gamithra-bg.png';
 	import FatimaSarahKhalidPhoto from '$lib/assets/fatima-sarah-khalid.png';
 	import AlessandroPedoriPhoto from '$lib/assets/alessandro-pedori.jpg';
 	import AlexandraCiocanelPhoto from '$lib/assets/alexandra-ciocanel.jpg';
@@ -124,9 +125,12 @@
 		},
 		{
 			name: 'Gamithra Marga',
-			profileSlug: 'gamithra',
 			photo: GamithraMargaPhoto,
-			description: '☀︎ a solarpunk technologist'
+			profileSlug: 'gamithra-marga',
+			description: '☀︎ raves, machines, and dishwashers',
+			mediaType: "image",
+			mediaUrl: GamithraMargaBg,
+			mediaAltText: 'gamithra holding a little drink'
 		},
 		{
 			name: 'Huda Abdirahim'
@@ -217,21 +221,30 @@
 	</div>
 
 	{#if selectedPerson}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="panel-overlay" onclick={closePanel}></div>
 		<div class="side-panel">
-			<div class="side-panel-inner">
-				<div class="cohort-profile">
-					<button class="close-button" onclick={closePanel}>✕</button>
-					<div class="panel-content">
-						{#if selectedPerson.photo}
-							<div class="photo-clip">
-								<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
-								<div class="clip-top"></div>
-								<div class="clip-bottom"></div>
-							</div>
-						{/if}
-						<h2>{selectedPerson.name}</h2>
-						{#if selectedPerson.description}
-							<p class="panel-description">{selectedPerson.description}</p>
+			<div class="cohort-profile">
+				<button class="close-button" onclick={closePanel}>✕</button>
+				{#if selectedPerson.photo}
+					<div class="photo-clip">
+						<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
+						<div class="clip-top"></div>
+						<div class="clip-bottom"></div>
+					</div>
+				{/if}
+				<div class="panel-content">
+					<h2>{selectedPerson.name}</h2>
+					{#if selectedPerson.description}
+						<p class="panel-description">{selectedPerson.description}</p>
+					{/if}
+
+					<div class="panel-details">
+						{#if profileContent}
+							<svelte:component this={profileContent} />
+						{:else}
+							<p>Loading profile...</p>
 						{/if}
 
 						<div class="panel-details">
@@ -327,36 +340,46 @@
 	.side-panel {
 		position: fixed;
 		right: 0;
-		top: 100px;
+		top: 96px;
 		width: 60vw;
 		background: rgba(232, 232, 220, 0.98);
 		backdrop-filter: blur(20px);
 		border-left: 3px solid #d62828;
 		transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 		box-sizing: border-box;
-		height: calc(100vh - 100px);
-		overflow-y: auto;
-	}
-
-	.side-panel-inner {
+		height: calc(100vh - 96px);
+		overflow: hidden;
 		display: flex;
-		min-height: 100%;
+		z-index: 100;
 	}
 
 	.cohort-profile {
-		padding: 3rem;
+		padding: 1rem 2rem 3rem 3rem;
 		position: relative;
 		flex-basis: 50%;
+		overflow-y: auto;
+		height: 100%;
+	}
+
+	.panel-overlay {
+		position: fixed;
+		top: 96px;
+		left: 0;
+		width: 100%;
+		height: calc(100vh - 96px);
+		background: rgba(0, 0, 0, 0.3);
+		z-index: 99;
+		cursor: pointer;
 	}
 
 	.close-button {
-		position: absolute;
-		top: 2rem;
-		right: 2rem;
+		position: sticky;
+		top: 1rem;
+		float: right;
 		width: 40px;
 		height: 40px;
 		border: 2px solid #1a1a1a;
-		background: rgba(255, 255, 255, 0.8);
+		background: rgba(255, 255, 255, 0.95);
 		color: #1a1a1a;
 		font-size: 1.5rem;
 		cursor: pointer;
@@ -365,6 +388,7 @@
 		align-items: center;
 		justify-content: center;
 		font-family: 'IBM Plex Mono', monospace;
+		z-index: 10;
 	}
 
 	.close-button:hover {
@@ -505,6 +529,18 @@
 		color: #333;
 	}
 
+	.panel-details :global(a) {
+		color: #d62828;
+		text-decoration: underline;
+		text-decoration-color: rgba(214, 40, 40, 0.4);
+		text-underline-offset: 2px;
+		transition: text-decoration-color 0.2s ease;
+	}
+
+	.panel-details :global(a:hover) {
+		text-decoration-color: #d62828;
+	}
+
 	.card-button {
 		all: unset;
 		cursor: pointer;
@@ -521,11 +557,19 @@
 		.side-panel {
 			width: 100vw;
 			flex-direction: column;
-			border-left: none;
+			overflow-y: auto;
 		}
 
-		.side-panel-inner {
-			flex-direction: column;
+		.cohort-profile {
+			overflow-y: visible;
+			height: auto;
+			flex-basis: auto;
+		}
+
+		.media-showcase {
+			flex-basis: auto;
+			height: auto;
+			min-height: 50vh;
 		}
 	}
 
