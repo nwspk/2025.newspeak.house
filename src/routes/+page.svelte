@@ -128,7 +128,7 @@
 			photo: GamithraMargaPhoto,
 			profileSlug: 'gamithra-marga',
 			description: '☀︎ raves, machines, and dishwashers',
-			mediaType: "image",
+			mediaType: 'image',
 			mediaUrl: GamithraMargaBg,
 			mediaAltText: 'gamithra holding a little drink'
 		},
@@ -227,14 +227,14 @@
 		<div class="side-panel">
 			<div class="cohort-profile">
 				<button class="close-button" onclick={closePanel}>✕</button>
-				{#if selectedPerson.photo}
-					<div class="photo-clip">
-						<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
-						<div class="clip-top"></div>
-						<div class="clip-bottom"></div>
-					</div>
-				{/if}
 				<div class="panel-content">
+					{#if selectedPerson.photo}
+						<div class="photo-clip">
+							<img src={selectedPerson.photo} alt={selectedPerson.name} class="panel-photo" />
+							<div class="clip-top"></div>
+							<div class="clip-bottom"></div>
+						</div>
+					{/if}
 					<h2>{selectedPerson.name}</h2>
 					{#if selectedPerson.description}
 						<p class="panel-description">{selectedPerson.description}</p>
@@ -295,16 +295,8 @@
 				rgba(208, 208, 196, 0.5) 50%,
 				transparent 100%
 			),
-			radial-gradient(
-				ellipse at 35% 65%,
-				rgba(200, 200, 180, 0.3) 0%,
-				transparent 50%
-			),
-			radial-gradient(
-				ellipse at 65% 35%,
-				rgba(180, 180, 160, 0.2) 0%,
-				transparent 50%
-			),
+			radial-gradient(ellipse at 35% 65%, rgba(200, 200, 180, 0.3) 0%, transparent 50%),
+			radial-gradient(ellipse at 65% 35%, rgba(180, 180, 160, 0.2) 0%, transparent 50%),
 			linear-gradient(to bottom, #d8d8cc 0%, #ccccc0 50%, #c0c0b4 100%);
 	}
 
@@ -399,12 +391,9 @@
 	}
 
 	.photo-clip {
-		position: absolute;
-		top: 0.5rem;
-		left: 2rem;
 		width: 180px;
-		z-index: 10;
 		transform: rotate(-2deg);
+		margin-bottom: 1.5rem;
 	}
 
 	.panel-photo {
@@ -445,7 +434,6 @@
 	}
 
 	.panel-content {
-		padding-top: 160px;
 		padding-bottom: 1rem;
 	}
 
@@ -588,12 +576,6 @@
 
 		.photo-clip {
 			width: 140px;
-			top: 0.5rem;
-			left: 1.5rem;
-		}
-
-		.panel-content {
-			padding-top: 130px;
 		}
 
 		.media-showcase {
