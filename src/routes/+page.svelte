@@ -246,42 +246,34 @@
 						{:else}
 							<p>Loading profile...</p>
 						{/if}
-
-						<div class="panel-details">
-							{#if profileContent}
-								<svelte:component this={profileContent} />
-							{:else}
-								<p>Loading profile...</p>
-							{/if}
-						</div>
 					</div>
 				</div>
+			</div>
 
-				<div class="media-showcase">
-					<div class="media-label">///</div>
-					{#if selectedPerson.mediaType === 'video'}
-						<div class="video-container">
-							<iframe
-								src={selectedPerson.mediaUrl}
-								title="Video content"
-								frameborder="0"
-								allow="autoplay; encrypted-media"
-								allowfullscreen
-							></iframe>
-						</div>
-					{:else if selectedPerson.mediaType === 'image'}
-						<div class="image-showcase">
-							<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
-						</div>
-					{:else}
-						<div class="image-showcase">
-							<img
-								src={'https://picsum.photos/seed/davit/1200/800'}
-								alt="Autumnal leaves on the ground"
-							/>
-						</div>
-					{/if}
-				</div>
+			<div class="media-showcase">
+				<div class="media-label">///</div>
+				{#if selectedPerson.mediaType === 'video'}
+					<div class="video-container">
+						<iframe
+							src={selectedPerson.mediaUrl}
+							title="Video content"
+							frameborder="0"
+							allow="autoplay; encrypted-media"
+							allowfullscreen
+						></iframe>
+					</div>
+				{:else if selectedPerson.mediaType === 'image'}
+					<div class="image-showcase">
+						<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
+					</div>
+				{:else}
+					<div class="image-showcase">
+						<img
+							src={'https://picsum.photos/seed/davit/1200/800'}
+							alt="Autumnal leaves on the ground"
+						/>
+					</div>
+				{/if}
 			</div>
 		</div>
 	{/if}
@@ -303,8 +295,16 @@
 				rgba(208, 208, 196, 0.5) 50%,
 				transparent 100%
 			),
-			radial-gradient(ellipse at 35% 65%, rgba(200, 200, 180, 0.3) 0%, transparent 50%),
-			radial-gradient(ellipse at 65% 35%, rgba(180, 180, 160, 0.2) 0%, transparent 50%),
+			radial-gradient(
+				ellipse at 35% 65%,
+				rgba(200, 200, 180, 0.3) 0%,
+				transparent 50%
+			),
+			radial-gradient(
+				ellipse at 65% 35%,
+				rgba(180, 180, 160, 0.2) 0%,
+				transparent 50%
+			),
 			linear-gradient(to bottom, #d8d8cc 0%, #ccccc0 50%, #c0c0b4 100%);
 	}
 
@@ -399,9 +399,12 @@
 	}
 
 	.photo-clip {
+		position: absolute;
+		top: 0.5rem;
+		left: 2rem;
 		width: 180px;
+		z-index: 10;
 		transform: rotate(-2deg);
-		margin-bottom: 1.5rem;
 	}
 
 	.panel-photo {
@@ -442,6 +445,7 @@
 	}
 
 	.panel-content {
+		padding-top: 160px;
 		padding-bottom: 1rem;
 	}
 
@@ -578,8 +582,18 @@
 			padding: 2rem 1.5rem;
 		}
 
+		.page-wrapper.panel-open .side-panel {
+			left: 0;
+		}
+
 		.photo-clip {
 			width: 140px;
+			top: 0.5rem;
+			left: 1.5rem;
+		}
+
+		.panel-content {
+			padding-top: 130px;
 		}
 
 		.media-showcase {
@@ -588,6 +602,8 @@
 			border-left: none;
 			padding: 0;
 			width: 100vw;
+			margin-left: 50%;
+			transform: translateX(-50%);
 		}
 
 		.media-showcase iframe,
