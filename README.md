@@ -31,4 +31,4 @@ See https://github.com/nwspk/2025.newspeak.house/pull/10 for an example.
 
 To add a weblog entry, create a new markdown file in `src/lib/static-pages/weblog-entries/[your-weblog-slug].md`, including the same metadata as in other posts.
 
-Commit the post to the main branch and it should appear within a couple of minutes.
+Commit the post to the main branch and it should appear within a couple of minutes. //
