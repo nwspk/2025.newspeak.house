@@ -10,6 +10,7 @@
 	import ConnorDunlopPhoto from '$lib/assets/connor-dunlop.jpg';
 	import EmilyMayhewPhoto from '$lib/assets/emily-mayhew.jpg';
 	import FrancescaGalliPhoto from '$lib/assets/francesca-galli.jpg';
+	import AsilSidahmedPhoto from '$lib/assets/asil-sidahmed.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -80,7 +81,9 @@
 		},
 		{
 			name: 'Asil Sidahmed',
-			profileSlug: 'asil-sidahmed'
+			description: 'Governance strategist',
+			profileSlug: 'asil-sidahmed',
+			photo: AsilSidahmedPhoto
 		},
 		{
 			name: 'Chris Owen',
