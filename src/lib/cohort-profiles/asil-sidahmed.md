@@ -5,8 +5,6 @@ description: Designing public interest campaigns and programmes
 
 Hi, I'm Asil! I design public interest campaigns, and programmes, working at the intersection of public service and innovation.
 
-<img src="https://asilsidahmed.com/images/asil.jpg" width="100" height="22">
-
 <details>
 <summary>Places to find me</summary>
 <ul>
