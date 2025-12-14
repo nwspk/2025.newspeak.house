@@ -55,3 +55,5 @@ I'm interested in
 - building tools that help people learn and create
 - exploring new ways of teaching and learning
 - building technologies that solve peoples actual problems
+
+You can find me on [LinkedIn](https://www.linkedin.com/in/chrisowen101/) and [GitHub](https://github.com/ChrisOwen101).
