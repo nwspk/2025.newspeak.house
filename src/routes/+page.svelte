@@ -11,6 +11,8 @@
 	import EmilyMayhewPhoto from '$lib/assets/emily-mayhew.jpg';
 	import FrancescaGalliPhoto from '$lib/assets/francesca-galli.jpg';
 	import AsilSidahmedPhoto from '$lib/assets/asil-sidahmed.jpg';
+	import ChrisOwenPhoto from '$lib/assets/chris-owen.jpg';
+	import ChrisOwenPhotoSide from '$lib/assets/chris-owen-side.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -87,7 +89,12 @@
 		},
 		{
 			name: 'Chris Owen',
-			profileSlug: 'chris-owen'
+			profileSlug: 'chris-owen',
+			description: 'Educator & Coder',
+			photo: ChrisOwenPhoto,
+			mediaType: 'image',
+			mediaUrl: ChrisOwenPhotoSide,
+			mediaAltText: 'chris wearing sunglasses'
 		},
 		{
 			name: 'Connor Dunlop',
