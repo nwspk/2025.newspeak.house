@@ -186,11 +186,6 @@
 						<span class="value">2025-2026</span>
 					</div>
 				</div>
-				<div class="hero-nav">
-					<a href="/library" class="hero-link">→ Browse our library</a>
-					<a href="/guest-room" class="hero-link">→ Stay in our guest room</a>
-					<a href="/contact" class="hero-link">→ Get in touch</a>
-				</div>
 			</div>
 		</div>
 
@@ -653,13 +648,6 @@
 		position: relative;
 	}
 
-	.hero-nav {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		padding-top: 0.5rem;
-	}
-
 	.hero-link {
 		font-size: 0.95rem;
 		color: #1a1a1a;
@@ -780,11 +768,6 @@
 		.hero-content {
 			flex-direction: column;
 			gap: 2rem;
-		}
-
-		.hero-nav {
-			padding-top: 1.5rem;
-			border-top: 1px solid rgba(26, 26, 26, 0.15);
 		}
 
 		.section-header {
