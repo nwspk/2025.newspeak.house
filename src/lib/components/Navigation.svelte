@@ -179,6 +179,7 @@
 		}
 
 		.container {
+			position: relative;
 			flex-wrap: wrap;
 			padding: 1.5rem;
 			gap: 1rem;
@@ -186,19 +187,27 @@
 		}
 
 		.breadcrumb-nav {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
 			flex-direction: column;
 			gap: 0.75rem;
 			align-items: flex-start;
-			width: 100%;
-			max-height: 0;
-			overflow: hidden;
+			padding: 1rem 0 1.5rem;
+			background: rgba(180, 180, 160, 0.98);
+			backdrop-filter: blur(10px);
+			border-bottom: 2px solid rgba(26, 26, 26, 0.2);
 			opacity: 0;
-			transition: max-height 0.35s ease, opacity 0.25s ease;
+			visibility: hidden;
+			pointer-events: none;
+			transition: opacity 0.2s ease, visibility 0.2s ease;
 		}
 
 		.breadcrumb-nav.open {
-			max-height: 300px;
 			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
 		}
 
 		.nav-link {
