@@ -8,9 +8,15 @@
 		{ href: '/contact', label: 'Contact' }
 	];
 
+	let menuOpen = $state(false);
+
 	function isActive(pathname: string, href: string): boolean {
 		if (href === '/') return pathname === '/';
 		return pathname === href || pathname.startsWith(href + '/');
+	}
+
+	function closeMenu() {
+		menuOpen = false;
 	}
 </script>
 
@@ -22,9 +28,20 @@
 			<span class="sub-title">25/26</span>
 		</div>
 	</a>
-	<nav class="breadcrumb-nav">
+	<button
+		class="hamburger"
+		class:open={menuOpen}
+		onclick={() => (menuOpen = !menuOpen)}
+		aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+		aria-expanded={menuOpen}
+	>
+		<span></span>
+		<span></span>
+		<span></span>
+	</button>
+	<nav class="breadcrumb-nav" class:open={menuOpen}>
 		{#each navItems as item}
-			<a href={item.href} class="nav-link" class:active={isActive($page.url.pathname, item.href)}>
+			<a href={item.href} class="nav-link" class:active={isActive($page.url.pathname, item.href)} onclick={closeMenu}>
 				<span>{item.label}</span>
 			</a>
 		{/each}
@@ -119,23 +136,75 @@
 		font-weight: 600;
 	}
 
+	/* Hamburger - hidden on desktop */
+	.hamburger {
+		display: none;
+	}
+
 	@media (max-width: 768px) {
-		.container {
+		.hamburger {
+			display: flex;
 			flex-direction: column;
+			justify-content: center;
+			gap: 5px;
+			width: 36px;
+			height: 36px;
+			padding: 6px;
+			background: none;
+			border: none;
+			cursor: pointer;
+			z-index: 110;
+			transition: transform 0.2s ease;
+		}
+
+		.hamburger span {
+			display: block;
+			width: 100%;
+			height: 2px;
+			background: #1a1a1a;
+			border-radius: 1px;
+			transition: transform 0.3s ease, opacity 0.2s ease;
+		}
+
+		.hamburger.open span:nth-child(1) {
+			transform: translateY(7px) rotate(45deg);
+		}
+
+		.hamburger.open span:nth-child(2) {
+			opacity: 0;
+		}
+
+		.hamburger.open span:nth-child(3) {
+			transform: translateY(-7px) rotate(-45deg);
+		}
+
+		.container {
+			flex-wrap: wrap;
 			padding: 1.5rem;
-			gap: 1.5rem;
-			align-items: flex-start;
+			gap: 1rem;
+			align-items: center;
 		}
 
 		.breadcrumb-nav {
 			flex-direction: column;
 			gap: 0.75rem;
 			align-items: flex-start;
+			width: 100%;
+			max-height: 0;
+			overflow: hidden;
+			opacity: 0;
+			transition: max-height 0.35s ease, opacity 0.25s ease;
+		}
+
+		.breadcrumb-nav.open {
+			max-height: 300px;
+			opacity: 1;
 		}
 
 		.nav-link {
 			border-right: none;
-			padding: 0;
+			padding: 0.5rem 0;
+			font-size: 1rem;
 		}
 	}
 </style>
