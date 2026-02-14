@@ -101,35 +101,26 @@ export const load: PageLoad = async ({ fetch }) => {
 	const iterationsRes = await fetch(`${REPO_BASE}/iterations.json`);
 	if (!iterationsRes.ok) throw new Error('Failed to fetch iterations');
 	const repoIterations: RepoIteration[] = await iterationsRes.json();
-
-	// Try per-version results first (results/v1.json, results/v2.json, etc.)
-	// Repo may not export these yet — fall back to main results.json
-	const resultsMap: Record<string, { projects: Project[]; isFallback: boolean }> = {};
 	const versionIds = repoIterations.map((it) => it.version);
 
-	for (const ver of versionIds) {
-		const versionRes = await fetch(`${REPO_BASE}/results/${ver}.json`);
-		if (versionRes.ok) {
-			const data = await versionRes.json();
-			const repoResults = toRepoResults(data);
-			const projects = toProjects(repoResults);
-			resultsMap[ver] = { projects, isFallback: false };
-		} else {
-			resultsMap[ver] = { projects: [], isFallback: true };
-		}
-	}
+	// Fetch main + all per-version results in parallel
+	const [mainRes, ...versionResponses] = await Promise.all([
+		fetch(`${REPO_BASE}/results.json`),
+		...versionIds.map((ver) => fetch(`${REPO_BASE}/results/${ver}.json`))
+	]);
 
-	// Fallback: use main results.json for any version that didn't have its own file
-	const mainRes = await fetch(`${REPO_BASE}/results.json`);
 	const mainData = mainRes.ok ? await mainRes.json() : [];
-	const mainResults = toRepoResults(mainData);
-	const fallbackProjects = toProjects(mainResults);
+	const fallbackProjects = toProjects(toRepoResults(mainData));
 
-	for (const ver of versionIds) {
-		if (resultsMap[ver].isFallback || resultsMap[ver].projects.length === 0) {
-			resultsMap[ver] = { projects: fallbackProjects, isFallback: true };
+	const resultsMap: Record<string, { projects: Project[]; isFallback: boolean }> = {};
+	for (let i = 0; i < versionIds.length; i++) {
+		const ver = versionIds[i];
+		const res = versionResponses[i];
+		if (res?.ok) {
+			const data = await res.json();
+			resultsMap[ver] = { projects: toProjects(toRepoResults(data)), isFallback: false };
 		} else {
-			resultsMap[ver] = { ...resultsMap[ver], isFallback: false };
+			resultsMap[ver] = { projects: fallbackProjects, isFallback: true };
 		}
 	}
 
