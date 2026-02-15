@@ -34,8 +34,13 @@
 	let selectedVersion = $state(data.currentVersion as string);
 
 	const EVALUATION_REPO = 'https://github.com/nwspk/politech-awards-2026';
-	const CODEOWNERS_URL = 'https://github.com/nwspk/politech-awards-2026/blob/main/.github/CODEOWNERS';
+	const CODEOWNERS_URL =
+		'https://github.com/nwspk/politech-awards-2026/blob/main/.github/CODEOWNERS';
 	const LUMA_SHOWCASE_URL = 'https://luma.com/4j8zzq1s';
+	const PROCESS_URL =
+		'https://github.com/nwspk/politech-awards-2026/blob/main/PROCESS.md';
+
+	const chartColors = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'];
 
 	const selectedVersionData = $derived(versions.find((v) => v.version === selectedVersion));
 	const results = $derived(resultsMap[selectedVersion] ?? []);
@@ -55,6 +60,11 @@
 			u.searchParams.set('version', v);
 			window.history.replaceState({}, '', u.toString());
 		}
+	}
+
+	function scrollTo(id: string) {
+		const el = document.getElementById(id);
+		el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
 	onMount(() => {
@@ -77,531 +87,745 @@
 </svelte:head>
 
 <div class="awards-page">
-	<!-- Hero -->
+	<!-- ① Hero Section -->
 	<section class="hero">
 		<h1>The Political Technology Awards</h1>
-		<p class="tagline">Awards show + open evaluation repo by the 2025–26 fellowship cohort.</p>
-		<div class="meta">
-			<span class="label">STATUS:</span>
-			<span class="value">ACTIVE</span>
-			<span class="separator">|</span>
-			<span class="label">LONG LIST:</span>
-			<span class="value">{totalCount}</span>
-			<span class="separator">|</span>
-			<span class="label">CURRENT VERSION:</span>
-			<span class="value">{selectedVersion}</span>
-			<span class="separator">|</span>
-			<span class="label">SHOWCASE:</span>
-			<span class="value">31 MAR 2026</span>
-		</div>
-		<nav class="hero-links" aria-label="Quick links">
-			<a href="#context" class="bracket-link">【→ What we're doing】</a>
-			<a href="#timeline" class="bracket-link">【→ Review the rankings】</a>
-			<a href={LUMA_SHOWCASE_URL} class="bracket-link" target="_blank" rel="noopener noreferrer"
-				>【→ Attend the showcase】
+		<p class="subtitle">
+			Awards show + open evaluation repo by the 2025–26 fellowship cohort.
+			Recognizing projects that advance democratic participation, government
+			transparency, and civic engagement through technology.
+		</p>
+		<div class="hero-actions">
+			<button
+				class="action-btn action-btn--filled"
+				style="border-left-color: hsl(var(--chart-1))"
+				onclick={() => scrollTo('rankings')}
+			>
+				Review the rankings
+			</button>
+			<button
+				class="action-btn action-btn--outline"
+				style="border-left-color: hsl(var(--chart-2))"
+				onclick={() => scrollTo('showcase')}
+			>
+				What we're doing
+			</button>
+			<a
+				class="action-btn action-btn--outline"
+				style="border-left-color: hsl(var(--chart-3))"
+				href={LUMA_SHOWCASE_URL}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Attend the showcase
 			</a>
-		</nav>
+		</div>
 	</section>
 
-	<!-- Project context: what we're doing, how we evaluate -->
-	<section id="context" class="section context-section">
-		<h2 class="section-title">/// WHAT WE'RE DOING HERE</h2>
-		<p>
-			The Political Technology Awards is an open evaluation exercise run by the 2025–26 Newspeak House
-			fellowship cohort. We're building a <strong>public, inspectable ranking</strong> of civic and political
-			technology projects — the kind of tools that help citizens understand institutions, participate in
-			democracy, and hold power to account.
-		</p>
-		<p>
-			<strong>How we evaluate:</strong> We use a scoring algorithm that evolves over time. Each version
-			applies different heuristics (governance signals, civic impact, data completeness, etc.) and produces
-			a ranked list. The algorithm lives in a public GitHub repo; you can inspect the code, the pull
-			requests, and the rationale for every change. We may add written assessments per project as the evaluation matures.
-		</p>
-		<p>
-			<strong>Why this matters:</strong> Rankings are political. By making our process transparent and
-			iterative, we hope to surface both strong projects and the tradeoffs inherent in any evaluation
-			framework.
-		</p>
-	</section>
+	<!-- ─── divider ─── -->
+	<hr class="divider" />
 
-	<!-- Showcase -->
-	<section class="section">
-		<h2 class="section-title">/// SHOWCASE</h2>
-		<p>
-			<strong>31 March 2026 · Newspeak Hall</strong>
-		</p>
-		<p>
-			The Political Technology Awards culminate in a public event at Newspeak Hall. We'll announce the winning projects
-			from our long list of 321 civic and political technology tools. The showcase includes a one-hour walkthrough of
-			how the algorithm works, the heuristics we've experimented with, and the tradeoffs we've surfaced along the way.
-			There will be a public Q&A so you can ask how we think about legitimacy, automation, and the limits of scoring.
-		</p>
-		<p>
-			<a href={LUMA_SHOWCASE_URL} target="_blank" rel="noopener noreferrer">RSVP via Luma →</a>
-		</p>
-	</section>
-
-	<!-- Timeline of iterations: left = version buttons, right = info + results -->
-	<section id="timeline" class="section timeline-section">
-		<h2 class="section-title">/// TIMELINE OF ITERATIONS</h2>
-		<p class="timeline-intro">
-			Here we use "algorithm" to mean the scoring logic that ranks our long list of 321 projects — the heuristics
-			(governance signals, civic impact, keyword matching, etc.) and how they're combined. Each iteration is a proposed
-			change to that logic, voted on by the committee. Click through the versions below to see the heuristic, rationale,
-			and how the top 5 and bottom 5 shifted as we experimented.
-		</p>
-
-		<div class="timeline-layout">
-			<div class="timeline-sidebar" role="tablist" aria-label="Algorithm version selector">
-				{#each versions as v}
-					<button
-						class="version-tab"
-						class:selected={selectedVersion === v.version}
-						role="tab"
-						aria-selected={selectedVersion === v.version}
-						onclick={() => setVersion(v.version)}
-					>
-						<span class="version-label">{v.version}</span>
-						{#if v.date}
-							<span class="version-date">{formatDate(v.date)}</span>
+	<!-- ② Rankings: Sidebar + Results Panel -->
+	<section id="rankings" class="rankings-grid">
+		<!-- Left: Version Sidebar -->
+		<div class="sidebar-wrap">
+			<!-- Desktop -->
+			<div class="sidebar-desktop" role="tablist" aria-label="Algorithm version selector">
+				<h3 class="sidebar-label">Timeline</h3>
+				{#each versions as v, i}
+					{@const color = chartColors[i % chartColors.length]}
+					{@const active = selectedVersion === v.version}
+					<div class="sidebar-item">
+						<button
+							class="version-btn"
+							class:selected={active}
+							role="tab"
+							aria-selected={active}
+							onclick={() => setVersion(v.version)}
+						>
+							<span class="version-btn-bar" style="background:hsl(var(--{color}))"></span>
+							<span class="version-btn-text">{v.version}</span>
+						</button>
+						{#if active && v.date}
+							<div class="version-detail" style="border-left-color:hsl(var(--{color}))">
+								<span class="version-detail-title">{v.version}</span>
+								<span class="version-detail-date">{formatDate(v.date)}</span>
+							</div>
 						{/if}
-					</button>
+					</div>
 				{/each}
 			</div>
 
-			{#if selectedVersionData}
-			<div class="version-panel">
-				<div class="version-header">
-					<h3>
-						{selectedVersion} · {formatDate(selectedVersionData.date)} ·
-						<a href={selectedVersionData.prUrl} target="_blank" rel="noopener noreferrer"
-							>【PR #{selectedVersionData.prUrl.split('/').pop()}】
-						</a>
-					</h3>
+			<!-- Mobile -->
+			<div class="sidebar-mobile">
+				<div class="mobile-row">
+					{#each versions as v, i}
+						{@const color = chartColors[i % chartColors.length]}
+						{@const active = selectedVersion === v.version}
+						<button
+							class="mobile-btn"
+							class:selected={active}
+							onclick={() => setVersion(v.version)}
+						>
+							<span class="version-btn-bar" style="background:hsl(var(--{color}))"></span>
+							<span class="mobile-btn-text">{v.version}</span>
+						</button>
+					{/each}
 				</div>
-
-				{#if resultsMeta[selectedVersion]}
-					<p class="results-notice">
-						<strong>Note:</strong> The evaluation repo exports a single results file. Rankings below reflect the current algorithm output. Per-version historical results are not yet available.
-					</p>
-				{/if}
-
-				<p class="heuristic"><strong>Heuristic:</strong> {selectedVersionData.heuristicSummary}</p>
-				<p class="rationale"><strong>Rationale:</strong> {selectedVersionData.rationale}</p>
-				<p><strong>Data sources:</strong> {selectedVersionData.dataSources.join(', ')}</p>
-
-				<!-- Top 5 | Bottom 5 side by side -->
-				<div class="rankings-comparison">
-					<div class="ranking-column">
-						<h4>Top 5</h4>
-						{#if top5.length > 0}
-							<ol class="ranking-list">
-								{#each top5 as project}
-									<li>
-										<span class="rank-num">{project.rank}.</span>
-										<span class="rank-score">{project.score}</span>
-										<a href={project.url} target="_blank" rel="noopener noreferrer"
-											>{project.name}</a
-										>
-										{#if project.summary}
-											<span class="rank-summary">— {project.summary}</span>
-										{/if}
-									</li>
-								{/each}
-							</ol>
-						{:else}
-							<p class="empty">No data for this version.</p>
-						{/if}
+				{#if selectedVersionData?.date}
+					<div class="mobile-info">
+						<span class="mobile-info-title">{selectedVersion}</span>
+						<span class="mobile-info-date">{formatDate(selectedVersionData.date)}</span>
 					</div>
-					<div class="ranking-column">
-						<h4>Bottom 5</h4>
-						{#if bottom5.length > 0}
-							<ol class="ranking-list">
-								{#each bottom5 as project}
-									<li>
-										<span class="rank-num">{project.rank}.</span>
-										<span class="rank-score">{project.score}</span>
-										<a href={project.url} target="_blank" rel="noopener noreferrer"
-											>{project.name}</a
-										>
-										{#if project.summary}
-											<span class="rank-summary">— {project.summary}</span>
-										{/if}
-									</li>
-								{/each}
-							</ol>
-						{:else}
-							<p class="empty">Not enough projects (need 10+ for bottom 5).</p>
-						{/if}
-					</div>
-				</div>
-
-				{#if selectedVersionData.diff.length > 0}
-					<p><strong>Changed since previous version:</strong></p>
-					<ul>
-						{#each selectedVersionData.diff as change}
-							<li>{change}</li>
-						{/each}
-					</ul>
 				{/if}
 			</div>
+		</div>
+
+		<!-- Right: Results Panel -->
+		<div class="panel">
+			{#if selectedVersionData}
+				<!-- Fallback notice -->
+				{#if resultsMeta[selectedVersion]}
+					<div class="fallback">
+						<span class="fallback-icon">⚠</span>
+						<div>
+							<p class="fallback-heading">Using fallback data</p>
+							<p class="fallback-text">
+								Per-version historical results are not yet available. Showing current
+								algorithm output from results.json.
+							</p>
+						</div>
+					</div>
+				{/if}
+
+				<!-- Version info -->
+				<div class="panel-version-info">
+					<h2 class="panel-title">
+						{selectedVersion} · {formatDate(selectedVersionData.date)}
+						<a href={selectedVersionData.prUrl} target="_blank" rel="noopener noreferrer" class="pr-link">
+							PR #{selectedVersionData.prUrl.split('/').pop()}
+						</a>
+					</h2>
+
+					<div class="info-fields">
+						<div class="info-field">
+							<h4 class="info-label">Heuristic</h4>
+							<p class="info-value">{selectedVersionData.heuristicSummary}</p>
+						</div>
+						<div class="info-field">
+							<h4 class="info-label">Rationale</h4>
+							<p class="info-value">{selectedVersionData.rationale}</p>
+						</div>
+						<div class="info-field">
+							<h4 class="info-label">Data Sources</h4>
+							<p class="info-value muted">{selectedVersionData.dataSources.join(', ')}</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Top 5 -->
+				<div class="rank-block">
+					<div class="rank-header">
+						<span class="rank-icon">🏆</span>
+						<h3 class="rank-heading">Top 5</h3>
+					</div>
+					{#if top5.length > 0}
+						<div class="card-list">
+							{#each top5 as project, i}
+								{@const color = chartColors[i % chartColors.length]}
+								<div class="card card--top" style="border-left-color:hsl(var(--{color}))">
+									<span class="card-rank" style="color:hsl(var(--{color}))">#{project.rank}</span>
+									<div class="card-body">
+										<h5 class="card-name">{project.name}</h5>
+										<a href={project.url} target="_blank" rel="noopener noreferrer" class="card-url">{project.url}</a>
+										{#if project.summary}
+											<p class="card-desc">{project.summary}</p>
+										{/if}
+										<p class="card-score">Score: {project.score.toFixed(2)}</p>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="empty">No data for this version.</p>
+					{/if}
+				</div>
+
+				<!-- Bottom 5 -->
+				<div class="rank-block">
+					<div class="rank-header">
+						<span class="rank-icon rank-icon--muted">▽</span>
+						<h3 class="rank-heading">Bottom 5</h3>
+					</div>
+					{#if bottom5.length > 0}
+						<div class="card-list">
+							{#each bottom5 as project}
+								<div class="card card--bottom">
+									<span class="card-rank card-rank--muted">#{project.rank}</span>
+									<div class="card-body">
+										<h5 class="card-name card-name--muted">{project.name}</h5>
+										<a href={project.url} target="_blank" rel="noopener noreferrer" class="card-url card-url--muted">{project.url}</a>
+										{#if project.summary}
+											<p class="card-desc card-desc--muted">{project.summary}</p>
+										{/if}
+										<p class="card-score card-score--muted">Score: {project.score.toFixed(2)}</p>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="empty">Not enough projects (need 10+ for bottom 5).</p>
+					{/if}
+				</div>
+
+				<!-- Diff / limitations -->
+				{#if selectedVersionData.diff.length > 0}
+					<div class="diff-block">
+						<h4 class="info-label">Changes / Limitations</h4>
+						<ul>
+							{#each selectedVersionData.diff as change}
+								<li>{change}</li>
+							{/each}
+						</ul>
+					</div>
+				{/if}
 			{/if}
 		</div>
 	</section>
 
-	<!-- Share your rankings -->
-	<section class="section">
-		<h2 class="section-title">/// CONTEST THE RANKINGS</h2>
-		<p>
-			If you have a different take on how to evaluate civic and political technology — a new heuristic, different
-			weights, or better data sources — you can propose an iteration. Open a pull request in the evaluation repo,
-			describe your heuristic and rationale, and the committee votes on it. The process is documented in
-			<a href="https://github.com/nwspk/politech-awards-2026/blob/main/PROCESS.md" target="_blank" rel="noopener noreferrer">PROCESS.md</a>.
-		</p>
+	<!-- ─── divider ─── -->
+	<hr class="divider" />
 
+	<!-- ③ Showcase Section (what we're doing + contest the rankings) -->
+	<section id="showcase" class="showcase">
+		<h2 class="section-title">
+			<span class="title-bar" style="background:hsl(var(--chart-4))"></span>
+			The Political Technology Awards
+		</h2>
+		<div class="showcase-body">
+			<p>
+				The Political Technology Awards is an open evaluation exercise run by the 2025–26
+				Newspeak House fellowship cohort. We're building a <strong>public, inspectable
+				ranking</strong> of civic and political technology projects — the kind of tools that help
+				citizens understand institutions, participate in democracy, and hold power to account.
+			</p>
+			<p>
+				Our evaluation process is iterative and transparent. We use a scoring algorithm that
+				evolves over time. Each version applies different heuristics and produces a ranked list.
+				The algorithm lives in a
+				<a href={EVALUATION_REPO} target="_blank" rel="noopener noreferrer">public GitHub repo</a>;
+				you can inspect the code, the pull requests, and the rationale for every change. We may
+				add written assessments per project as the evaluation matures.
+			</p>
+			<p>
+				Rankings are political. By making our process transparent and iterative, we hope to
+				surface both strong projects and the tradeoffs inherent in any evaluation framework.
+				A simple tool that empowers marginalized communities ranks higher than a technically
+				impressive platform that reinforces existing power structures.
+			</p>
+		</div>
+
+		<!-- Share / contest sub-section -->
+		<div class="showcase-share">
+			<h3 class="share-title">
+				<span class="title-bar title-bar--sm" style="background:hsl(var(--chart-5))"></span>
+				Contest the rankings
+			</h3>
+			<p class="share-text">
+				Our evaluation process is open and contestable. We encourage you to review our
+				methodology, examine our data, and share your own rankings. Political technology
+				evaluation is inherently political — different values lead to different conclusions,
+				and that's exactly as it should be.
+			</p>
+			<a
+				href={PROCESS_URL}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="process-link"
+				style="border-left-color:hsl(var(--chart-5))"
+			>
+				Read our process documentation →
+			</a>
+		</div>
 	</section>
 
-	<!-- Committee (from CODEOWNERS) -->
-	<section id="committee" class="section committee-section">
-		<h2 class="section-title">/// COMMITTEE</h2>
-		<div class="committee-bubbles">
-			{#each committee as member}
-				<div class="committee-member">
-					<span
-					class="committee-bubble"
-					aria-label={member.name}
-					title={member.name}
-				>
-							{#if member.photo}
-								<img src={member.photo} alt="" />
-							{:else}
-								<span class="initials">{member.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}</span>
-							{/if}
-				</span>
+	<!-- ─── divider ─── -->
+	<hr class="divider" />
+
+	<!-- ④ Committee Section -->
+	<section id="committee" class="committee">
+		<h2 class="section-title">
+			<span class="title-bar" style="background:hsl(var(--chart-3))"></span>
+			Awards Committee
+		</h2>
+		<p class="committee-desc">
+			Our committee brings together expertise in civic technology, political science, digital
+			rights, and community organizing. The committee is defined in the
+			<strong>CODEOWNERS</strong> file in the evaluation repository — everyone listed there can
+			approve changes to the algorithm and assessments.
+		</p>
+
+		<div class="avatar-row">
+			{#each committee as member, i}
+				{@const color = chartColors[i % chartColors.length]}
+				<div class="avatar-card">
+					<span class="avatar" style="border-color:hsl(var(--{color}))">
+						{#if member.photo}
+							<img src={member.photo} alt={member.name} />
+						{:else}
+							<span class="initials">{member.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}</span>
+						{/if}
+					</span>
+					<span class="avatar-name">{member.name}</span>
 				</div>
 			{/each}
 		</div>
-		<p>
-			The evaluation is judged by {committee.map((m) => m.name).join(', ').replace(/, ([^,]+)$/, ', and $1')} from the 2025–26 fellowship cohort. The committee is defined in the
-			<strong>CODEOWNERS</strong> file in the evaluation repository — everyone listed there can approve
-			changes to the algorithm and assessments.
-		</p>
-		<p>
+
+		<p class="committee-links">
 			<a href={CODEOWNERS_URL} target="_blank" rel="noopener noreferrer">View committee (CODEOWNERS) →</a>
-			<span class="separator-inline">|</span>
-			<a href="/">→ Full cohort page</a>
+			<span class="link-sep">|</span>
+			<a href="/">Full cohort page →</a>
 		</p>
 	</section>
 </div>
 
 <style>
+	/* ━━ Page ━━ */
 	.awards-page {
-		width: 100%;
-		max-width: 1200px;
+		max-width: 1400px;
 		margin: 0 auto;
-		padding: 3rem 2rem 4rem;
-		box-sizing: border-box;
-		text-align: left;
+		padding: 2.5rem 1.75rem 4rem;
 	}
 
-	.hero {
-		margin-bottom: 3rem;
-		padding-bottom: 2.5rem;
-		border-bottom: 1px solid rgba(26, 26, 26, 0.15);
+	.divider {
+		border: none;
+		border-top: 1px solid rgba(26, 26, 26, 0.15);
+		margin: 3rem 0;
 	}
 
+	/* ━━ ① Hero ━━ */
 	.hero h1 {
 		font-size: clamp(2rem, 5vw, 3.5rem);
 		font-weight: 600;
-		margin: 0 0 1rem 0;
-		color: #0a0a0a;
+		font-family: 'Stack Sans Notch', 'Crimson Pro', serif;
 		letter-spacing: -0.01em;
 		line-height: 1.1;
-		font-family: 'Stack Sans Notch', 'Crimson Pro', serif;
-		text-align: center;
+		margin: 0 0 0.75rem 0;
 	}
 
-	.tagline {
-		font-size: 1rem;
-		line-height: 1.6;
-		color: #1a1a1a;
+	.subtitle {
+		font-size: 1.05rem;
+		line-height: 1.65;
+		color: rgba(26, 26, 26, 0.8);
+		max-width: 54ch;
 		margin: 0 0 1.5rem 0;
-		text-align: center;
 	}
 
-	.meta {
-		font-size: 0.8rem;
-		font-family: 'IBM Plex Mono', monospace;
-		color: #666;
-		letter-spacing: 0.02em;
+	.hero-actions {
 		display: flex;
-		justify-content: center;
+		flex-wrap: wrap;
 		gap: 0.75rem;
-		flex-wrap: wrap;
-		margin-bottom: 1.5rem;
 	}
 
-	.label { font-weight: 600; color: #4a4a4a; }
-	.value { font-weight: 700; color: #5a6a4a; }
-	.separator { color: #8a8a8a; }
-
-	.hero-links {
-		display: flex;
-		justify-content: center;
-		flex-wrap: wrap;
-		gap: 0.75rem 1.5rem;
-	}
-
-	.bracket-link {
+	.action-btn {
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: #1a1a1a;
-		text-decoration: none;
-		padding: 0.25rem 0.5rem;
+		font-size: 0.88rem;
+		font-weight: 600;
+		padding: 0.6rem 1.25rem;
 		border: 2px solid #1a1a1a;
+		border-left-width: 4px;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.action-btn--filled {
+		background: #1a1a1a;
+		color: #d0d0c4;
+	}
+	.action-btn--filled:hover {
+		background: rgba(26, 26, 26, 0.85);
+		color: #d0d0c4;
+	}
+
+	.action-btn--outline {
 		background: rgba(255, 255, 255, 0.5);
-		transition: all 0.2s ease;
-	}
-
-	.bracket-link:hover {
-		background: #d62828;
-		color: white;
-		border-color: #d62828;
-	}
-
-	.section {
-		margin-bottom: 3rem;
-	}
-
-	.section-title {
-		font-size: 0.75rem;
-		font-weight: 700;
 		color: #1a1a1a;
-		margin: 0 0 1.5rem 0;
-		letter-spacing: 0.1em;
-		font-family: 'IBM Plex Mono', monospace;
-		position: relative;
-		padding-left: 0;
 	}
-
-	.section-title::before {
-		content: '';
-		display: block;
-		width: 60px;
-		height: 2px;
-		background: #d62828;
-		margin: 0 0 0.5rem 0;
-	}
-
-	.section p,
-	.section li {
-		font-size: 1rem;
-		line-height: 1.7;
+	.action-btn--outline:hover {
+		background: rgba(26, 26, 26, 0.08);
 		color: #1a1a1a;
-		margin-bottom: 0.75rem;
 	}
 
-	.section ul {
-		padding-left: 1.5rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.section a {
-		color: #d62828;
-		text-decoration: underline;
-		text-decoration-color: rgba(214, 40, 40, 0.4);
-		text-underline-offset: 2px;
-	}
-
-	.section a:hover {
-		text-decoration-color: #d62828;
-	}
-
-	.separator-inline {
-		margin: 0 0.5rem;
-		color: #888;
-	}
-
-	.results-notice {
-		padding: 0.75rem 1rem;
-		background: rgba(214, 40, 40, 0.08);
-		border-left: 3px solid #d62828;
-		margin-bottom: 1rem;
-		font-size: 0.9rem;
-	}
-
-	.context-section p,
-	.section p {
-		max-width: 72ch;
-		text-align: left;
-	}
-
-	/* Timeline: left sidebar + right content panel */
-	.timeline-intro {
-		margin-bottom: 1.5rem;
-		max-width: 72ch;
-	}
-
-	.timeline-layout {
+	/* ━━ ② Rankings Grid ━━ */
+	.rankings-grid {
 		display: grid;
-		grid-template-columns: 220px 1fr;
+		grid-template-columns: 240px 1fr;
 		gap: 2rem;
 		align-items: start;
 	}
 
-	.timeline-sidebar {
+	/* Sidebar */
+	.sidebar-desktop {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
 		position: sticky;
 		top: 120px;
 	}
+	.sidebar-mobile {
+		display: none;
+	}
 
-	.version-tab {
+	.sidebar-label {
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: rgba(26, 26, 26, 0.55);
+		margin: 0 0 0.25rem 0;
+	}
+
+	.sidebar-item {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
-		text-align: left;
+		gap: 0.35rem;
+	}
+
+	.version-btn {
+		position: relative;
+		display: flex;
+		align-items: center;
 		width: 100%;
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.9rem;
-		padding: 0.75rem 1rem;
+		font-size: 0.88rem;
+		font-weight: 500;
+		padding: 0.6rem 0.75rem 0.6rem 1rem;
 		border: 2px solid #1a1a1a;
-		background: rgba(255, 255, 255, 0.6);
+		background: rgba(255, 255, 255, 0.5);
 		color: #1a1a1a;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		text-align: left;
+		overflow: hidden;
+		transition: all 0.15s ease;
 	}
-
-	.version-tab:hover {
-		background: rgba(26, 26, 26, 0.08);
-	}
-
-	.version-tab.selected {
+	.version-btn:hover { background: rgba(26, 26, 26, 0.06); }
+	.version-btn.selected {
 		background: #1a1a1a;
-		color: white;
+		color: #d0d0c4;
 		border-color: #1a1a1a;
 	}
 
-	.version-label {
-		font-weight: 600;
+	.version-btn-bar {
+		position: absolute;
+		left: 0; top: 0; bottom: 0;
+		width: 4px;
+	}
+	.version-btn-text { margin-left: 0.25rem; }
+
+	.version-detail {
+		padding-left: 0.75rem;
+		border-left: 2px solid;
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+	.version-detail-title {
+		font-size: 0.78rem;
+		font-weight: 700;
+	}
+	.version-detail-date {
+		font-size: 0.72rem;
+		color: rgba(26, 26, 26, 0.5);
 	}
 
-	.version-date {
-		font-size: 0.75rem;
-		color: inherit;
-		opacity: 0.8;
-		margin-top: 0.25rem;
-	}
-
-	.version-tab.selected .version-date {
-		opacity: 0.9;
-	}
-
-	.version-panel {
-		padding: 1.5rem;
-		border: 2px solid rgba(26, 26, 26, 0.2);
-		background: rgba(255, 255, 255, 0.6);
-		text-align: left;
-		min-height: 200px;
-	}
-
-	.version-panel h3 {
-		font-size: 1.15rem;
-		margin: 0 0 1rem 0;
-		font-family: 'Crimson Pro', serif;
-	}
-
-	.version-panel h3 a {
-		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.85rem;
-	}
-
-	.heuristic,
-	.rationale {
-		margin-bottom: 1rem;
-	}
-
-	/* Top 5 | Bottom 5 side by side */
-	.rankings-comparison {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+	/* Results panel */
+	.panel {
+		display: flex;
+		flex-direction: column;
 		gap: 2rem;
-		margin: 2rem 0 1.5rem;
-		text-align: left;
+		min-width: 0;
 	}
 
-	.ranking-column h4 {
+	.fallback {
+		display: flex;
+		gap: 0.75rem;
+		padding: 0.85rem 1rem;
+		background: rgba(214, 40, 40, 0.06);
+		border-left: 3px solid #d62828;
+	}
+	.fallback-icon { font-size: 1.1rem; flex-shrink: 0; }
+	.fallback-heading {
 		font-size: 0.85rem;
-		font-family: 'IBM Plex Mono', monospace;
-		margin: 0 0 0.75rem 0;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: #555;
+		font-weight: 700;
+		margin: 0 0 0.2rem 0;
+	}
+	.fallback-text {
+		font-size: 0.78rem;
+		color: rgba(26, 26, 26, 0.7);
+		margin: 0;
+		line-height: 1.5;
 	}
 
-	.ranking-list {
-		list-style: none;
-		padding: 0;
+	.panel-version-info {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	.panel-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
+		margin: 0;
+	}
+	.pr-link {
+		font-size: 0.82rem;
+		font-weight: 500;
+		color: #d62828;
+		text-decoration: underline dotted rgba(214, 40, 40, 0.4);
+		text-underline-offset: 2px;
+	}
+	.pr-link:hover { text-decoration-color: #d62828; color: #d62828; }
+
+	.info-fields {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	.info-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+	.info-label {
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: rgba(26, 26, 26, 0.55);
+		margin: 0;
+	}
+	.info-value {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		margin: 0;
+	}
+	.info-value.muted { color: rgba(26, 26, 26, 0.7); }
+
+	/* Ranking blocks */
+	.rank-block {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.rank-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.rank-icon { font-size: 1.1rem; }
+	.rank-icon--muted { opacity: 0.5; }
+	.rank-heading {
+		font-size: 1.1rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
 		margin: 0;
 	}
 
-	.ranking-list li {
-		margin-bottom: 0.75rem;
+	.card-list {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 0.35rem;
-		font-size: 0.95rem;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
-	.rank-num {
-		font-family: 'IBM Plex Mono', monospace;
-		color: #888;
-		font-size: 0.85rem;
+	.card {
+		display: flex;
+		gap: 0.75rem;
+		padding: 1rem 1.15rem;
+		border: 1px solid rgba(26, 26, 26, 0.12);
+		transition: border-color 0.15s ease;
+	}
+	.card--top {
+		background: rgba(255, 255, 255, 0.45);
+		border-left: 4px solid;
+	}
+	.card--top:hover { border-color: rgba(26, 26, 26, 0.25); }
+	.card--bottom {
+		background: rgba(255, 255, 255, 0.2);
+		border-color: rgba(26, 26, 26, 0.08);
 	}
 
-	.rank-score {
-		font-family: 'IBM Plex Mono', monospace;
+	.card-rank {
+		font-size: 1.35rem;
 		font-weight: 700;
-		color: #5a6a4a;
-		min-width: 1.5em;
+		font-family: 'IBM Plex Mono', monospace;
+		flex-shrink: 0;
+		line-height: 1.2;
 	}
+	.card-rank--muted { color: rgba(26, 26, 26, 0.25) !important; }
 
-	.ranking-list li a {
-		font-weight: 600;
+	.card-body {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
 	}
+	.card-name {
+		font-size: 0.9rem;
+		font-weight: 700;
+		margin: 0;
+	}
+	.card-name--muted { color: rgba(26, 26, 26, 0.7); }
 
-	.rank-summary {
-		width: 100%;
-		font-size: 0.85rem;
-		color: #555;
-		margin-left: 0;
+	.card-url {
+		font-size: 0.78rem;
+		color: rgba(26, 26, 26, 0.5);
+		text-decoration: none;
+		word-break: break-all;
 	}
+	.card-url:hover { color: #1a1a1a; text-decoration: underline; }
+	.card-url--muted { color: rgba(26, 26, 26, 0.4); }
+	.card-url--muted:hover { color: rgba(26, 26, 26, 0.6); }
+
+	.card-desc {
+		font-size: 0.78rem;
+		color: rgba(26, 26, 26, 0.6);
+		line-height: 1.5;
+		margin: 0;
+	}
+	.card-desc--muted { color: rgba(26, 26, 26, 0.5); }
+
+	.card-score {
+		font-size: 0.75rem;
+		font-family: 'IBM Plex Mono', monospace;
+		color: rgba(26, 26, 26, 0.4);
+		margin: 0;
+	}
+	.card-score--muted { color: rgba(26, 26, 26, 0.3); }
 
 	.empty {
 		font-style: italic;
-		color: #888;
-		font-size: 0.9rem;
+		color: rgba(26, 26, 26, 0.5);
+		font-size: 0.88rem;
 	}
 
-	/* Committee bubbles */
-	.committee-bubbles {
+	.diff-block ul {
+		padding-left: 1.25rem;
+		margin: 0.35rem 0 0;
+	}
+	.diff-block li {
+		font-size: 0.88rem;
+		color: rgba(26, 26, 26, 0.75);
+		line-height: 1.55;
+	}
+
+	/* ━━ ③ Showcase ━━ */
+	.section-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
+		margin: 0 0 1.25rem 0;
 		display: flex;
-		flex-wrap: wrap;
-		gap: 1.5rem 2rem;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.title-bar {
+		display: inline-block;
+		width: 5px;
+		height: 1.6rem;
+		border-radius: 3px;
+		flex-shrink: 0;
+	}
+	.title-bar--sm {
+		width: 4px;
+		height: 1.15rem;
+	}
+
+	.showcase-body {
+		max-width: 74ch;
+	}
+	.showcase-body p {
+		font-size: 0.95rem;
+		line-height: 1.7;
+		color: rgba(26, 26, 26, 0.9);
+		margin-bottom: 0.85rem;
+	}
+	.showcase-body a {
+		color: #d62828;
+		text-decoration: underline;
+		text-decoration-color: rgba(214, 40, 40, 0.4);
+		text-underline-offset: 2px;
+	}
+	.showcase-body a:hover { text-decoration-color: #d62828; }
+
+	.showcase-share {
+		margin-top: 1.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid rgba(26, 26, 26, 0.15);
+	}
+
+	.share-title {
+		font-size: 1.1rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
+		margin: 0 0 0.75rem 0;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.share-text {
+		font-size: 0.9rem;
+		line-height: 1.7;
+		color: rgba(26, 26, 26, 0.8);
+		max-width: 74ch;
+		margin-bottom: 1rem;
+	}
+
+	.process-link {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.88rem;
+		font-family: 'IBM Plex Mono', monospace;
+		font-weight: 500;
+		padding: 0.5rem 1rem;
+		border-left: 4px solid;
+		background: rgba(255, 255, 255, 0.4);
+		color: #1a1a1a;
+		text-decoration: none;
+		transition: background 0.15s ease;
+	}
+	.process-link:hover { background: rgba(255, 255, 255, 0.7); color: #1a1a1a; }
+
+	/* ━━ ④ Committee ━━ */
+	.committee-desc {
+		font-size: 0.9rem;
+		color: rgba(26, 26, 26, 0.65);
+		max-width: 74ch;
+		line-height: 1.6;
 		margin-bottom: 1.5rem;
 	}
 
-	.committee-member {
+	.avatar-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.avatar-card {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		gap: 0.5rem;
+		max-width: 110px;
 	}
 
-	.committee-bubble {
+	.avatar {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -609,53 +833,96 @@
 		height: 64px;
 		border-radius: 50%;
 		overflow: hidden;
-		border: 2px solid rgba(26, 26, 26, 0.2);
-		background: rgba(255, 255, 255, 0.6);
+		border: 3px solid;
+		background: rgba(255, 255, 255, 0.5);
 		flex-shrink: 0;
-		text-decoration: none;
-		transition: border-color 0.2s ease, transform 0.2s ease;
 	}
+	.avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-	.committee-bubble img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.committee-bubble .initials {
+	.initials {
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 1rem;
+		font-size: 0.95rem;
 		font-weight: 600;
 		color: #555;
 	}
 
-	@media (max-width: 768px) {
-		.awards-page {
-			padding: 2rem 1rem 3rem;
-			max-width: none;
+	.avatar-name {
+		font-size: 0.82rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
+		text-align: center;
+		line-height: 1.3;
+	}
+
+	.committee-links {
+		font-size: 0.88rem;
+	}
+	.committee-links a {
+		color: #d62828;
+		text-decoration: underline;
+		text-decoration-color: rgba(214, 40, 40, 0.4);
+		text-underline-offset: 2px;
+	}
+	.committee-links a:hover { text-decoration-color: #d62828; }
+
+	.link-sep {
+		margin: 0 0.5rem;
+		color: #aaa;
+	}
+
+	/* ━━ Mobile ━━ */
+	@media (max-width: 900px) {
+		.awards-page { padding: 2rem 1.25rem 3rem; }
+
+		.rankings-grid { grid-template-columns: 1fr; }
+
+		.sidebar-desktop { display: none; }
+		.sidebar-mobile  { display: block; }
+
+		.mobile-row {
+			display: flex;
+			gap: 0.5rem;
+			overflow-x: auto;
+			padding-bottom: 0.5rem;
 		}
 
-		.timeline-layout {
-			grid-template-columns: 1fr;
+		.mobile-btn {
+			position: relative;
+			flex-shrink: 0;
+			font-family: 'IBM Plex Mono', monospace;
+			font-size: 0.82rem;
+			font-weight: 500;
+			padding: 0.5rem 0.75rem 0.5rem 1rem;
+			border: 2px solid #1a1a1a;
+			background: rgba(255, 255, 255, 0.5);
+			color: #1a1a1a;
+			cursor: pointer;
+			overflow: hidden;
+			transition: all 0.15s ease;
+		}
+		.mobile-btn.selected {
+			background: #1a1a1a;
+			color: #d0d0c4;
+		}
+		.mobile-btn-text { margin-left: 0.25rem; }
+
+		.mobile-info {
+			margin-top: 0.75rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.15rem;
+		}
+		.mobile-info-title {
+			font-size: 0.85rem;
+			font-weight: 700;
+		}
+		.mobile-info-date {
+			font-size: 0.75rem;
+			color: rgba(26, 26, 26, 0.5);
 		}
 
-		.timeline-sidebar {
-			position: static;
-			flex-direction: row;
-			flex-wrap: wrap;
-		}
+		.hero h1 { font-size: clamp(1.8rem, 6vw, 2.5rem); }
 
-		.version-tab {
-			flex: 1 1 auto;
-			min-width: 100px;
-		}
-
-		.version-date {
-			display: none;
-		}
-
-		.rankings-comparison {
-			grid-template-columns: 1fr;
-		}
+		.avatar-row { gap: 1.25rem; }
 	}
 </style>
