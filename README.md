@@ -19,7 +19,7 @@ Where possible the site is configured so that content - be they static pages, co
 
 ## Adding a fellow landing page (with your own data)
 
-Cohort members can have full landing pages at `/fellow/[slug]` with field notes, reading lists, etc. **Parsing is per-fellow**: you add your own parser to map your data (e.g. Matrix export, API) into the shared format. See [docs/fellows.md](docs/fellows.md) for the full guide.
+Cohort members can have full landing pages at `/fellow/[slug]` with field notes, reading lists, etc. If you'd like to automatically publish posts from your Matrix channel to your page, see the [Matrix Publisher Bot](https://github.com/nwspk/matrix-publisher-bot) and the [setup guide](docs/fellows.md).
 
 ## Adding a profile page (markdown)
 

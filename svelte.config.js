@@ -4,7 +4,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 // Fellow slugs to prerender (from cohort + matrix export config)
 const fellowSlugs = [
-	'fatima-sarah-khalid',
+	'fatima',
 	'alex-pedori',
 	'alexandra-ciocanel',
 	'asil-sidahmed',

@@ -13,8 +13,6 @@ export interface FieldNote {
 	emoji?: string;
 	summary?: string;
 	links?: string[];
-	/** Auto-extracted keywords and hashtags from the source message */
-	keywords?: string[];
 	/** Raw body for detail view (e.g. original Matrix message) */
 	rawBody?: string;
 	/** HTML/formatted body if available */

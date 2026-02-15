@@ -14,26 +14,23 @@ interface Message {
 	body: string;
 	parent_id: string | null;
 	formatted_body?: string;
-	keywords?: string[];
 }
 
 const URL_REGEX = /https?:\/\/[^\s\]"<>)]+/g;
 
 /** Which message types map to which output bucket */
-const NOTE_TYPES = new Set(['field_note', 'journal', 'blog_post']);
+const NOTE_TYPES = new Set(['field_note', 'journal']);
 const ACTIVITY_TYPES = new Set(['link', 'project']);
 const EXPLORATION_TYPES = new Set(['question', 'idea']);
 
 const CONTENT_TYPE_MAP: Record<string, FieldNote['contentType']> = {
 	field_note: 'field-note',
-	journal: 'journal',
-	blog_post: 'blog-post'
+	journal: 'journal'
 };
 
 const EMOJI_MAP: Record<string, string> = {
 	field_note: '📔', journal: '📥', link: '🔗',
-	project: '💾', question: '❓', idea: '💡',
-	blog_post: '📄'
+	project: '💾', question: '❓', idea: '💡'
 };
 
 function formatDate(ts: number): string {
@@ -85,7 +82,7 @@ export function parse(raw: unknown): ParsedFellowContent {
 	for (const msg of messages) {
 		if (msg.parent_id !== null) continue; // skip replies
 
-		const { id, ts, type, body, formatted_body, keywords } = msg;
+		const { id, ts, type, body, formatted_body } = msg;
 		const title = extractTitle(body);
 		const content = extractContent(body);
 		const date = formatDate(ts);
@@ -99,7 +96,6 @@ export function parse(raw: unknown): ParsedFellowContent {
 				emoji,
 				summary: content ? truncate(content, 120) : title,
 				links: links.length > 0 ? links : undefined,
-				keywords: keywords && keywords.length > 0 ? keywords : undefined,
 				rawBody: body,
 				formattedBody: formatted_body
 			});

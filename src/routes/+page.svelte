@@ -119,7 +119,7 @@
 		},
 		{
 			name: 'Fatima Sarah Khalid',
-			profileSlug: 'fatima-sarah-khalid',
+			profileSlug: 'fatima',
 			photo: FatimaSarahKhalidPhoto,
 			description: '✧ ai engineer & civic hacker'
 		},
