@@ -6,6 +6,17 @@ Future enhancements for the cohort landing page. Work on these when ready.
 
 ---
 
+## Field notes integration (Matrix Publisher Bot)
+
+Content is fetched from each fellow's GitHub repo at build time. See [fellows.md](./fellows.md) for the full architecture.
+
+- **Config**: Each fellow sets `contentUrl` in their own `src/fellows/[slug]/config.ts`
+- **Fetch**: `src/lib/data/fellow-data.ts` — fetches from `contentUrl` (remote) or `dataFile` (local fallback)
+- **Parse**: Per-fellow parsers in `src/fellows/[slug]/parser.ts`
+- **Rebuild trigger**: `.github/workflows/rebuild-on-field-notes.yml` — listens for `repository_dispatch` (`field-notes-updated`)
+
+---
+
 ## Upcoming events
 
 ### Option A: Manual list (current)
@@ -52,9 +63,10 @@ Bluesky’s AT Protocol is public. `app.bsky.feed.getAuthorFeed` returns a user�
 
 ## Other ideas
 - [ ] Pagination for “Currently exploring” if the list grows large
-- [ ] Filter or search within field notes
+- [ ] Filter or search within field notes (keywords are now available on FieldNote)
 - [ ] Dark mode or theme toggle
 - [ ] Export / share links for individual field notes
+- [ ] oEmbed or Substack API for `blog_post` type (currently renders as link card)
 
 ---
 

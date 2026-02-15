@@ -1,5 +1,5 @@
 /**
- * Parser for Fatima's matrix_export.json.
+ * Parser for Fatima's content.json.
  *
  * Message types: field_note, journal, link, idea, question, project, reply
  * Each message has: id, ts, type, body, parent_id, formatted_body?
@@ -14,23 +14,26 @@ interface Message {
 	body: string;
 	parent_id: string | null;
 	formatted_body?: string;
+	keywords?: string[];
 }
 
-const URL_REGEX = /https?:\/\/[^\s\]"<>)+]+/g;
+const URL_REGEX = /https?:\/\/[^\s\]"<>)]+/g;
 
 /** Which message types map to which output bucket */
-const NOTE_TYPES = new Set(['field_note', 'journal']);
+const NOTE_TYPES = new Set(['field_note', 'journal', 'blog_post']);
 const ACTIVITY_TYPES = new Set(['link', 'project']);
 const EXPLORATION_TYPES = new Set(['question', 'idea']);
 
 const CONTENT_TYPE_MAP: Record<string, FieldNote['contentType']> = {
 	field_note: 'field-note',
-	journal: 'journal'
+	journal: 'journal',
+	blog_post: 'blog-post'
 };
 
 const EMOJI_MAP: Record<string, string> = {
 	field_note: '📔', journal: '📥', link: '🔗',
-	project: '💾', question: '❓', idea: '💡'
+	project: '💾', question: '❓', idea: '💡',
+	blog_post: '📄'
 };
 
 function formatDate(ts: number): string {
@@ -44,8 +47,12 @@ function extractLinks(body: string): string[] {
 function extractTitle(body: string): string {
 	const first = body.split('\n').find((l) => l.trim());
 	if (!first) return 'Untitled';
-	// Strip leading emoji, markdown headers, bold markers
-	return first.replace(/^[\p{Emoji}\uFE0F]+\s*/u, '').replace(/^#+\s*/, '').replace(/^\*\*/, '').replace(/\*\*$/, '').trim() || 'Untitled';
+	// Strip markdown headers first, then leading emoji, then bold markers
+	return first
+		.replace(/^#+\s*/, '')
+		.replace(/^[\p{Emoji}\p{Emoji_Component}\uFE0F]+\s*/u, '')
+		.replace(/^\*\*/, '').replace(/\*\*$/, '')
+		.trim() || 'Untitled';
 }
 
 function extractContent(body: string): string | undefined {
@@ -78,7 +85,7 @@ export function parse(raw: unknown): ParsedFellowContent {
 	for (const msg of messages) {
 		if (msg.parent_id !== null) continue; // skip replies
 
-		const { id, ts, type, body, formatted_body } = msg;
+		const { id, ts, type, body, formatted_body, keywords } = msg;
 		const title = extractTitle(body);
 		const content = extractContent(body);
 		const date = formatDate(ts);
@@ -92,6 +99,7 @@ export function parse(raw: unknown): ParsedFellowContent {
 				emoji,
 				summary: content ? truncate(content, 120) : title,
 				links: links.length > 0 ? links : undefined,
+				keywords: keywords && keywords.length > 0 ? keywords : undefined,
 				rawBody: body,
 				formattedBody: formatted_body
 			});

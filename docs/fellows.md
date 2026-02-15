@@ -12,13 +12,13 @@ src/fellows/
     types.ts              # Shared: FieldNote, CurrentActivity – what parsers must return
   [your-slug]/
     parser.ts             # Your parser: raw data → ParsedFellowContent
-    config.ts             # Data source path, profile overrides
+    config.ts             # Remote content URL, profile overrides
   registry.ts             # Maps slug → parser + config
 ```
 
 - **Contract** (`_contract/types.ts`): `FieldNote`, `CurrentActivity`, `ParsedFellowContent`. Your parser must return this shape.
-- **Parser**: Takes your raw data (JSON, whatever) and returns `{ fieldNotes, currentlyExploring }`.
-- **Config**: Where your data lives (e.g. `matrix-export/export.json`) and profile overrides (bio, links, etc.).
+- **Parser**: Takes your raw data (JSON, whatever) and returns `{ fieldNotes, currentlyExploring, explorationItems }`.
+- **Config (per-fellow)**: Remote `contentUrl` for your `content.json` and profile overrides (bio, links, etc.).
 - **Registry**: Add your entry so the loader knows to use your parser.
 
 ---
@@ -55,8 +55,9 @@ See `src/fellows/_contract/types.ts` for the exact shapes of `FieldNote` and `Cu
 // src/fellows/your-slug/config.ts
 import type { FellowProfile } from '$lib/data/fellow-types.js';
 
-/** Matrix export filename (no .json) – file in matrix-export/ folder */
-export const matrixExportFile = 'export';
+/** Remote URL to fetch content.json at build time */
+export const contentUrl =
+  'https://raw.githubusercontent.com/nwspk/your-slug-field-notes/main/content.json';
 
 /** Profile overrides */
 export const profileOverrides: Partial<Omit<FellowProfile, 'slug' | 'fieldNotes' | 'currentlyExploring'>> = {
@@ -67,21 +68,21 @@ export const profileOverrides: Partial<Omit<FellowProfile, 'slug' | 'fieldNotes'
 };
 ```
 
-If your data lives elsewhere (e.g. API, different file), you can extend the config. The registry and loader may need minor changes to support alternate sources.
+Your `content.json` is published by the Matrix Publisher Bot in your own GitHub repo. The site fetches it at build time from the raw GitHub URL above.
 
 ### 4. Register yourself
 
 ```typescript
 // src/fellows/registry.ts
 import { parse as parseYou } from './your-slug/parser.js';
-import * as configYou from './your-slug/config.js';
+import { contentUrl as yourContentUrl, profileOverrides as yourOverrides } from './your-slug/config.js';
 
 const registry: Record<string, FellowEntry> = {
   // ...
   'your-slug': {
     parse: parseYou,
-    matrixExportFile: configYou.matrixExportFile,
-    profileOverrides: configYou.profileOverrides
+    contentUrl: yourContentUrl,
+    profileOverrides: yourOverrides
   }
 };
 ```
@@ -102,9 +103,10 @@ const fellowSlugs = [
 
 1. User visits `/fellow/your-slug`.
 2. `getFellowBySlug` checks the registry for `your-slug`.
-3. If found: loads your data file (from config), runs your `parse()`, merges with cohort + overrides.
-4. If not found: uses cohort metadata only (no field notes / reading list).
-5. Shared components render the result.
+3. If found: fetches your `content.json` from the remote URL (falls back to local file if no URL), runs your `parse()`, merges with cohort + overrides.
+4. If the fetch fails: the fellow page renders with empty content (no field notes / reading list) rather than breaking the build.
+5. If not found in registry: uses cohort metadata only.
+6. Shared components render the result.
 
 ---
 
@@ -172,7 +174,9 @@ Her parser lives at `src/fellows/fatima-sarah-khalid/parser.ts` and expects `mat
 
 ## Data sources
 
-**Current**: Matrix export JSON in `matrix-export/[filename].json`.
+**Current**: Each fellow's `content.json` is exported by the Matrix Publisher Bot to a GitHub repo (e.g. `nwspk/sugaroverflow-field-notes`) and fetched at build time from the raw GitHub URL.
+
+**Rebuild trigger**: When a fellow configures `SITE_REPO` and `SITE_DEPLOY_TOKEN` in their bot repo, a `repository_dispatch` event (`field-notes-updated`) is sent to the site repo after each export. The `.github/workflows/rebuild-on-field-notes.yml` workflow listens for this and triggers a rebuild.
 
 **Future options** (not yet supported):
 

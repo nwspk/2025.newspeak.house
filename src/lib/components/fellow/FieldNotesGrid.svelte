@@ -33,11 +33,19 @@
 		'blog-post': 'BLOG-POST',
 		journal: 'JOURNAL'
 	};
+
+	/** Strip the first heading element from HTML so the title isn't duplicated */
+	function stripFirstHeading(html: string): string {
+		return html.replace(/^\s*<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>\s*/i, '').trim();
+	}
 </script>
 
 <div class="section">
 	<div class="header">
-		<h2 class="title">/// PUBLICATIONS</h2>
+		<div class="title-row">
+			<div class="accent-bar accent-coral"></div>
+			<h2 class="title">/// PUBLICATIONS</h2>
+		</div>
 		<div class="filters">
 			{#each [['all', 'All'], ['field-note', 'Field Notes'], ['blog-post', 'Blog Posts'], ['journal', 'Journal']] as [value, label]}
 				<button
@@ -54,7 +62,7 @@
 
 	<div class="grid">
 		{#each currentNotes as note}
-			<button type="button" class="note-card" onclick={() => (selectedNote = note)}>
+			<button type="button" class="note-card border-{note.contentType}" onclick={() => (selectedNote = note)}>
 				<div class="note-meta">
 					<span class="note-date">{note.date}</span>
 					<span class="note-type type-{note.contentType}">
@@ -81,26 +89,30 @@
 	open={selectedNote !== null}
 	title={selectedNote?.title}
 	date={selectedNote?.date}
+	contentType={selectedNote?.contentType}
+	emoji={selectedNote?.emoji}
 	onClose={() => (selectedNote = null)}
 >
 	{#if selectedNote}
 		<div class="detail-content">
 			{#if selectedNote.formattedBody}
-				{@html selectedNote.formattedBody}
-			{:else if selectedNote.rawBody}
-				{@html selectedNote.rawBody.replace(/\n/g, '<br>')}
+				{@html stripFirstHeading(selectedNote.formattedBody)}
 			{:else if selectedNote.content}
 				{@html selectedNote.content.replace(/\n/g, '<br>')}
 			{:else}
-				<p>{selectedNote.summary ?? selectedNote.title}</p>
+				<p>{selectedNote.title}</p>
 			{/if}
 			{#if selectedNote.links && selectedNote.links.length > 0}
-				<p class="links-section">
-					<strong>Links:</strong><br />
-					{#each selectedNote.links as link}
-						<a href={link} target="_blank" rel="noopener noreferrer">{link}</a><br />
-					{/each}
-				</p>
+				<div class="links-section">
+					<h3 class="links-heading">Related Links</h3>
+					<ul class="links-list">
+						{#each selectedNote.links as link}
+							<li>
+								<a href={link} target="_blank" rel="noopener noreferrer" class="detail-link">{link}</a>
+							</li>
+						{/each}
+					</ul>
+				</div>
 			{/if}
 		</div>
 	{/if}
@@ -120,6 +132,20 @@
 		flex-wrap: wrap;
 		gap: 1rem;
 	}
+
+	.title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.accent-bar {
+		width: 4px;
+		height: 1.5rem;
+		border-radius: 2px;
+	}
+
+	.accent-coral { background: var(--color-coral); }
 
 	.title {
 		font-size: 1.25rem;
@@ -170,6 +196,7 @@
 
 	.note-card {
 		border: 1px solid rgba(26, 26, 26, 0.2);
+		border-left: 4px solid var(--color-coral);
 		background: rgba(255, 255, 255, 0.5);
 		padding: 0.75rem;
 		text-align: left;
@@ -178,6 +205,10 @@
 		min-width: 0;
 		overflow: hidden;
 	}
+
+	.note-card.border-field-note { border-left-color: var(--color-coral); }
+	.note-card.border-blog-post  { border-left-color: var(--color-navy); }
+	.note-card.border-journal    { border-left-color: var(--color-orange); }
 
 	.note-card:hover {
 		background: rgba(26, 26, 26, 0.05);
@@ -266,6 +297,38 @@
 	}
 
 	.links-section {
-		margin-top: 1.5rem;
+		margin-top: 2rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid rgba(26, 26, 26, 0.1);
+	}
+
+	.links-heading {
+		font-size: 0.875rem;
+		font-weight: 600;
+		font-family: 'IBM Plex Mono', monospace;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: rgba(26, 26, 26, 0.7);
+		margin: 0 0 0.75rem 0;
+	}
+
+	.links-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.detail-link {
+		font-size: 0.875rem;
+		color: rgba(26, 26, 26, 0.7);
+		text-decoration: underline dotted;
+		word-break: break-all;
+	}
+
+	.detail-link:hover {
+		color: #1a1a1a;
 	}
 </style>

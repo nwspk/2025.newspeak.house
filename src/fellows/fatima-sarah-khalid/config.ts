@@ -1,11 +1,12 @@
 /**
  * Config for Fatima's fellow page.
- * Data source path and profile overrides.
+ * Remote content URL and profile overrides.
  */
 import type { FellowProfile } from '$lib/data/fellow-types.js';
 
-/** Path to data file relative to project root */
-export const dataFile = 'matrix_export.json';
+/** Remote URL to fetch content.json from at build time */
+export const contentUrl =
+	'https://raw.githubusercontent.com/nwspk/sugaroverflow-field-notes/main/content.json';
 
 /** Profile overrides: bio, social links, interests, etc. */
 export const profileOverrides: Partial<Omit<FellowProfile, 'slug' | 'fieldNotes' | 'currentlyExploring'>> = {

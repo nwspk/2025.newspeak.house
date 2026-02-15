@@ -8,14 +8,21 @@
 
 	let { items }: Props = $props();
 	let selectedItem = $state<ExplorationItem | null>(null);
+
+	function stripFirstHeading(html: string): string {
+		return html.replace(/^\s*<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>\s*/i, '').trim();
+	}
 </script>
 
 {#if items.length > 0}
 	<div class="section">
-		<h2 class="title">/// EXPLORATION</h2>
+		<div class="title-row">
+			<div class="accent-bar"></div>
+			<h2 class="title">/// EXPLORATION</h2>
+		</div>
 		<div class="grid">
 			{#each items as item}
-				<button type="button" class="card" onclick={() => (selectedItem = item)}>
+				<button type="button" class="card border-{item.kind}" onclick={() => (selectedItem = item)}>
 					<div class="card-meta">
 						<span class="card-date">{item.date}</span>
 						<span class="card-kind kind-{item.kind}">{item.kind.toUpperCase()}</span>
@@ -31,14 +38,14 @@
 	open={selectedItem !== null}
 	title={selectedItem?.title}
 	date={selectedItem?.date}
+	contentType={selectedItem?.kind}
+	emoji={selectedItem?.emoji}
 	onClose={() => (selectedItem = null)}
 >
 	{#if selectedItem}
 		<div class="detail-content">
 			{#if selectedItem.formattedBody}
-				{@html selectedItem.formattedBody}
-			{:else if selectedItem.rawBody}
-				{@html selectedItem.rawBody.replace(/\n/g, '<br>')}
+				{@html stripFirstHeading(selectedItem.formattedBody)}
 			{:else if selectedItem.content}
 				{@html selectedItem.content.replace(/\n/g, '<br>')}
 			{:else}
@@ -69,6 +76,19 @@
 		gap: 1rem;
 	}
 
+	.title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.accent-bar {
+		width: 4px;
+		height: 1.5rem;
+		border-radius: 2px;
+		background: #7B6B8F;
+	}
+
 	.title {
 		font-size: 1.25rem;
 		font-weight: 700;
@@ -93,6 +113,7 @@
 
 	.card {
 		border: 1px solid rgba(26, 26, 26, 0.2);
+		border-left: 4px solid #7B6B8F;
 		background: rgba(255, 255, 255, 0.5);
 		padding: 0.75rem;
 		text-align: left;
@@ -101,6 +122,9 @@
 		min-width: 0;
 		overflow: hidden;
 	}
+
+	.card.border-question { border-left-color: #7B6B8F; }
+	.card.border-idea     { border-left-color: #6B8B7F; }
 
 	.card:hover {
 		background: rgba(26, 26, 26, 0.05);

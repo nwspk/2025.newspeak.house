@@ -74,19 +74,21 @@
 		</div>
 		<div class="reading-list">
 			{#each currentReadingList as activity}
-				<div class="activity-item">
-					<span class="emoji">{activity.emoji || '•'}</span>
-					<div class="activity-content">
-						{#if activity.url}
-							<a href={activity.url} target="_blank" rel="noopener noreferrer" class="activity-link">
-								{activity.title || activity.url}
-							</a>
-						{:else}
-							<span class="activity-title">{activity.title}</span>
-						{/if}
-						{#if activity.description}
-							<p class="activity-desc">{activity.description}</p>
-						{/if}
+				<div class="activity-item type-{activity.type}">
+					<div class="activity-inner">
+						<span class="emoji">{activity.emoji || '•'}</span>
+						<div class="activity-content">
+							{#if activity.url}
+								<a href={activity.url} target="_blank" rel="noopener noreferrer" class="activity-link">
+									{activity.title || activity.url}
+								</a>
+							{:else}
+								<span class="activity-title">{activity.title}</span>
+							{/if}
+							{#if activity.description}
+								<p class="activity-desc">{activity.description}</p>
+							{/if}
+						</div>
 					</div>
 				</div>
 			{/each}
@@ -131,7 +133,8 @@
 
 	.tag {
 		padding: 0.25rem 0.75rem;
-		background: rgba(26, 26, 26, 0.1);
+		background: color-mix(in srgb, var(--color-teal) 15%, transparent);
+		border-left: 2px solid var(--color-teal);
 		color: #1a1a1a;
 		font-size: 0.75rem;
 		font-family: 'IBM Plex Mono', monospace;
@@ -205,6 +208,17 @@
 	}
 
 	.activity-item {
+		border-left: 2px solid var(--color-gold);
+		padding-left: 0.75rem;
+		padding-top: 0.25rem;
+		padding-bottom: 0.25rem;
+	}
+
+	.activity-item.type-link    { border-left-color: var(--color-navy); }
+	.activity-item.type-project { border-left-color: var(--color-coral); }
+	.activity-item.type-reading { border-left-color: var(--color-gold); }
+
+	.activity-inner {
 		display: flex;
 		align-items: flex-start;
 		gap: 0.5rem;

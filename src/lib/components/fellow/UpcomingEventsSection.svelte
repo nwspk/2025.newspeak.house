@@ -11,16 +11,9 @@
 	let currentPage = $state(0);
 
 	const totalPages = $derived(Math.ceil(events.length / itemsPerPage));
-	const startIndex = $derived(currentPage * itemsPerPage);
-	const currentEvents = $derived(events.slice(startIndex, startIndex + itemsPerPage));
-
-	function prev() {
-		currentPage = Math.max(0, currentPage - 1);
-	}
-
-	function next() {
-		currentPage = Math.min(totalPages - 1, currentPage + 1);
-	}
+	const currentEvents = $derived(
+		events.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
+	);
 </script>
 
 {#if events.length > 0}
@@ -29,18 +22,18 @@
 			<h2 class="label">Upcoming events</h2>
 			{#if totalPages > 1}
 				<div class="pagination">
-					<button type="button" onclick={prev} disabled={currentPage === 0} class="nav-btn" aria-label="Previous">
-						←
+					<button type="button" onclick={() => (currentPage = Math.max(0, currentPage - 1))} disabled={currentPage === 0} class="nav-btn" aria-label="Previous">
+						&larr;
 					</button>
 					<span class="page-num">{currentPage + 1} / {totalPages}</span>
 					<button
 						type="button"
-						onclick={next}
+						onclick={() => (currentPage = Math.min(totalPages - 1, currentPage + 1))}
 						disabled={currentPage >= totalPages - 1}
 						class="nav-btn"
 						aria-label="Next"
 					>
-						→
+						&rarr;
 					</button>
 				</div>
 			{/if}
@@ -131,19 +124,16 @@
 	}
 
 	@media (min-width: 768px) {
-		.grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
+		.grid { grid-template-columns: repeat(2, 1fr); }
 	}
 
 	@media (min-width: 1024px) {
-		.grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
+		.grid { grid-template-columns: repeat(3, 1fr); }
 	}
 
 	.event-card {
 		border: 1px solid rgba(26, 26, 26, 0.2);
+		border-left: 4px solid var(--color-teal);
 		background: rgba(255, 255, 255, 0.5);
 		padding: 0.75rem;
 		display: flex;
@@ -175,15 +165,16 @@
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
 
-	.event-title a {
+	a.event-title {
 		text-decoration: underline;
 	}
 
-	.event-title a:hover {
+	a.event-title:hover {
 		opacity: 0.8;
 	}
 
