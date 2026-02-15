@@ -255,31 +255,26 @@
 				</div>
 			</div>
 
-			<div class="media-showcase">
-				<div class="media-label">///</div>
-				{#if selectedPerson.mediaType === 'video'}
-					<div class="video-container">
-						<iframe
-							src={selectedPerson.mediaUrl}
-							title="Video content"
-							frameborder="0"
-							allow="autoplay; encrypted-media"
-							allowfullscreen
-						></iframe>
-					</div>
-				{:else if selectedPerson.mediaType === 'image'}
-					<div class="image-showcase">
-						<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
-					</div>
-				{:else}
-					<div class="image-showcase">
-						<img
-							src={'https://picsum.photos/seed/davit/1200/800'}
-							alt="Autumnal leaves on the ground"
-						/>
-					</div>
-				{/if}
-			</div>
+			{#if selectedPerson.mediaType}
+				<div class="media-showcase">
+					<div class="media-label">///</div>
+					{#if selectedPerson.mediaType === 'video'}
+						<div class="video-container">
+							<iframe
+								src={selectedPerson.mediaUrl}
+								title="Video content"
+								frameborder="0"
+								allow="autoplay; encrypted-media"
+								allowfullscreen
+							></iframe>
+						</div>
+					{:else if selectedPerson.mediaType === 'image'}
+						<div class="image-showcase">
+							<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -354,6 +349,7 @@
 		padding: 1rem 2rem 3rem 3rem;
 		position: relative;
 		flex-basis: 50%;
+		flex-grow: 1;
 		overflow-y: auto;
 		height: 100%;
 	}
