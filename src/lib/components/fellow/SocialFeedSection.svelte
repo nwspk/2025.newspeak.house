@@ -6,13 +6,6 @@
 	}
 
 	let { posts = [] }: Props = $props();
-
-	const platformColors: Record<string, string> = {
-		twitter: 'bg-[#1DA1F2]/10 text-[#1DA1F2]',
-		bluesky: 'bg-[#0085FF]/10 text-[#0085FF]',
-		mastodon: 'bg-[#6364FF]/10 text-[#6364FF]',
-		linkedin: 'bg-[#0A66C2]/10 text-[#0A66C2]'
-	};
 </script>
 
 {#if posts.length > 0}
@@ -24,7 +17,7 @@
 					<div class="post-header">
 						<span class="post-date">{post.date}</span>
 						{#if post.platform}
-							<span class="post-platform {platformColors[post.platform]}">
+							<span class="post-platform platform-{post.platform}">
 								{post.platform}
 							</span>
 						{/if}
@@ -91,6 +84,11 @@
 		padding: 0.125rem 0.5rem;
 		border-radius: 2px;
 	}
+
+	.post-platform.platform-twitter  { background: rgba(29, 161, 242, 0.1); color: #1DA1F2; }
+	.post-platform.platform-bluesky  { background: rgba(0, 133, 255, 0.1);  color: #0085FF; }
+	.post-platform.platform-mastodon { background: rgba(99, 100, 255, 0.1);  color: #6364FF; }
+	.post-platform.platform-linkedin { background: rgba(10, 102, 194, 0.1);  color: #0A66C2; }
 
 	.post-content {
 		font-size: 0.875rem;

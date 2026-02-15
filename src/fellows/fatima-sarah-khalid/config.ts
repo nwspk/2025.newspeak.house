@@ -4,8 +4,8 @@
  */
 import type { FellowProfile } from '$lib/data/fellow-types.js';
 
-/** Matrix export filename (without .json) - file lives in matrix-export/ folder */
-export const matrixExportFile = 'export';
+/** Path to data file relative to project root */
+export const dataFile = 'matrix_export.json';
 
 /** Profile overrides: bio, social links, interests, etc. */
 export const profileOverrides: Partial<Omit<FellowProfile, 'slug' | 'fieldNotes' | 'currentlyExploring'>> = {
@@ -34,7 +34,7 @@ export const profileOverrides: Partial<Omit<FellowProfile, 'slug' | 'fieldNotes'
 		]
 	},
 	upcomingEvents: [
-		{ title: 'Office hours on Refract →', status: 'Thursdays 2-4pm GMT', url: 'https://refract.chat' },
+		{ title: 'Office hours on Refract', status: 'Thursdays 2-4pm GMT', url: 'https://refract.chat' },
 		{ title: 'AI Governance Workshop', status: 'Feb 15, 2025', url: 'https://lu.ma/ai-governance-workshop' }
 	],
 	socialPosts: [

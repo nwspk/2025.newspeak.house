@@ -7,21 +7,7 @@
 	}
 
 	let { items }: Props = $props();
-
 	let selectedItem = $state<ExplorationItem | null>(null);
-
-	function openItem(item: ExplorationItem) {
-		selectedItem = item;
-	}
-
-	function closePanel() {
-		selectedItem = null;
-	}
-
-	const kindColors: Record<string, string> = {
-		question: 'bg-[#7B6B8F] text-white',
-		idea: 'bg-[#6B8B7F] text-white'
-	};
 </script>
 
 {#if items.length > 0}
@@ -29,10 +15,10 @@
 		<h2 class="title">/// EXPLORATION</h2>
 		<div class="grid">
 			{#each items as item}
-				<button type="button" class="card" onclick={() => openItem(item)}>
+				<button type="button" class="card" onclick={() => (selectedItem = item)}>
 					<div class="card-meta">
 						<span class="card-date">{item.date}</span>
-						<span class="card-kind {kindColors[item.kind]}">{item.kind.toUpperCase()}</span>
+						<span class="card-kind kind-{item.kind}">{item.kind.toUpperCase()}</span>
 					</div>
 					<p class="card-title">{item.title}</p>
 				</button>
@@ -45,7 +31,7 @@
 	open={selectedItem !== null}
 	title={selectedItem?.title}
 	date={selectedItem?.date}
-	onClose={closePanel}
+	onClose={() => (selectedItem = null)}
 >
 	{#if selectedItem}
 		<div class="detail-content">
@@ -98,15 +84,11 @@
 	}
 
 	@media (min-width: 640px) {
-		.grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
+		.grid { grid-template-columns: repeat(2, 1fr); }
 	}
 
 	@media (min-width: 1024px) {
-		.grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
+		.grid { grid-template-columns: repeat(3, 1fr); }
 	}
 
 	.card {
@@ -145,7 +127,11 @@
 		letter-spacing: 0.05em;
 		padding: 0.125rem 0.5rem;
 		border-radius: 2px;
+		color: white;
 	}
+
+	.card-kind.kind-question { background: #7B6B8F; }
+	.card-kind.kind-idea     { background: #6B8B7F; }
 
 	.card-title {
 		font-size: 0.875rem;
@@ -155,6 +141,7 @@
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		word-break: break-word;

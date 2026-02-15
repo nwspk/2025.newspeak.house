@@ -4,15 +4,7 @@
  */
 import type { FieldNote, CurrentActivity, ExplorationItem } from '../../fellows/_contract/types.js';
 
-export type {
-	FieldNote,
-	CurrentActivity,
-	ExplorationItem,
-	OpenQuestion,
-	ThreadReply,
-	FieldNoteContentType,
-	PostType
-} from '../../fellows/_contract/types.js';
+export type { FieldNote, CurrentActivity, ExplorationItem, ThreadReply } from '../../fellows/_contract/types.js';
 
 export interface SocialPost {
 	id: string;
@@ -33,14 +25,7 @@ export interface FellowProfile {
 	name: string;
 	avatar: string;
 	bio: string;
-	socialLinks: {
-		linkedin?: string;
-		twitter?: string;
-		bluesky?: string;
-		github?: string;
-		mastodon?: string;
-		website?: string;
-	};
+	socialLinks: Record<string, string>;
 	summary: {
 		interests: string[];
 		working_on: string[];

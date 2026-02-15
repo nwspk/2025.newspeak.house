@@ -17,21 +17,13 @@
 
 	let currentPage = $state(0);
 
-	const derived = $derived.by(() => {
-		const totalPages = Math.ceil(currentlyExploring.length / readingListItemsPerPage);
-		const startIndex = currentPage * readingListItemsPerPage;
-		const endIndex = startIndex + readingListItemsPerPage;
-		return { totalPages, currentReadingList: currentlyExploring.slice(startIndex, endIndex) };
-	});
-
-	function prev() {
-		currentPage = Math.max(0, currentPage - 1);
-	}
-
-	function next() {
-		const total = Math.ceil(currentlyExploring.length / readingListItemsPerPage);
-		currentPage = Math.min(total - 1, currentPage + 1);
-	}
+	const totalPages = $derived(Math.ceil(currentlyExploring.length / readingListItemsPerPage));
+	const currentReadingList = $derived(
+		currentlyExploring.slice(
+			currentPage * readingListItemsPerPage,
+			(currentPage + 1) * readingListItemsPerPage
+		)
+	);
 </script>
 
 <div class="grid">
@@ -52,7 +44,7 @@
 				<h2 class="label">Currently working on</h2>
 				<ul class="list">
 					{#each workingOn as item}
-						<li><span class="bullet">•</span><span>{item}</span></li>
+						<li><span class="bullet">&bull;</span><span>{item}</span></li>
 					{/each}
 				</ul>
 			</div>
@@ -62,28 +54,28 @@
 	<div class="right-col">
 		<div class="block-header">
 			<h2 class="label">Reading list</h2>
-			{#if derived.totalPages > 1}
+			{#if totalPages > 1}
 				<div class="pagination">
-					<button type="button" onclick={prev} disabled={currentPage === 0} class="nav-btn" aria-label="Previous">
-						←
+					<button type="button" onclick={() => (currentPage = Math.max(0, currentPage - 1))} disabled={currentPage === 0} class="nav-btn" aria-label="Previous">
+						&larr;
 					</button>
-					<span class="page-num">{currentPage + 1} / {derived.totalPages}</span>
+					<span class="page-num">{currentPage + 1} / {totalPages}</span>
 					<button
 						type="button"
-						onclick={next}
-						disabled={currentPage >= derived.totalPages - 1}
+						onclick={() => (currentPage = Math.min(totalPages - 1, currentPage + 1))}
+						disabled={currentPage >= totalPages - 1}
 						class="nav-btn"
 						aria-label="Next"
 					>
-						→
+						&rarr;
 					</button>
 				</div>
 			{/if}
 		</div>
 		<div class="reading-list">
-			{#each derived.currentReadingList as activity}
+			{#each currentReadingList as activity}
 				<div class="activity-item">
-					<span class="emoji">{activity.emoji || activity.icon || '•'}</span>
+					<span class="emoji">{activity.emoji || '•'}</span>
 					<div class="activity-content">
 						{#if activity.url}
 							<a href={activity.url} target="_blank" rel="noopener noreferrer" class="activity-link">

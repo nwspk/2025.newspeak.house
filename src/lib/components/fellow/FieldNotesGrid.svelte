@@ -18,91 +18,47 @@
 	const filteredNotes = $derived(
 		filter === 'all' ? notes : notes.filter((n) => n.contentType === filter)
 	);
-
 	const totalPages = $derived(Math.ceil(filteredNotes.length / itemsPerPage));
-	const startIndex = $derived((currentPage - 1) * itemsPerPage);
-	const currentNotes = $derived(filteredNotes.slice(startIndex, startIndex + itemsPerPage));
+	const currentNotes = $derived(
+		filteredNotes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+	);
 
 	function setFilter(f: ContentFilter) {
 		filter = f;
 		currentPage = 1;
 	}
 
-	function prevPage() {
-		currentPage = Math.max(1, currentPage - 1);
-	}
-
-	function nextPage() {
-		currentPage = Math.min(totalPages, currentPage + 1);
-	}
-
-	function openNote(note: FieldNote) {
-		selectedNote = note;
-	}
-
-	function closePanel() {
-		selectedNote = null;
-	}
-
-	const typeColors: Record<string, string> = {
-		'field-note': 'bg-[#8B7355] text-white',
-		'blog-post': 'bg-[#5B7B8F] text-white',
-		journal: 'bg-[#7B6B8F] text-white'
+	const typeLabels: Record<string, string> = {
+		'field-note': 'FIELD-NOTE',
+		'blog-post': 'BLOG-POST',
+		journal: 'JOURNAL'
 	};
-
-	function typeLabel(ct: string) {
-		if (ct === 'field-note') return 'FIELD-NOTE';
-		if (ct === 'blog-post') return 'BLOG-POST';
-		return 'JOURNAL';
-	}
 </script>
 
 <div class="section">
 	<div class="header">
 		<h2 class="title">/// PUBLICATIONS</h2>
 		<div class="filters">
-			<button
-				type="button"
-				class="filter-btn"
-				class:active={filter === 'all'}
-				onclick={() => setFilter('all')}
-			>
-				All
-			</button>
-			<button
-				type="button"
-				class="filter-btn"
-				class:active={filter === 'field-note'}
-				onclick={() => setFilter('field-note')}
-			>
-				Field Notes
-			</button>
-			<button
-				type="button"
-				class="filter-btn"
-				class:active={filter === 'blog-post'}
-				onclick={() => setFilter('blog-post')}
-			>
-				Blog Posts
-			</button>
-			<button
-				type="button"
-				class="filter-btn"
-				class:active={filter === 'journal'}
-				onclick={() => setFilter('journal')}
-			>
-				Journal
-			</button>
+			{#each [['all', 'All'], ['field-note', 'Field Notes'], ['blog-post', 'Blog Posts'], ['journal', 'Journal']] as [value, label]}
+				<button
+					type="button"
+					class="filter-btn"
+					class:active={filter === value}
+					onclick={() => setFilter(value as ContentFilter)}
+				>
+					{label}
+				</button>
+			{/each}
 		</div>
 	</div>
 
 	<div class="grid">
 		{#each currentNotes as note}
-			<button type="button" class="note-card" onclick={() => openNote(note)}>
+			<button type="button" class="note-card" onclick={() => (selectedNote = note)}>
 				<div class="note-meta">
 					<span class="note-date">{note.date}</span>
-					<span class="note-type {typeColors[note.contentType]}">
-						{typeLabel(note.contentType)}
+					<span class="note-type type-{note.contentType}">
+						{typeLabels[note.contentType] ?? note.contentType}
 					</span>
 				</div>
 				<p class="note-title">{note.title}</p>
@@ -111,12 +67,12 @@
 	</div>
 
 	<div class="pagination">
-		<button type="button" onclick={prevPage} disabled={currentPage === 1} class="page-btn">
-			← Prev
+		<button type="button" onclick={() => (currentPage = Math.max(1, currentPage - 1))} disabled={currentPage === 1} class="page-btn">
+			&larr; Prev
 		</button>
 		<span class="page-info">Page {currentPage} of {totalPages}</span>
-		<button type="button" onclick={nextPage} disabled={currentPage === totalPages} class="page-btn">
-			Next →
+		<button type="button" onclick={() => (currentPage = Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} class="page-btn">
+			Next &rarr;
 		</button>
 	</div>
 </div>
@@ -125,7 +81,7 @@
 	open={selectedNote !== null}
 	title={selectedNote?.title}
 	date={selectedNote?.date}
-	onClose={closePanel}
+	onClose={() => (selectedNote = null)}
 >
 	{#if selectedNote}
 		<div class="detail-content">
@@ -205,15 +161,11 @@
 	}
 
 	@media (min-width: 640px) {
-		.grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
+		.grid { grid-template-columns: repeat(2, 1fr); }
 	}
 
 	@media (min-width: 1024px) {
-		.grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
+		.grid { grid-template-columns: repeat(3, 1fr); }
 	}
 
 	.note-card {
@@ -252,7 +204,12 @@
 		letter-spacing: 0.05em;
 		padding: 0.125rem 0.5rem;
 		border-radius: 2px;
+		color: white;
 	}
+
+	.note-type.type-field-note { background: #8B7355; }
+	.note-type.type-blog-post  { background: #5B7B8F; }
+	.note-type.type-journal    { background: #7B6B8F; }
 
 	.note-title {
 		font-size: 0.875rem;
@@ -262,6 +219,7 @@
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		word-break: break-word;

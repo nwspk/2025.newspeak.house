@@ -1,184 +1,120 @@
 /**
- * Parser for Fatima's Matrix room export.
- * Expects messages with emoji prefixes from the room topic:
- * 📥 reading, 🔗 interesting link, ❓ question, 💾 project, 💡 idea, 📔 field notes, 📄 blog post
- * Ignores any message that doesn't start with one of these.
+ * Parser for Fatima's matrix_export.json.
+ *
+ * Message types: field_note, journal, link, idea, question, project, reply
+ * Each message has: id, ts, type, body, parent_id, formatted_body?
+ * Replies have a non-null parent_id pointing to the root message.
  */
 import type { FieldNote, CurrentActivity, ExplorationItem, ParsedFellowContent, ThreadReply } from '../_contract/types.js';
 
-const EMOJI_TO_POST_TYPE: Record<string, { postType: string; contentType: FieldNote['contentType'] }> = {
-	'📥': { postType: 'reading', contentType: 'field-note' },
-	'📥️': { postType: 'reading', contentType: 'field-note' },
-	'🔗': { postType: 'link', contentType: 'field-note' },
-	'❓': { postType: 'question', contentType: 'journal' },
-	'💾': { postType: 'project', contentType: 'field-note' },
-	'💡': { postType: 'idea', contentType: 'field-note' },
-	'📔': { postType: 'field_note', contentType: 'field-note' },
-	'📄': { postType: 'blog_post', contentType: 'blog-post' }
+interface Message {
+	id: string;
+	ts: number;
+	type: string;
+	body: string;
+	parent_id: string | null;
+	formatted_body?: string;
+}
+
+const URL_REGEX = /https?:\/\/[^\s\]"<>)+]+/g;
+
+/** Which message types map to which output bucket */
+const NOTE_TYPES = new Set(['field_note', 'journal']);
+const ACTIVITY_TYPES = new Set(['link', 'project']);
+const EXPLORATION_TYPES = new Set(['question', 'idea']);
+
+const CONTENT_TYPE_MAP: Record<string, FieldNote['contentType']> = {
+	field_note: 'field-note',
+	journal: 'journal'
 };
 
-const URL_REGEX = /https?:\/\/[^\s\]"<>]+/g;
+const EMOJI_MAP: Record<string, string> = {
+	field_note: '📔', journal: '📥', link: '🔗',
+	project: '💾', question: '❓', idea: '💡'
+};
 
-interface MatrixMessage {
-	type: string;
-	content?: {
-		body?: string;
-		msgtype?: string;
-		format?: string;
-		'formatted_body'?: string;
-		'm.relates_to'?: { rel_type?: string; event_id?: string; 'm.in_reply_to'?: { event_id?: string } };
-	};
-	event_id?: string;
-	origin_server_ts?: number;
-}
-
-interface MatrixExport {
-	room_name?: string;
-	messages?: MatrixMessage[];
-}
-
-function isRootMessage(msg: MatrixMessage): boolean {
-	const relatesTo = msg.content?.['m.relates_to'];
-	if (!relatesTo) return true;
-	if (relatesTo.rel_type === 'm.thread' || relatesTo['m.in_reply_to']) return false;
-	if (relatesTo.rel_type === 'm.replace') return false;
-	return true;
-}
-
-function isThreadReply(msg: MatrixMessage): { parentEventId: string } | null {
-	const relatesTo = msg.content?.['m.relates_to'];
-	if (!relatesTo || relatesTo.rel_type !== 'm.thread') return null;
-	const parentId = relatesTo['m.in_reply_to']?.event_id ?? relatesTo.event_id;
-	return parentId ? { parentEventId: parentId } : null;
-}
-
-function inferPostTypeFromBody(
-	body: string
-): { emoji: string; postType: string; contentType: FieldNote['contentType'] } | null {
-	const trimmed = body.trimStart();
-	for (const [emoji, mapping] of Object.entries(EMOJI_TO_POST_TYPE)) {
-		if (trimmed.startsWith(emoji)) return { emoji, ...mapping };
-	}
-	return null;
+function formatDate(ts: number): string {
+	return new Date(ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function extractLinks(body: string): string[] {
-	const matches = body.match(URL_REGEX) ?? [];
-	return [...new Set(matches)];
+	return [...new Set(body.match(URL_REGEX) ?? [])];
 }
 
-function extractTitleAndContent(body: string, emoji: string): { title: string; content?: string } {
-	const trimmed = body.trim();
-	const withoutEmoji = trimmed.replace(new RegExp(`^${emoji}\\s*`), '').trim();
-	const lines = withoutEmoji.split('\n').filter((l) => l.trim());
-	if (lines.length === 0) return { title: 'Untitled', content: undefined };
-	const firstLine = lines[0];
-	const title = firstLine.replace(/^#+\s*/, '').replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
-	const rest = lines.slice(1).join('\n').trim();
-	return { title: title || 'Untitled', content: rest || undefined };
+function extractTitle(body: string): string {
+	const first = body.split('\n').find((l) => l.trim());
+	if (!first) return 'Untitled';
+	// Strip leading emoji, markdown headers, bold markers
+	return first.replace(/^[\p{Emoji}\uFE0F]+\s*/u, '').replace(/^#+\s*/, '').replace(/^\*\*/, '').replace(/\*\*$/, '').trim() || 'Untitled';
 }
 
-function formatDate(ts: number): string {
-	const d = new Date(ts);
-	return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+function extractContent(body: string): string | undefined {
+	const lines = body.split('\n').filter((l) => l.trim());
+	return lines.length > 1 ? lines.slice(1).join('\n').trim() : undefined;
+}
+
+function truncate(text: string, max: number): string {
+	return text.length > max ? text.slice(0, max) + '…' : text;
 }
 
 export function parse(raw: unknown): ParsedFellowContent {
-	const json = raw as MatrixExport;
-	const messages = json?.messages ?? [];
+	const messages = (raw as { messages?: Message[] })?.messages ?? [];
+
+	// Collect thread replies by parent_id
+	const threadReplies = new Map<string, ThreadReply[]>();
+	for (const msg of messages) {
+		if (msg.type !== 'reply' || !msg.parent_id) continue;
+		const replies = threadReplies.get(msg.parent_id) ?? [];
+		replies.push({ body: msg.body, formattedBody: msg.formatted_body, ts: msg.ts });
+		threadReplies.set(msg.parent_id, replies);
+	}
+	threadReplies.forEach((replies) => replies.sort((a, b) => (a.ts ?? 0) - (b.ts ?? 0)));
+
+	// Process root messages
 	const fieldNotes: FieldNote[] = [];
-	const currentActivities = new Map<string, CurrentActivity>();
+	const activities = new Map<string, CurrentActivity>();
 	const explorationItems: ExplorationItem[] = [];
 
-	// First pass: collect thread replies (messages that reply to another)
-	const threadRepliesByParent = new Map<string, ThreadReply[]>();
 	for (const msg of messages) {
-		if (msg.type !== 'm.room.message') continue;
-		const replyInfo = isThreadReply(msg);
-		if (!replyInfo) continue;
+		if (msg.parent_id !== null) continue; // skip replies
 
-		const body = msg.content?.body?.trim();
-		if (!body) continue;
+		const { id, ts, type, body, formatted_body } = msg;
+		const title = extractTitle(body);
+		const content = extractContent(body);
+		const date = formatDate(ts);
+		const emoji = EMOJI_MAP[type];
 
-		const reply: ThreadReply = {
-			body,
-			formattedBody: msg.content?.['formatted_body'],
-			ts: msg.origin_server_ts
-		};
-		const existing = threadRepliesByParent.get(replyInfo.parentEventId) ?? [];
-		existing.push(reply);
-		threadRepliesByParent.set(replyInfo.parentEventId, existing);
-	}
-	// Sort replies by timestamp within each thread
-	threadRepliesByParent.forEach((replies) => {
-		replies.sort((a, b) => (a.ts ?? 0) - (b.ts ?? 0));
-	});
-
-	for (const msg of messages) {
-		if (msg.type !== 'm.room.message') continue;
-		if (!isRootMessage(msg)) continue;
-
-		const body = msg.content?.body?.trim();
-		if (!body) continue;
-
-		const inferred = inferPostTypeFromBody(body);
-		if (!inferred) continue;
-
-		const { emoji, postType, contentType } = inferred;
-		const { title, content } = extractTitleAndContent(body, emoji);
-		const links = extractLinks(body);
-		const date = msg.origin_server_ts ? formatDate(msg.origin_server_ts) : 'Unknown';
-		const id = msg.event_id ?? `msg-${fieldNotes.length + explorationItems.length}`;
-
-		// Publications: 📥 reading, 📔 field notes, 📄 blog post (idea goes to Exploration)
-		if (['reading', 'field_note', 'blog_post'].includes(postType)) {
-			const note: FieldNote = {
-				id,
-				date,
-				title,
-				content,
-				contentType,
-				postType: postType as FieldNote['postType'],
+		if (NOTE_TYPES.has(type)) {
+			const links = extractLinks(body);
+			fieldNotes.push({
+				id, date, title, content,
+				contentType: CONTENT_TYPE_MAP[type] ?? 'field-note',
 				emoji,
-				summary: content ? (content.length > 120 ? content.slice(0, 120) + '…' : content) : title,
+				summary: content ? truncate(content, 120) : title,
 				links: links.length > 0 ? links : undefined,
-				metadata: [contentType.replace('-', ' ')],
 				rawBody: body,
-				formattedBody: msg.content?.['formatted_body']
-			};
-			fieldNotes.push(note);
-		}
-
-		// Reading list: 🔗 link, 💾 project
-		if (['link', 'project'].includes(postType)) {
-			const activity: CurrentActivity = {
-				type: postType as CurrentActivity['type'],
-				emoji,
-				postType,
-				title: title !== 'Untitled' ? title : undefined,
-				url: links[0],
-				description: content ? (content.length > 100 ? content.slice(0, 100) + '…' : content) : undefined,
-				date
-			};
-			const key = activity.url ?? activity.title ?? id;
-			if (!currentActivities.has(key)) {
-				currentActivities.set(key, activity);
+				formattedBody: formatted_body
+			});
+		} else if (ACTIVITY_TYPES.has(type)) {
+			const links = extractLinks(body);
+			const key = links[0] ?? title ?? id;
+			if (!activities.has(key)) {
+				activities.set(key, {
+					type: type as CurrentActivity['type'],
+					emoji,
+					title: title !== 'Untitled' ? title : undefined,
+					url: links[0],
+					description: content ? truncate(content, 100) : undefined,
+					date
+				});
 			}
-		}
-
-		// Exploration: ❓ question, 💡 idea (with thread transcripts)
-		if (postType === 'question' || postType === 'idea') {
-			const threadReplies = threadRepliesByParent.get(id) ?? [];
+		} else if (EXPLORATION_TYPES.has(type)) {
 			explorationItems.push({
-				id,
-				date,
-				title,
-				content,
-				emoji,
-				kind: postType as 'question' | 'idea',
+				id, date, title, content, emoji,
+				kind: type as 'question' | 'idea',
 				rawBody: body,
-				formattedBody: msg.content?.['formatted_body'],
-				threadReplies: threadReplies.length > 0 ? threadReplies : undefined
+				formattedBody: formatted_body,
+				threadReplies: threadReplies.get(id)
 			});
 		}
 	}
@@ -186,9 +122,9 @@ export function parse(raw: unknown): ParsedFellowContent {
 	fieldNotes.reverse();
 	explorationItems.reverse();
 
-	const currentlyExploring = Array.from(currentActivities.values())
-		.reverse()
-		.slice(0, 20);
-
-	return { fieldNotes, currentlyExploring, explorationItems };
+	return {
+		fieldNotes,
+		currentlyExploring: [...activities.values()].reverse().slice(0, 20),
+		explorationItems
+	};
 }

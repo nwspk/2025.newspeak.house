@@ -3,31 +3,19 @@
 		name: string;
 		avatar: string;
 		bio: string;
-		socialLinks: {
-			linkedin?: string;
-			twitter?: string;
-			bluesky?: string;
-			github?: string;
-			mastodon?: string;
-			website?: string;
-		};
+		socialLinks: Record<string, string>;
 	}
 
 	let { name, avatar, bio, socialLinks }: Props = $props();
 
-	const hasLinks = $derived(
-		!!(
-			(socialLinks.twitter && socialLinks.twitter.trim()) ||
-			(socialLinks.bluesky && socialLinks.bluesky.trim()) ||
-			(socialLinks.github && socialLinks.github.trim()) ||
-			(socialLinks.linkedin && socialLinks.linkedin.trim()) ||
-			(socialLinks.mastodon && socialLinks.mastodon.trim()) ||
-			(socialLinks.website && socialLinks.website.trim())
-		)
+	const links = $derived(
+		Object.entries(socialLinks)
+			.filter(([, url]) => url?.trim())
+			.map(([platform, url]) => ({ platform: platform.toUpperCase(), url }))
 	);
 </script>
 
-<div class="space-y-4">
+<div class="profile-header">
 	<div class="avatar-wrap">
 		{#if avatar}
 			<img src={avatar} alt={name} class="avatar-img" />
@@ -52,49 +40,19 @@
 		</a>
 	</div>
 
-	{#if hasLinks}
-	<div class="links">
-		<span class="links-label">LINKS: ACTIVE</span>
-		<span class="links-sep">·</span>
-		{#if socialLinks.twitter && socialLinks.twitter.trim()}
-			<a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" class="link">TWITTER</a>
-		{/if}
-		{#if socialLinks.twitter && socialLinks.bluesky}
-			<span class="links-sep">·</span>
-		{/if}
-		{#if socialLinks.bluesky && socialLinks.bluesky.trim()}
-			<a href={socialLinks.bluesky} target="_blank" rel="noopener noreferrer" class="link">BLUESKY</a>
-		{/if}
-		{#if socialLinks.bluesky && socialLinks.github}
-			<span class="links-sep">·</span>
-		{/if}
-		{#if socialLinks.github && socialLinks.github.trim()}
-			<a href={socialLinks.github} target="_blank" rel="noopener noreferrer" class="link">GITHUB</a>
-		{/if}
-		{#if socialLinks.github && socialLinks.linkedin}
-			<span class="links-sep">·</span>
-		{/if}
-		{#if socialLinks.linkedin && socialLinks.linkedin.trim()}
-			<a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" class="link">LINKEDIN</a>
-		{/if}
-		{#if socialLinks.mastodon && socialLinks.mastodon.trim()}
-			{#if socialLinks.linkedin}
-				<span class="links-sep">·</span>
-			{/if}
-			<a href={socialLinks.mastodon} target="_blank" rel="noopener noreferrer" class="link">MASTODON</a>
-		{/if}
-		{#if socialLinks.website && socialLinks.website.trim()}
-			{#if socialLinks.linkedin || socialLinks.mastodon}
-				<span class="links-sep">·</span>
-			{/if}
-			<a href={socialLinks.website} target="_blank" rel="noopener noreferrer" class="link">WEBSITE</a>
-		{/if}
-	</div>
+	{#if links.length > 0}
+		<div class="links">
+			<span class="links-label">LINKS: ACTIVE</span>
+			{#each links as { platform, url }, i}
+				<span class="links-sep">&middot;</span>
+				<a href={url} target="_blank" rel="noopener noreferrer" class="link">{platform}</a>
+			{/each}
+		</div>
 	{/if}
 </div>
 
 <style>
-	.space-y-4 {
+	.profile-header {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
