@@ -13,6 +13,8 @@
 	import AsilSidahmedPhoto from '$lib/assets/asil-sidahmed.jpg';
 	import ChrisOwenPhoto from '$lib/assets/chris-owen.jpg';
 	import ChrisOwenPhotoSide from '$lib/assets/chris-owen-side.jpg';
+	import FredOBrienPhoto from '$lib/assets/fred-obrien.jpg';
+	import FredOBrienPhotoSide from '$lib/assets/fred-obrien-side.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -131,7 +133,12 @@
 		},
 		{
 			name: "Fred O'Brien",
-			profileSlug: 'frederick-obrien'
+			profileSlug: 'frederick-obrien',
+			description: 'Gonzo man',
+			photo: FredOBrienPhoto,
+			mediaType: 'image',
+			mediaUrl: FredOBrienPhotoSide,
+			mediaAltText: 'Man walking up a mountain'
 		},
 		{
 			name: 'Gamithra Marga',
