@@ -1,0 +1,30 @@
+# Rebuild the site when a fellow's Matrix Publisher Bot exports new content.
+#
+# Triggered by a repository_dispatch event sent from each fellow's
+# field-notes repo after a successful export. The fellow configures
+# SITE_REPO and SITE_DEPLOY_TOKEN in their bot repo to enable this.
+#
+# Event payload: { "event_type": "field-notes-updated" }
+
+name: Rebuild on field notes update
+
+on:
+  repository_dispatch:
+    types: [field-notes-updated]
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build

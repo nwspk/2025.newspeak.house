@@ -121,7 +121,7 @@
 		},
 		{
 			name: 'Fatima Sarah Khalid',
-			profileSlug: 'fatima-sarah-khalid',
+			profileSlug: 'fatima',
 			photo: FatimaSarahKhalidPhoto,
 			description: '✧ ai engineer & civic hacker'
 		},
@@ -250,6 +250,11 @@
 					<h2>{selectedPerson.name}</h2>
 					{#if selectedPerson.description}
 						<p class="panel-description">{selectedPerson.description}</p>
+					{/if}
+					{#if selectedPerson.profileSlug}
+						<a href="/fellow/{selectedPerson.profileSlug}" class="full-profile-link">
+							View full profile →
+						</a>
 					{/if}
 
 					<div class="panel-details">
@@ -456,8 +461,21 @@
 	.panel-description {
 		font-size: 1.1rem;
 		color: #1a1a1a;
-		margin-bottom: 2rem;
+		margin-bottom: 1rem;
 		line-height: 1.6;
+	}
+
+	.full-profile-link {
+		display: inline-block;
+		font-size: 0.85rem;
+		font-family: 'IBM Plex Mono', monospace;
+		color: #d62828;
+		margin-bottom: 1.5rem;
+		text-decoration: underline;
+	}
+
+	.full-profile-link:hover {
+		opacity: 0.9;
 	}
 
 	.media-showcase {

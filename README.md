@@ -17,9 +17,13 @@ Deployment is handled through Github Actions and it is hosted using Github pages
 
 Where possible the site is configured so that content - be they static pages, cohort profiles, or weblog entries - can be added with Markdown files. This [Markdown Guide cheat sheet](https://www.markdownguide.org/cheat-sheet/) is a great introduction for anyone unfamiliar.
 
-## Adding a profile page
+## Adding a fellow landing page (with your own data)
 
-To add a profile page about yourself, create a new file `src/lib/static-pages/cohort-profiles/[your-name].md` and do whatever you want with it.
+Cohort members can have full landing pages at `/fellow/[slug]` with field notes, reading lists, etc. If you'd like to automatically publish posts from your Matrix channel to your page, see the [Matrix Publisher Bot](https://github.com/nwspk/matrix-publisher-bot) and the [setup guide](docs/fellows.md).
+
+## Adding a profile page (markdown)
+
+To add a profile page about yourself, create a new file `src/lib/cohort-profiles/[your-name].md` and do whatever you want with it.
 
 Then add a a page slug to `src/routes/+page.svelte`
 
