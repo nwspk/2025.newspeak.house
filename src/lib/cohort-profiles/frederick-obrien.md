@@ -3,7 +3,7 @@ title: Frederick O'Brien
 description: Master of no trades
 ---
 
-Hallo hallo. My name's Fred. I'm a software engineer and occasional journalist at the _Guardian_. I also code free, open source software for artists.
+Software engineer and occasional journalist at the _Guardian_. I also develop free, open source software for reporters, musicians, and other members of the freak kingdom.
 
 A few links:
 

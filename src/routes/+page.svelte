@@ -13,6 +13,8 @@
 	import AsilSidahmedPhoto from '$lib/assets/asil-sidahmed.jpg';
 	import ChrisOwenPhoto from '$lib/assets/chris-owen.jpg';
 	import ChrisOwenPhotoSide from '$lib/assets/chris-owen-side.jpg';
+	import FredOBrienPhoto from '$lib/assets/fred-obrien.jpg';
+	import FredOBrienPhotoSide from '$lib/assets/fred-obrien-side.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -131,7 +133,12 @@
 		},
 		{
 			name: "Fred O'Brien",
-			profileSlug: 'frederick-obrien'
+			profileSlug: 'frederick-obrien',
+			description: 'Gonzo man',
+			photo: FredOBrienPhoto,
+			mediaType: 'image',
+			mediaUrl: FredOBrienPhotoSide,
+			mediaAltText: 'Man walking up a mountain'
 		},
 		{
 			name: 'Gamithra Marga',
@@ -255,31 +262,26 @@
 				</div>
 			</div>
 
-			<div class="media-showcase">
-				<div class="media-label">///</div>
-				{#if selectedPerson.mediaType === 'video'}
-					<div class="video-container">
-						<iframe
-							src={selectedPerson.mediaUrl}
-							title="Video content"
-							frameborder="0"
-							allow="autoplay; encrypted-media"
-							allowfullscreen
-						></iframe>
-					</div>
-				{:else if selectedPerson.mediaType === 'image'}
-					<div class="image-showcase">
-						<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
-					</div>
-				{:else}
-					<div class="image-showcase">
-						<img
-							src={'https://picsum.photos/seed/davit/1200/800'}
-							alt="Autumnal leaves on the ground"
-						/>
-					</div>
-				{/if}
-			</div>
+			{#if selectedPerson.mediaType}
+				<div class="media-showcase">
+					<div class="media-label">///</div>
+					{#if selectedPerson.mediaType === 'video'}
+						<div class="video-container">
+							<iframe
+								src={selectedPerson.mediaUrl}
+								title="Video content"
+								frameborder="0"
+								allow="autoplay; encrypted-media"
+								allowfullscreen
+							></iframe>
+						</div>
+					{:else if selectedPerson.mediaType === 'image'}
+						<div class="image-showcase">
+							<img src={selectedPerson.mediaUrl} alt={selectedPerson.mediaAltText} />
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -354,6 +356,7 @@
 		padding: 1rem 2rem 3rem 3rem;
 		position: relative;
 		flex-basis: 50%;
+		flex-grow: 1;
 		overflow-y: auto;
 		height: 100%;
 	}
