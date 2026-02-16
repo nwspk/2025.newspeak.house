@@ -5,7 +5,8 @@
 		{ href: '/', label: 'Home' },
 		{ href: '/library', label: 'Library' },
 		{ href: '/guest-room', label: 'Guest Room' },
-		{ href: '/contact', label: 'Contact' }
+		{ href: '/contact', label: 'Contact' },
+		{ href: '/blog', label: 'Blog' }
 	];
 
 	let menuOpen = $state(false);
@@ -41,7 +42,12 @@
 	</button>
 	<nav class="breadcrumb-nav" class:open={menuOpen}>
 		{#each navItems as item}
-			<a href={item.href} class="nav-link" class:active={isActive($page.url.pathname, item.href)} onclick={closeMenu}>
+			<a
+				href={item.href}
+				class="nav-link"
+				class:active={isActive($page.url.pathname, item.href)}
+				onclick={closeMenu}
+			>
 				<span>{item.label}</span>
 			</a>
 		{/each}
@@ -163,7 +169,9 @@
 			height: 2px;
 			background: #1a1a1a;
 			border-radius: 1px;
-			transition: transform 0.3s ease, opacity 0.2s ease;
+			transition:
+				transform 0.3s ease,
+				opacity 0.2s ease;
 		}
 
 		.hamburger.open span:nth-child(1) {
@@ -201,7 +209,9 @@
 			opacity: 0;
 			visibility: hidden;
 			pointer-events: none;
-			transition: opacity 0.2s ease, visibility 0.2s ease;
+			transition:
+				opacity 0.2s ease,
+				visibility 0.2s ease;
 		}
 
 		.breadcrumb-nav.open {
