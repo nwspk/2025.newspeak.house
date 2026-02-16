@@ -2,40 +2,21 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { committee } from '$lib/data/committee';
-
-	interface Version {
-		version: string;
-		current: boolean;
-		date: string;
-		prUrl: string;
-		heuristicSummary: string;
-		rationale: string;
-		dataSources: string[];
-		topProject: { name: string; score: number };
-		diff: string[];
-	}
-
-	interface Project {
-		rank: number;
-		score: number;
-		name: string;
-		url: string;
-		summary: string;
-		assessment: string;
-	}
+	import type { Version, Project } from '$lib/types/awards';
+	import ProjectCard from '$lib/components/awards/ProjectCard.svelte';
+	import VersionTimeline from '$lib/components/awards/VersionTimeline.svelte';
 
 	let { data } = $props();
 
 	let versions = $state(data.versions as Version[]);
 	let resultsMap = $state(data.resultsMap as Record<string, Project[]>);
 	let resultsMeta = $state((data.resultsMeta ?? {}) as Record<string, boolean>);
-	let totalCount = $state(data.totalCount ?? 321);
 
 	let selectedVersion = $state(data.currentVersion as string);
 
-	const EVALUATION_REPO = 'https://github.com/nwspk/politech-awards-2026';
 	const CODEOWNERS_URL =
 		'https://github.com/nwspk/politech-awards-2026/blob/main/.github/CODEOWNERS';
+	const EVALUATION_REPO = 'https://github.com/nwspk/politech-awards-2026';
 	const LUMA_SHOWCASE_URL = 'https://luma.com/4j8zzq1s';
 	const PROCESS_URL =
 		'https://github.com/nwspk/politech-awards-2026/blob/main/PROCESS.md';
@@ -87,7 +68,7 @@
 </svelte:head>
 
 <div class="awards-page">
-	<!-- ① Hero Section -->
+	<!-- Hero -->
 	<section class="hero">
 		<h1>The Political Technology Awards</h1>
 		<p class="subtitle">
@@ -122,69 +103,20 @@
 		</div>
 	</section>
 
-	<!-- ─── divider ─── -->
 	<hr class="divider" />
 
-	<!-- ② Rankings: Sidebar + Results Panel -->
+	<!-- Rankings: Timeline + Results Panel -->
 	<section id="rankings" class="rankings-grid">
-		<!-- Left: Version Sidebar -->
-		<div class="sidebar-wrap">
-			<!-- Desktop -->
-			<div class="sidebar-desktop" role="tablist" aria-label="Algorithm version selector">
-				<h3 class="sidebar-label">Timeline</h3>
-				{#each versions as v, i}
-					{@const color = chartColors[i % chartColors.length]}
-					{@const active = selectedVersion === v.version}
-					<div class="sidebar-item">
-						<button
-							class="version-btn"
-							class:selected={active}
-							role="tab"
-							aria-selected={active}
-							onclick={() => setVersion(v.version)}
-						>
-							<span class="version-btn-bar" style="background:hsl(var(--{color}))"></span>
-							<span class="version-btn-text">{v.version}</span>
-						</button>
-						{#if active && v.date}
-							<div class="version-detail" style="border-left-color:hsl(var(--{color}))">
-								<span class="version-detail-title">{v.version}</span>
-								<span class="version-detail-date">{formatDate(v.date)}</span>
-							</div>
-						{/if}
-					</div>
-				{/each}
-			</div>
+		<VersionTimeline
+			{versions}
+			{selectedVersion}
+			onselect={setVersion}
+			{chartColors}
+			{formatDate}
+		/>
 
-			<!-- Mobile -->
-			<div class="sidebar-mobile">
-				<div class="mobile-row">
-					{#each versions as v, i}
-						{@const color = chartColors[i % chartColors.length]}
-						{@const active = selectedVersion === v.version}
-						<button
-							class="mobile-btn"
-							class:selected={active}
-							onclick={() => setVersion(v.version)}
-						>
-							<span class="version-btn-bar" style="background:hsl(var(--{color}))"></span>
-							<span class="mobile-btn-text">{v.version}</span>
-						</button>
-					{/each}
-				</div>
-				{#if selectedVersionData?.date}
-					<div class="mobile-info">
-						<span class="mobile-info-title">{selectedVersion}</span>
-						<span class="mobile-info-date">{formatDate(selectedVersionData.date)}</span>
-					</div>
-				{/if}
-			</div>
-		</div>
-
-		<!-- Right: Results Panel -->
 		<div class="panel">
 			{#if selectedVersionData}
-				<!-- Fallback notice -->
 				{#if resultsMeta[selectedVersion]}
 					<div class="fallback">
 						<span class="fallback-icon">⚠</span>
@@ -198,7 +130,6 @@
 					</div>
 				{/if}
 
-				<!-- Version info -->
 				<div class="panel-version-info">
 					<h2 class="panel-title">
 						{selectedVersion} · {formatDate(selectedVersionData.date)}
@@ -232,18 +163,7 @@
 					{#if top5.length > 0}
 						<div class="card-list">
 							{#each top5 as project, i}
-								{@const color = chartColors[i % chartColors.length]}
-								<div class="card card--top" style="border-left-color:hsl(var(--{color}))">
-									<span class="card-rank" style="color:hsl(var(--{color}))">#{project.rank}</span>
-									<div class="card-body">
-										<h5 class="card-name">{project.name}</h5>
-										<a href={project.url} target="_blank" rel="noopener noreferrer" class="card-url">{project.url}</a>
-										{#if project.summary}
-											<p class="card-desc">{project.summary}</p>
-										{/if}
-										<p class="card-score">Score: {project.score.toFixed(2)}</p>
-									</div>
-								</div>
+								<ProjectCard {project} variant="top" color={chartColors[i % chartColors.length]} />
 							{/each}
 						</div>
 					{:else}
@@ -260,17 +180,7 @@
 					{#if bottom5.length > 0}
 						<div class="card-list">
 							{#each bottom5 as project}
-								<div class="card card--bottom">
-									<span class="card-rank card-rank--muted">#{project.rank}</span>
-									<div class="card-body">
-										<h5 class="card-name card-name--muted">{project.name}</h5>
-										<a href={project.url} target="_blank" rel="noopener noreferrer" class="card-url card-url--muted">{project.url}</a>
-										{#if project.summary}
-											<p class="card-desc card-desc--muted">{project.summary}</p>
-										{/if}
-										<p class="card-score card-score--muted">Score: {project.score.toFixed(2)}</p>
-									</div>
-								</div>
+								<ProjectCard {project} variant="bottom" />
 							{/each}
 						</div>
 					{:else}
@@ -278,7 +188,6 @@
 					{/if}
 				</div>
 
-				<!-- Diff / limitations -->
 				{#if selectedVersionData.diff.length > 0}
 					<div class="diff-block">
 						<h4 class="info-label">Changes / Limitations</h4>
@@ -293,10 +202,9 @@
 		</div>
 	</section>
 
-	<!-- ─── divider ─── -->
 	<hr class="divider" />
 
-	<!-- ③ Showcase Section (what we're doing + contest the rankings) -->
+	<!-- Showcase -->
 	<section id="showcase" class="showcase">
 		<h2 class="section-title">
 			<span class="title-bar" style="background:hsl(var(--chart-4))"></span>
@@ -325,7 +233,6 @@
 			</p>
 		</div>
 
-		<!-- Share / contest sub-section -->
 		<div class="showcase-share">
 			<h3 class="share-title">
 				<span class="title-bar title-bar--sm" style="background:hsl(var(--chart-5))"></span>
@@ -349,10 +256,9 @@
 		</div>
 	</section>
 
-	<!-- ─── divider ─── -->
 	<hr class="divider" />
 
-	<!-- ④ Committee Section -->
+	<!-- Committee -->
 	<section id="committee" class="committee">
 		<h2 class="section-title">
 			<span class="title-bar" style="background:hsl(var(--chart-3))"></span>
@@ -390,7 +296,7 @@
 </div>
 
 <style>
-	/* ━━ Page ━━ */
+	/* Page layout */
 	.awards-page {
 		max-width: 1400px;
 		margin: 0 auto;
@@ -403,7 +309,7 @@
 		margin: 3rem 0;
 	}
 
-	/* ━━ ① Hero ━━ */
+	/* Hero */
 	.hero h1 {
 		font-size: clamp(2rem, 5vw, 3.5rem);
 		font-weight: 600;
@@ -459,86 +365,12 @@
 		color: #1a1a1a;
 	}
 
-	/* ━━ ② Rankings Grid ━━ */
+	/* Rankings grid */
 	.rankings-grid {
 		display: grid;
 		grid-template-columns: 240px 1fr;
 		gap: 2rem;
 		align-items: start;
-	}
-
-	/* Sidebar */
-	.sidebar-desktop {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		position: sticky;
-		top: 120px;
-	}
-	.sidebar-mobile {
-		display: none;
-	}
-
-	.sidebar-label {
-		font-size: 0.72rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: rgba(26, 26, 26, 0.55);
-		margin: 0 0 0.25rem 0;
-	}
-
-	.sidebar-item {
-		display: flex;
-		flex-direction: column;
-		gap: 0.35rem;
-	}
-
-	.version-btn {
-		position: relative;
-		display: flex;
-		align-items: center;
-		width: 100%;
-		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.88rem;
-		font-weight: 500;
-		padding: 0.6rem 0.75rem 0.6rem 1rem;
-		border: 2px solid #1a1a1a;
-		background: rgba(255, 255, 255, 0.5);
-		color: #1a1a1a;
-		cursor: pointer;
-		text-align: left;
-		overflow: hidden;
-		transition: all 0.15s ease;
-	}
-	.version-btn:hover { background: rgba(26, 26, 26, 0.06); }
-	.version-btn.selected {
-		background: #1a1a1a;
-		color: #d0d0c4;
-		border-color: #1a1a1a;
-	}
-
-	.version-btn-bar {
-		position: absolute;
-		left: 0; top: 0; bottom: 0;
-		width: 4px;
-	}
-	.version-btn-text { margin-left: 0.25rem; }
-
-	.version-detail {
-		padding-left: 0.75rem;
-		border-left: 2px solid;
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-	}
-	.version-detail-title {
-		font-size: 0.78rem;
-		font-weight: 700;
-	}
-	.version-detail-date {
-		font-size: 0.72rem;
-		color: rgba(26, 26, 26, 0.5);
 	}
 
 	/* Results panel */
@@ -556,7 +388,10 @@
 		background: rgba(214, 40, 40, 0.06);
 		border-left: 3px solid #d62828;
 	}
-	.fallback-icon { font-size: 1.1rem; flex-shrink: 0; }
+	.fallback-icon {
+		font-size: 1.1rem;
+		flex-shrink: 0;
+	}
 	.fallback-heading {
 		font-size: 0.85rem;
 		font-weight: 700;
@@ -587,7 +422,10 @@
 		text-decoration: underline dotted rgba(214, 40, 40, 0.4);
 		text-underline-offset: 2px;
 	}
-	.pr-link:hover { text-decoration-color: #d62828; color: #d62828; }
+	.pr-link:hover {
+		text-decoration-color: #d62828;
+		color: #d62828;
+	}
 
 	.info-fields {
 		display: flex;
@@ -612,7 +450,9 @@
 		line-height: 1.6;
 		margin: 0;
 	}
-	.info-value.muted { color: rgba(26, 26, 26, 0.7); }
+	.info-value.muted {
+		color: rgba(26, 26, 26, 0.7);
+	}
 
 	/* Ranking blocks */
 	.rank-block {
@@ -625,8 +465,12 @@
 		align-items: center;
 		gap: 0.5rem;
 	}
-	.rank-icon { font-size: 1.1rem; }
-	.rank-icon--muted { opacity: 0.5; }
+	.rank-icon {
+		font-size: 1.1rem;
+	}
+	.rank-icon--muted {
+		opacity: 0.5;
+	}
 	.rank-heading {
 		font-size: 1.1rem;
 		font-weight: 700;
@@ -639,72 +483,6 @@
 		flex-direction: column;
 		gap: 0.75rem;
 	}
-
-	.card {
-		display: flex;
-		gap: 0.75rem;
-		padding: 1rem 1.15rem;
-		border: 1px solid rgba(26, 26, 26, 0.12);
-		transition: border-color 0.15s ease;
-	}
-	.card--top {
-		background: rgba(255, 255, 255, 0.45);
-		border-left: 4px solid;
-	}
-	.card--top:hover { border-color: rgba(26, 26, 26, 0.25); }
-	.card--bottom {
-		background: rgba(255, 255, 255, 0.2);
-		border-color: rgba(26, 26, 26, 0.08);
-	}
-
-	.card-rank {
-		font-size: 1.35rem;
-		font-weight: 700;
-		font-family: 'IBM Plex Mono', monospace;
-		flex-shrink: 0;
-		line-height: 1.2;
-	}
-	.card-rank--muted { color: rgba(26, 26, 26, 0.25) !important; }
-
-	.card-body {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-	.card-name {
-		font-size: 0.9rem;
-		font-weight: 700;
-		margin: 0;
-	}
-	.card-name--muted { color: rgba(26, 26, 26, 0.7); }
-
-	.card-url {
-		font-size: 0.78rem;
-		color: rgba(26, 26, 26, 0.5);
-		text-decoration: none;
-		word-break: break-all;
-	}
-	.card-url:hover { color: #1a1a1a; text-decoration: underline; }
-	.card-url--muted { color: rgba(26, 26, 26, 0.4); }
-	.card-url--muted:hover { color: rgba(26, 26, 26, 0.6); }
-
-	.card-desc {
-		font-size: 0.78rem;
-		color: rgba(26, 26, 26, 0.6);
-		line-height: 1.5;
-		margin: 0;
-	}
-	.card-desc--muted { color: rgba(26, 26, 26, 0.5); }
-
-	.card-score {
-		font-size: 0.75rem;
-		font-family: 'IBM Plex Mono', monospace;
-		color: rgba(26, 26, 26, 0.4);
-		margin: 0;
-	}
-	.card-score--muted { color: rgba(26, 26, 26, 0.3); }
 
 	.empty {
 		font-style: italic;
@@ -722,7 +500,7 @@
 		line-height: 1.55;
 	}
 
-	/* ━━ ③ Showcase ━━ */
+	/* Showcase */
 	.section-title {
 		font-size: 1.5rem;
 		font-weight: 700;
@@ -760,7 +538,9 @@
 		text-decoration-color: rgba(214, 40, 40, 0.4);
 		text-underline-offset: 2px;
 	}
-	.showcase-body a:hover { text-decoration-color: #d62828; }
+	.showcase-body a:hover {
+		text-decoration-color: #d62828;
+	}
 
 	.showcase-share {
 		margin-top: 1.5rem;
@@ -799,9 +579,12 @@
 		text-decoration: none;
 		transition: background 0.15s ease;
 	}
-	.process-link:hover { background: rgba(255, 255, 255, 0.7); color: #1a1a1a; }
+	.process-link:hover {
+		background: rgba(255, 255, 255, 0.7);
+		color: #1a1a1a;
+	}
 
-	/* ━━ ④ Committee ━━ */
+	/* Committee */
 	.committee-desc {
 		font-size: 0.9rem;
 		color: rgba(26, 26, 26, 0.65);
@@ -837,7 +620,11 @@
 		background: rgba(255, 255, 255, 0.5);
 		flex-shrink: 0;
 	}
-	.avatar img { width: 100%; height: 100%; object-fit: cover; }
+	.avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
 
 	.initials {
 		font-family: 'IBM Plex Mono', monospace;
@@ -863,66 +650,31 @@
 		text-decoration-color: rgba(214, 40, 40, 0.4);
 		text-underline-offset: 2px;
 	}
-	.committee-links a:hover { text-decoration-color: #d62828; }
+	.committee-links a:hover {
+		text-decoration-color: #d62828;
+	}
 
 	.link-sep {
 		margin: 0 0.5rem;
 		color: #aaa;
 	}
 
-	/* ━━ Mobile ━━ */
+	/* Mobile */
 	@media (max-width: 900px) {
-		.awards-page { padding: 2rem 1.25rem 3rem; }
-
-		.rankings-grid { grid-template-columns: 1fr; }
-
-		.sidebar-desktop { display: none; }
-		.sidebar-mobile  { display: block; }
-
-		.mobile-row {
-			display: flex;
-			gap: 0.5rem;
-			overflow-x: auto;
-			padding-bottom: 0.5rem;
+		.awards-page {
+			padding: 2rem 1.25rem 3rem;
 		}
 
-		.mobile-btn {
-			position: relative;
-			flex-shrink: 0;
-			font-family: 'IBM Plex Mono', monospace;
-			font-size: 0.82rem;
-			font-weight: 500;
-			padding: 0.5rem 0.75rem 0.5rem 1rem;
-			border: 2px solid #1a1a1a;
-			background: rgba(255, 255, 255, 0.5);
-			color: #1a1a1a;
-			cursor: pointer;
-			overflow: hidden;
-			transition: all 0.15s ease;
-		}
-		.mobile-btn.selected {
-			background: #1a1a1a;
-			color: #d0d0c4;
-		}
-		.mobile-btn-text { margin-left: 0.25rem; }
-
-		.mobile-info {
-			margin-top: 0.75rem;
-			display: flex;
-			flex-direction: column;
-			gap: 0.15rem;
-		}
-		.mobile-info-title {
-			font-size: 0.85rem;
-			font-weight: 700;
-		}
-		.mobile-info-date {
-			font-size: 0.75rem;
-			color: rgba(26, 26, 26, 0.5);
+		.rankings-grid {
+			grid-template-columns: 1fr;
 		}
 
-		.hero h1 { font-size: clamp(1.8rem, 6vw, 2.5rem); }
+		.hero h1 {
+			font-size: clamp(1.8rem, 6vw, 2.5rem);
+		}
 
-		.avatar-row { gap: 1.25rem; }
+		.avatar-row {
+			gap: 1.25rem;
+		}
 	}
 </style>

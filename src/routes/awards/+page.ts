@@ -1,27 +1,7 @@
 import type { PageLoad } from './$types';
+import type { Version, Project } from '$lib/types/awards';
 
 const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
-
-interface Version {
-	version: string;
-	current: boolean;
-	date: string;
-	prUrl: string;
-	heuristicSummary: string;
-	rationale: string;
-	dataSources: string[];
-	topProject: { name: string; score: number };
-	diff: string[];
-}
-
-interface Project {
-	rank: number;
-	score: number;
-	name: string;
-	url: string;
-	summary: string;
-	assessment: string;
-}
 
 interface RepoIteration {
 	version: string;
