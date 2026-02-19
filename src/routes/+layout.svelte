@@ -3,8 +3,11 @@
 	import '$lib/styles/reset.css';
 	import '$lib/styles/main.css';
 
-	import favicon from '$lib/assets/favicon.jpeg';
+	import favicon from '$lib/assets/newspeak-logo.png';
+	import cohortGroupPhoto from '$lib/assets/cohort-group-photo.JPEG';
 	import Navigation from '$lib/components/Navigation.svelte';
+
+	const SITE_ORIGIN = 'https://2025.newspeak.house';
 
 	let { children } = $props();
 	let scrolled = $state(false);
@@ -23,6 +26,12 @@
 	<link rel="icon" href={favicon} />
 	<title>Newspeak House 25/26</title>
 	<meta name="description" content="Newspeak House Fellowship 2025/26" />
+	<!-- Link preview / thumbnail: cohort group photo -->
+	<meta property="og:image" content={SITE_ORIGIN + cohortGroupPhoto} />
+	<meta property="og:title" content="Newspeak House 25/26" />
+	<meta property="og:description" content="Newspeak House Fellowship 2025/26" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content={SITE_ORIGIN + cohortGroupPhoto} />
 </svelte:head>
 
 <header class:scrolled>

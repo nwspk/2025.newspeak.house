@@ -15,6 +15,7 @@
 	import ChrisOwenPhotoSide from '$lib/assets/chris-owen-side.jpg';
 	import FredOBrienPhoto from '$lib/assets/fred-obrien.jpg';
 	import FredOBrienPhotoSide from '$lib/assets/fred-obrien-side.jpg';
+	import cohortGroupPhoto from '$lib/assets/cohort-group-photo.JPEG';
 
 	type CohortMember = {
 		name: string;
@@ -193,6 +194,9 @@
 						<span class="value">2025-2026</span>
 					</div>
 				</div>
+				<figure class="hero-group-photo">
+					<img src={cohortGroupPhoto} alt="2025/26 fellowship cohort" />
+				</figure>
 			</div>
 		</div>
 
@@ -686,6 +690,23 @@
 		max-width: 700px;
 	}
 
+	.hero-group-photo {
+		flex-shrink: 0;
+		width: min(420px, 45%);
+		max-width: 100%;
+		margin: 0 1.5rem 0 0;
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+		align-self: flex-start;
+	}
+
+	.hero-group-photo img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
 	.meta {
 		font-size: 0.8rem;
 		font-family: 'IBM Plex Mono', monospace;
@@ -771,6 +792,12 @@
 		.hero-content {
 			flex-direction: column;
 			gap: 2rem;
+		}
+
+		.hero-group-photo {
+			width: 100%;
+			max-width: 480px;
+			margin: 0;
 		}
 
 		.section-header {
