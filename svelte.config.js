@@ -9,6 +9,9 @@ const config = {
 		adapter: adapter({
 			fallback: '200.html'
 		}),
+		prerender: {
+			handleUnseenRoutes: 'ignore'
+		},
 		experimental: {
 			remoteFunctions: true
 		}
