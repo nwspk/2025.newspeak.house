@@ -9,4 +9,4 @@ He currently works on improving collaborative research writing workflows at [Ove
 
 He is based in Lewisham, enjoys running, and is an avid tabletop gamer.
 
-[LinkedIn](https://linkedin.com/in/david-m-powell), [GitHub](https://github.com/davidmcpowell)
+[Personal Website](https://davidbuildstech.com), [LinkedIn](https://linkedin.com/in/david-m-powell), [GitHub](https://github.com/davidmcpowell)
