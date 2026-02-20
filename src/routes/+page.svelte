@@ -1,21 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import CohortCard from '$lib/components/CohortCard.svelte';
-	import DavidPowellPhoto from '$lib/assets/david-powell.png';
-	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
-	import GamithraMargaBg from '$lib/assets/gamithra-bg.png';
-	import FatimaSarahKhalidPhoto from '$lib/assets/fatima-sarah-khalid.png';
 	import AlessandroPedoriPhoto from '$lib/assets/alessandro-pedori.jpg';
 	import AlexandraCiocanelPhoto from '$lib/assets/alexandra-ciocanel.jpg';
-	import ConnorDunlopPhoto from '$lib/assets/connor-dunlop.jpg';
-	import EmilyMayhewPhoto from '$lib/assets/emily-mayhew.jpg';
-	import FrancescaGalliPhoto from '$lib/assets/francesca-galli.jpg';
 	import AsilSidahmedPhoto from '$lib/assets/asil-sidahmed.jpg';
 	import ChrisOwenPhoto from '$lib/assets/chris-owen.jpg';
 	import ChrisOwenPhotoSide from '$lib/assets/chris-owen-side.jpg';
+	import ConnorDunlopPhoto from '$lib/assets/connor-dunlop.jpg';
+	import cohortGroupPhoto from '$lib/assets/cohort-group-photo.JPEG';
+	import DavidPowellPhoto from '$lib/assets/david-powell.png';
+	import EmilyMayhewPhoto from '$lib/assets/emily-mayhew.jpg';
+	import FatimaSarahKhalidPhoto from '$lib/assets/fatima-sarah-khalid.png';
+	import FrancescaGalliPhoto from '$lib/assets/francesca-galli.jpg';
 	import FredOBrienPhoto from '$lib/assets/fred-obrien.jpg';
 	import FredOBrienPhotoSide from '$lib/assets/fred-obrien-side.jpg';
-	import cohortGroupPhoto from '$lib/assets/cohort-group-photo.JPEG';
+	import GamithraMargaBg from '$lib/assets/gamithra-bg.png';
+	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
+	import JamieCoombesPhoto from '$lib/assets/jamie-coombes.jpg';
+	import JamieCoombesPhotoSide from '$lib/assets/jamie-coombes-side.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -154,7 +156,13 @@
 			name: 'Huda Abdirahim'
 		},
 		{
-			name: 'Jamie Coombes'
+			name: 'Jamie Coombes',
+			profileSlug: 'jamie-coombes',
+			description: 'AI risk and chloropleth maps',
+			photo: JamieCoombesPhoto,
+			mediaType: 'image',
+			mediaUrl: JamieCoombesPhotoSide,
+			mediaAltText: 'cherry blossom season for jam'
 		},
 		{
 			name: 'Martina Orlea',
