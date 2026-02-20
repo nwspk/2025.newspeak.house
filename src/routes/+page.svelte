@@ -18,6 +18,7 @@
 	import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
 	import JamieCoombesPhoto from '$lib/assets/jamie-coombes.jpg';
 	import JamieCoombesPhotoSide from '$lib/assets/jamie-coombes-side.jpg';
+	import TunaAcisuPhoto from '$lib/assets/tuna-acisu.jpg';
 
 	type CohortMember = {
 		name: string;
@@ -173,7 +174,9 @@
 		},
 		{
 			name: 'Tuna Acisu',
-			profileSlug: 'tuna-acisu'
+			profileSlug: 'tuna-acisu',
+			photo: TunaAcisuPhoto,
+			mediaType: 'image',
 		}
 	];
 </script>
