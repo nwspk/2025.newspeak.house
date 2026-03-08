@@ -32,6 +32,9 @@
 	const PROCESS_URL =
 		'https://github.com/nwspk/politech-awards-2026/blob/main/PROCESS.md';
 
+	const SHOWCASE_DATE = new Date('2026-03-31');
+	let daysRemaining = $state<number | null>(null);
+
 	const chartColors = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'];
 
 	const selectedVersionData = $derived(versions.find((v) => v.version === selectedVersion));
@@ -40,6 +43,13 @@
 	);
 	const results = $derived(resultsMap[selectedVersion] ?? []);
 	const top5 = $derived(results.slice(0, 5));
+
+	/** Countdown color: 20–30 yellow, 6–19 orange, 0–5 red */
+	function countdownColor(days: number): string {
+		if (days <= 5) return '#d62828';
+		if (days < 20) return 'hsl(var(--chart-1))'; /* orange */
+		return 'hsl(var(--chart-4))'; /* yellow */
+	}
 
 	function formatDate(iso: string) {
 		if (!iso) return '';
@@ -69,6 +79,13 @@
 		if (v && validVersions.includes(v)) {
 			selectedVersion = v;
 		}
+		// Countdown to showcase: days from start of today to showcase date
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const end = new Date(SHOWCASE_DATE);
+		end.setHours(0, 0, 0, 0);
+		const diffMs = end.getTime() - today.getTime();
+		daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 	});
 </script>
 
@@ -83,38 +100,57 @@
 <div class="awards-page">
 	<!-- Hero -->
 	<section class="hero">
-		<h1>The Political Technology Awards</h1>
-		<p class="subtitle">
-			The Political Technology Awards is an open evaluation exercise run by the
-			2025–26 Newspeak House fellowship cohort. Review the iterations below,
-			<a href="#showcase" class="subtitle-link">read me</a>, and join us at the
-			Showcase on March 31, 2026 to hear all about it!
-		</p>
-		<div class="hero-actions">
-			<button
-				class="action-btn action-btn--filled"
-				style="border-left-color: hsl(var(--chart-1))"
-				onclick={() => scrollTo('rankings')}
-			>
-				Review the rankings
-			</button>
-			<button
-				class="action-btn action-btn--outline"
-				style="border-left-color: hsl(var(--chart-2))"
-				onclick={() => scrollTo('showcase')}
-			>
-				What we're doing
-			</button>
-			<a
-				class="action-btn action-btn--outline"
-				style="border-left-color: hsl(var(--chart-3))"
-				href={LUMA_SHOWCASE_URL}
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				Attend the showcase
-			</a>
+		<div class="hero-content">
+			<h1>The Political Technology Awards</h1>
+			<p class="subtitle">
+				The Political Technology Awards is an open evaluation exercise run by the
+				2025–26 Newspeak House fellowship cohort. Review the iterations,
+				<a href="#showcase" class="subtitle-link">read about the process</a>, and join us at the
+				<a href={LUMA_SHOWCASE_URL} target="_blank" rel="noopener noreferrer" class="subtitle-link">Showcase on March 31, 2026</a>
+				to hear all about it!
+			</p>
+			<div class="hero-actions">
+				<button
+					class="action-btn action-btn--filled"
+					style="border-left-color: hsl(var(--chart-1))"
+					onclick={() => scrollTo('rankings')}
+				>
+					Review the rankings
+				</button>
+				<button
+					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-2))"
+					onclick={() => scrollTo('showcase')}
+				>
+					What we're doing
+				</button>
+				<a
+					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-3))"
+					href={LUMA_SHOWCASE_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Attend the showcase
+				</a>
+			</div>
 		</div>
+		{#if daysRemaining !== null}
+			<div
+				class="countdown-box"
+				style="border-left-color: {countdownColor(daysRemaining)}"
+			>
+				<span
+					class="countdown-number"
+					style="color: {countdownColor(daysRemaining)}"
+				>
+					{daysRemaining}
+				</span>
+				<span class="countdown-label">
+					day{daysRemaining === 1 ? '' : 's'} until the Showcase!
+				</span>
+			</div>
+		{/if}
 	</section>
 
 	<hr class="divider" />
@@ -338,6 +374,19 @@
 	}
 
 	/* Hero */
+	.hero {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2rem;
+		align-items: stretch;
+		justify-content: space-between;
+	}
+
+	.hero-content {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.hero h1 {
 		font-size: clamp(2rem, 5vw, 3.5rem);
 		font-weight: 600;
@@ -345,6 +394,37 @@
 		letter-spacing: -0.01em;
 		line-height: 1.1;
 		margin: 0 0 0.75rem 0;
+	}
+
+	.countdown-box {
+		/* Same box style as VersionTimeline .version-btn and ProjectCard .card--top */
+		border: 2px solid #1a1a1a;
+		border-left-width: 4px;
+		background: rgba(255, 255, 255, 0.5);
+		min-width: 200px;
+		min-height: 140px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		padding: 1.25rem 1.5rem;
+	}
+
+	.countdown-number {
+		font-size: 6.5rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
+		line-height: 1;
+		-webkit-text-stroke: 2px rgba(26, 26, 26, 0.6);
+		paint-order: stroke fill;
+	}
+
+	.countdown-label {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #1a1a1a;
+		letter-spacing: 0.02em;
 	}
 
 	.subtitle {
@@ -705,6 +785,14 @@
 
 		.rankings-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.hero {
+			flex-direction: column;
+		}
+
+		.countdown-box {
+			width: 100%;
 		}
 
 		.hero h1 {
