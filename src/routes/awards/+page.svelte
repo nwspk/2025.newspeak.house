@@ -242,6 +242,7 @@
 
 	<!-- What we're doing -->
 	<section id="showcase" class="showcase">
+		<span id="documents" class="anchor"></span>
 		<h2 class="section-title">
 			<span class="title-bar" style="background:hsl(var(--chart-4))"></span>
 			What we're doing
@@ -406,29 +407,6 @@
 		flex-direction: column;
 		gap: 2rem;
 		min-width: 0;
-	}
-
-	.fallback {
-		display: flex;
-		gap: 0.75rem;
-		padding: 0.85rem 1rem;
-		background: rgba(214, 40, 40, 0.06);
-		border-left: 3px solid #d62828;
-	}
-	.fallback-icon {
-		font-size: 1.1rem;
-		flex-shrink: 0;
-	}
-	.fallback-heading {
-		font-size: 0.85rem;
-		font-weight: 700;
-		margin: 0 0 0.2rem 0;
-	}
-	.fallback-text {
-		font-size: 0.78rem;
-		color: rgba(26, 26, 26, 0.7);
-		margin: 0;
-		line-height: 1.5;
 	}
 
 	.panel-version-info {
