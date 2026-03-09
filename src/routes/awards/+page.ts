@@ -5,6 +5,7 @@ const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/
 
 interface RepoIteration {
 	version: string;
+	title?: string | null;
 	date: string | null;
 	author: string | null;
 	pr_number: number;
@@ -107,6 +108,8 @@ export const load: PageLoad = async ({ fetch }) => {
 	// Transform iterations to our Version schema (newest first for display)
 	const versions: Version[] = repoIterations.map((it, idx) => ({
 		version: it.version,
+		title: it.title ?? it.version,
+		author: it.author ?? null,
 		current: idx === repoIterations.length - 1,
 		date: it.date ?? '',
 		prUrl: it.pr_url,
