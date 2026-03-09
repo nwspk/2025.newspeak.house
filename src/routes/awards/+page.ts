@@ -17,6 +17,8 @@ interface RepoIteration {
 	data_sources: string[];
 	keywords?: string[] | null;
 	limitations?: string | null;
+	assessment?: string | null;
+	vote_result?: string | null;
 }
 
 interface RepoResult {
@@ -112,15 +114,19 @@ export const load: PageLoad = async ({ fetch }) => {
 		author: it.author ?? null,
 		current: idx === repoIterations.length - 1,
 		date: it.date ?? '',
+		prNumber: it.pr_number,
 		prUrl: it.pr_url,
+		prStatus: it.pr_status,
 		heuristicSummary: it.heuristic,
-		rationale: it.rationale ? stripMarkdown(it.rationale) : '',
+		rationale: it.rationale ?? '',
 		dataSources: it.data_sources ?? [],
 		topProject: {
 			name: it.top_project?.name ?? urlToName(it.top_project?.url ?? ''),
 			score: it.top_project?.score ?? 0
 		},
-		diff: it.limitations ? [it.limitations] : []
+		diff: it.limitations ? [it.limitations] : [],
+		assessment: it.assessment ?? undefined,
+		voteResult: it.vote_result ?? undefined
 	})).reverse();
 
 	const currentVersion = versions.find((v) => v.current)?.version ?? versions[0]?.version ?? 'v4';
