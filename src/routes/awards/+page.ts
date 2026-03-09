@@ -5,6 +5,7 @@ const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/
 
 interface RepoIteration {
 	version: string;
+	title?: string | null;
 	date: string | null;
 	author: string | null;
 	pr_number: number;
@@ -38,13 +39,6 @@ function urlToName(urlStr: string): string {
 	} catch {
 		return urlStr;
 	}
-}
-
-function stripMarkdown(text: string): string {
-	return text
-		.replace(/\*\*(.+?)\*\*/g, '$1')
-		.replace(/\n+/g, ' ')
-		.trim();
 }
 
 function toRepoResults(raw: unknown): RepoResult[] {
@@ -83,10 +77,12 @@ export const load: PageLoad = async ({ fetch }) => {
 	const repoIterations: RepoIteration[] = await iterationsRes.json();
 	const versionIds = repoIterations.map((it) => it.version);
 
-	// Fetch main + all per-version results in parallel
+	// Fetch main + all per-version results (iterations/vN/results.json) + per-version markdown in parallel
+	// Cache-bust to avoid stale 404s from raw.githubusercontent.com
+	const cacheBust = `?t=${Date.now()}`;
 	const [mainRes, ...versionResponses] = await Promise.all([
-		fetch(`${REPO_BASE}/results.json`),
-		...versionIds.map((ver) => fetch(`${REPO_BASE}/results/${ver}.json`))
+		fetch(`${REPO_BASE}/results.json${cacheBust}`),
+		...versionIds.map((ver) => fetch(`${REPO_BASE}/iterations/${ver}/results.json${cacheBust}`))
 	]);
 
 	const mainData = mainRes.ok ? await mainRes.json() : [];
@@ -104,20 +100,38 @@ export const load: PageLoad = async ({ fetch }) => {
 		}
 	}
 
+	// Optionally fetch per-iteration markdown (iterations/{version}/README.md)
+	const markdownResponses = await Promise.all(
+		versionIds.map((ver) => fetch(`${REPO_BASE}/iterations/${ver}/README.md`))
+	);
+	const markdownBodies: Record<string, string> = {};
+	for (let i = 0; i < versionIds.length; i++) {
+		const res = markdownResponses[i];
+		if (res?.ok) {
+			const text = await res.text();
+			// Strip frontmatter (--- ... ---) to get body
+			const body = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '').trim();
+			if (body) markdownBodies[versionIds[i]] = body;
+		}
+	}
+
 	// Transform iterations to our Version schema (newest first for display)
 	const versions: Version[] = repoIterations.map((it, idx) => ({
 		version: it.version,
+		title: it.title ?? it.version,
+		author: it.author ?? null,
 		current: idx === repoIterations.length - 1,
 		date: it.date ?? '',
 		prUrl: it.pr_url,
 		heuristicSummary: it.heuristic,
-		rationale: it.rationale ? stripMarkdown(it.rationale) : '',
+		rationale: it.rationale ?? '',
 		dataSources: it.data_sources ?? [],
 		topProject: {
 			name: it.top_project?.name ?? urlToName(it.top_project?.url ?? ''),
 			score: it.top_project?.score ?? 0
 		},
-		diff: it.limitations ? [it.limitations] : []
+		diff: it.limitations ? [it.limitations] : [],
+		markdownBody: markdownBodies[it.version]
 	})).reverse();
 
 	const currentVersion = versions.find((v) => v.current)?.version ?? versions[0]?.version ?? 'v4';

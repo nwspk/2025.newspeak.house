@@ -1,10 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { committee } from '$lib/data/committee';
+	import { committee, type CommitteeMember } from '$lib/data/committee';
 	import type { Version, Project } from '$lib/types/awards';
+	import AvatarCard from '$lib/components/awards/AvatarCard.svelte';
+	import MarkdownBlock from '$lib/components/awards/MarkdownBlock.svelte';
 	import ProjectCard from '$lib/components/awards/ProjectCard.svelte';
 	import VersionTimeline from '$lib/components/awards/VersionTimeline.svelte';
+
+	/** Map iteration author string (e.g. @jcoombes, Asil) to committee member */
+	function authorToMember(author: string | null): CommitteeMember | null {
+		if (!author) return null;
+		const normalized = author.replace(/^@/, '').toLowerCase();
+		const aliasMap: Record<string, string> = { asil: 'asilsidahmed-newspeak' };
+		const github = aliasMap[normalized] ?? normalized;
+		return committee.find((m) => m.github.toLowerCase() === github) ?? null;
+	}
 
 	let { data } = $props();
 
@@ -21,12 +32,24 @@
 	const PROCESS_URL =
 		'https://github.com/nwspk/politech-awards-2026/blob/main/PROCESS.md';
 
+	const SHOWCASE_DATE = new Date('2026-03-31');
+	let daysRemaining = $state<number | null>(null);
+
 	const chartColors = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'];
 
 	const selectedVersionData = $derived(versions.find((v) => v.version === selectedVersion));
+	const versionAuthorMember = $derived(
+		selectedVersionData?.author ? authorToMember(selectedVersionData.author) : null
+	);
 	const results = $derived(resultsMap[selectedVersion] ?? []);
 	const top5 = $derived(results.slice(0, 5));
-	const bottom5 = $derived(results.length >= 10 ? results.slice(-5) : []);
+
+	/** Countdown color: 20–30 yellow, 6–19 orange, 0–5 red */
+	function countdownColor(days: number): string {
+		if (days <= 5) return '#d62828';
+		if (days < 20) return 'hsl(var(--chart-1))'; /* orange */
+		return 'hsl(var(--chart-4))'; /* yellow */
+	}
 
 	function formatDate(iso: string) {
 		if (!iso) return '';
@@ -56,6 +79,13 @@
 		if (v && validVersions.includes(v)) {
 			selectedVersion = v;
 		}
+		// Countdown to showcase: days from start of today to showcase date
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const end = new Date(SHOWCASE_DATE);
+		end.setHours(0, 0, 0, 0);
+		const diffMs = end.getTime() - today.getTime();
+		daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 	});
 </script>
 
@@ -70,37 +100,57 @@
 <div class="awards-page">
 	<!-- Hero -->
 	<section class="hero">
-		<h1>The Political Technology Awards</h1>
-		<p class="subtitle">
-			Awards show + open evaluation repo by the 2025–26 fellowship cohort.
-			Recognizing projects that advance democratic participation, government
-			transparency, and civic engagement through technology.
-		</p>
-		<div class="hero-actions">
-			<button
-				class="action-btn action-btn--filled"
-				style="border-left-color: hsl(var(--chart-1))"
-				onclick={() => scrollTo('rankings')}
-			>
-				Review the rankings
-			</button>
-			<button
-				class="action-btn action-btn--outline"
-				style="border-left-color: hsl(var(--chart-2))"
-				onclick={() => scrollTo('showcase')}
-			>
-				What we're doing
-			</button>
-			<a
-				class="action-btn action-btn--outline"
-				style="border-left-color: hsl(var(--chart-3))"
-				href={LUMA_SHOWCASE_URL}
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				Attend the showcase
-			</a>
+		<div class="hero-content">
+			<h1>The Political Technology Awards</h1>
+			<p class="subtitle">
+				The Political Technology Awards is an open evaluation exercise run by the
+				2025–26 Newspeak House fellowship cohort. Review the iterations,
+				<a href="#showcase" class="subtitle-link">read about the process</a>, and join us at the
+				<a href={LUMA_SHOWCASE_URL} target="_blank" rel="noopener noreferrer" class="subtitle-link">Showcase on March 31, 2026</a>
+				to hear all about it!
+			</p>
+			<div class="hero-actions">
+				<button
+					class="action-btn action-btn--filled"
+					style="border-left-color: hsl(var(--chart-1))"
+					onclick={() => scrollTo('rankings')}
+				>
+					Review the rankings
+				</button>
+				<button
+					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-2))"
+					onclick={() => scrollTo('showcase')}
+				>
+					What we're doing
+				</button>
+				<a
+					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-3))"
+					href={LUMA_SHOWCASE_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Attend the showcase
+				</a>
+			</div>
 		</div>
+		{#if daysRemaining !== null}
+			<div
+				class="countdown-box"
+				style="border-left-color: {countdownColor(daysRemaining)}"
+			>
+				<span
+					class="countdown-number"
+					style="color: {countdownColor(daysRemaining)}"
+				>
+					{daysRemaining}
+				</span>
+				<span class="countdown-label">
+					day{daysRemaining === 1 ? '' : 's'} until the Showcase!
+				</span>
+			</div>
+		{/if}
 	</section>
 
 	<hr class="divider" />
@@ -117,41 +167,66 @@
 
 		<div class="panel">
 			{#if selectedVersionData}
-				{#if resultsMeta[selectedVersion]}
-					<div class="fallback">
-						<span class="fallback-icon">⚠</span>
-						<div>
-							<p class="fallback-heading">Using fallback data</p>
-							<p class="fallback-text">
-								Per-version historical results are not yet available. Showing current
-								algorithm output from results.json.
-							</p>
-						</div>
-					</div>
-				{/if}
-
 				<div class="panel-version-info">
-					<h2 class="panel-title">
-						{selectedVersion} · {formatDate(selectedVersionData.date)}
-						<a href={selectedVersionData.prUrl} target="_blank" rel="noopener noreferrer" class="pr-link">
-							PR #{selectedVersionData.prUrl.split('/').pop()}
-						</a>
-					</h2>
-
-					<div class="info-fields">
-						<div class="info-field">
-							<h4 class="info-label">Heuristic</h4>
-							<p class="info-value">{selectedVersionData.heuristicSummary}</p>
-						</div>
-						<div class="info-field">
-							<h4 class="info-label">Rationale</h4>
-							<p class="info-value">{selectedVersionData.rationale}</p>
-						</div>
-						<div class="info-field">
-							<h4 class="info-label">Data Sources</h4>
-							<p class="info-value muted">{selectedVersionData.dataSources.join(', ')}</p>
+					<div class="panel-header-row">
+						{#if versionAuthorMember}
+							<AvatarCard
+								name={versionAuthorMember.name}
+								photo={versionAuthorMember.photo}
+								color={chartColors[0]}
+							/>
+						{:else if selectedVersionData.author}
+							<AvatarCard
+								name={selectedVersionData.author.replace(/^@/, '')}
+								color={chartColors[0]}
+							/>
+						{/if}
+						<div class="panel-header-main">
+							<h2 class="panel-title">{selectedVersionData.title}</h2>
+							<span class="panel-meta">
+								{formatDate(selectedVersionData.date)}
+								<a href={selectedVersionData.prUrl} target="_blank" rel="noopener noreferrer" class="pr-link">
+									PR #{selectedVersionData.prUrl.split('/').pop()}
+								</a>
+							</span>
 						</div>
 					</div>
+
+					{#if selectedVersionData.markdownBody}
+						<div class="markdown-body-block">
+							<MarkdownBlock content={selectedVersionData.markdownBody} />
+						</div>
+					{:else}
+						{#if selectedVersionData.diff.length > 0}
+							<div class="diff-block">
+								<h4 class="info-label">Changes / Limitations</h4>
+								<div class="diff-content">
+									{#each selectedVersionData.diff as change}
+										<MarkdownBlock content={change} />
+									{/each}
+								</div>
+							</div>
+						{/if}
+
+						<div class="info-fields">
+							<div class="info-field">
+								<h4 class="info-label">Heuristic</h4>
+								<p class="info-value">{selectedVersionData.heuristicSummary}</p>
+							</div>
+							<div class="info-field">
+								<h4 class="info-label">Rationale</h4>
+								{#if selectedVersionData.rationale}
+									<MarkdownBlock content={selectedVersionData.rationale} />
+								{:else}
+									<p class="info-value">(No rationale provided)</p>
+								{/if}
+							</div>
+							<div class="info-field">
+								<h4 class="info-label">Data Sources</h4>
+								<p class="info-value muted">{selectedVersionData.dataSources.join(', ')}</p>
+							</div>
+						</div>
+					{/if}
 				</div>
 
 				<!-- Top 5 -->
@@ -171,44 +246,42 @@
 					{/if}
 				</div>
 
-				<!-- Bottom 5 -->
+				<!-- All rankings -->
 				<div class="rank-block">
-					<div class="rank-header">
-						<span class="rank-icon rank-icon--muted">▽</span>
-						<h3 class="rank-heading">Bottom 5</h3>
-					</div>
-					{#if bottom5.length > 0}
-						<div class="card-list">
-							{#each bottom5 as project}
-								<ProjectCard {project} variant="bottom" />
-							{/each}
-						</div>
-					{:else}
-						<p class="empty">Not enough projects (need 10+ for bottom 5).</p>
-					{/if}
+					<details class="all-rankings-details">
+						<summary class="all-rankings-summary">
+							<span class="rank-icon rank-icon--muted">▽</span>
+							<h3 class="rank-heading">All rankings</h3>
+						</summary>
+						{#if results.length > 0}
+							<ol class="all-rankings-list">
+								{#each results as project}
+									<li class="all-rankings-item">
+										<span class="all-rankings-rank">#{project.rank}</span>
+										<a href={project.url} target="_blank" rel="noopener noreferrer" class="all-rankings-link">
+											{project.name}
+										</a>
+										<span class="all-rankings-score">{project.score.toFixed(2)}</span>
+									</li>
+								{/each}
+							</ol>
+						{:else}
+							<p class="empty">No data for this version.</p>
+						{/if}
+					</details>
 				</div>
-
-				{#if selectedVersionData.diff.length > 0}
-					<div class="diff-block">
-						<h4 class="info-label">Changes / Limitations</h4>
-						<ul>
-							{#each selectedVersionData.diff as change}
-								<li>{change}</li>
-							{/each}
-						</ul>
-					</div>
-				{/if}
 			{/if}
 		</div>
 	</section>
 
 	<hr class="divider" />
 
-	<!-- Showcase -->
+	<!-- What we're doing -->
 	<section id="showcase" class="showcase">
+		<span id="documents" class="anchor"></span>
 		<h2 class="section-title">
 			<span class="title-bar" style="background:hsl(var(--chart-4))"></span>
-			The Political Technology Awards
+			What we're doing
 		</h2>
 		<div class="showcase-body">
 			<p>
@@ -274,16 +347,7 @@
 		<div class="avatar-row">
 			{#each committee as member, i}
 				{@const color = chartColors[i % chartColors.length]}
-				<div class="avatar-card">
-					<span class="avatar" style="border-color:hsl(var(--{color}))">
-						{#if member.photo}
-							<img src={member.photo} alt={member.name} />
-						{:else}
-							<span class="initials">{member.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}</span>
-						{/if}
-					</span>
-					<span class="avatar-name">{member.name}</span>
-				</div>
+				<AvatarCard name={member.name} photo={member.photo} color={color} />
 			{/each}
 		</div>
 
@@ -310,6 +374,19 @@
 	}
 
 	/* Hero */
+	.hero {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2rem;
+		align-items: stretch;
+		justify-content: space-between;
+	}
+
+	.hero-content {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.hero h1 {
 		font-size: clamp(2rem, 5vw, 3.5rem);
 		font-weight: 600;
@@ -317,6 +394,37 @@
 		letter-spacing: -0.01em;
 		line-height: 1.1;
 		margin: 0 0 0.75rem 0;
+	}
+
+	.countdown-box {
+		/* Same box style as VersionTimeline .version-btn and ProjectCard .card--top */
+		border: 2px solid #1a1a1a;
+		border-left-width: 4px;
+		background: rgba(255, 255, 255, 0.5);
+		min-width: 200px;
+		min-height: 140px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		padding: 1.25rem 1.5rem;
+	}
+
+	.countdown-number {
+		font-size: 6.5rem;
+		font-weight: 700;
+		font-family: 'IBM Plex Mono', monospace;
+		line-height: 1;
+		-webkit-text-stroke: 2px rgba(26, 26, 26, 0.6);
+		paint-order: stroke fill;
+	}
+
+	.countdown-label {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #1a1a1a;
+		letter-spacing: 0.02em;
 	}
 
 	.subtitle {
@@ -381,33 +489,29 @@
 		min-width: 0;
 	}
 
-	.fallback {
-		display: flex;
-		gap: 0.75rem;
-		padding: 0.85rem 1rem;
-		background: rgba(214, 40, 40, 0.06);
-		border-left: 3px solid #d62828;
-	}
-	.fallback-icon {
-		font-size: 1.1rem;
-		flex-shrink: 0;
-	}
-	.fallback-heading {
-		font-size: 0.85rem;
-		font-weight: 700;
-		margin: 0 0 0.2rem 0;
-	}
-	.fallback-text {
-		font-size: 0.78rem;
-		color: rgba(26, 26, 26, 0.7);
-		margin: 0;
-		line-height: 1.5;
-	}
-
 	.panel-version-info {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+	.panel-header-row {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+	.panel-header-main {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		min-width: 0;
+	}
+	.panel-meta {
+		font-size: 0.88rem;
+		color: rgba(26, 26, 26, 0.7);
+	}
+	.panel-meta .pr-link {
+		margin-left: 0.35rem;
 	}
 	.panel-title {
 		font-size: 1.25rem;
@@ -425,6 +529,15 @@
 	.pr-link:hover {
 		text-decoration-color: #d62828;
 		color: #d62828;
+	}
+	.markdown-body-block {
+		margin-top: 0.5rem;
+	}
+	.diff-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-top: 0.35rem;
 	}
 
 	.info-fields {
@@ -490,14 +603,60 @@
 		font-size: 0.88rem;
 	}
 
-	.diff-block ul {
-		padding-left: 1.25rem;
-		margin: 0.35rem 0 0;
+	.all-rankings-details {
+		border: 1px solid rgba(26, 26, 26, 0.12);
+		border-radius: 2px;
 	}
-	.diff-block li {
-		font-size: 0.88rem;
-		color: rgba(26, 26, 26, 0.75);
-		line-height: 1.55;
+	.all-rankings-summary {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 0.75rem;
+		cursor: pointer;
+		list-style: none;
+	}
+	.all-rankings-summary::-webkit-details-marker {
+		display: none;
+	}
+	.all-rankings-list {
+		max-height: 400px;
+		overflow-y: auto;
+		margin: 0;
+		padding: 0.5rem 0.75rem 0.75rem 1rem;
+		list-style: none;
+		border-top: 1px solid rgba(26, 26, 26, 0.08);
+	}
+	.all-rankings-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.35rem 0;
+		font-size: 0.85rem;
+		border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+	}
+	.all-rankings-item:last-child {
+		border-bottom: none;
+	}
+	.all-rankings-rank {
+		font-family: 'IBM Plex Mono', monospace;
+		font-weight: 600;
+		color: rgba(26, 26, 26, 0.5);
+		min-width: 2.5rem;
+	}
+	.all-rankings-link {
+		flex: 1;
+		color: #1a1a1a;
+		text-decoration: none;
+		word-break: break-all;
+	}
+	.all-rankings-link:hover {
+		text-decoration: underline;
+		color: #d62828;
+	}
+	.all-rankings-score {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.8rem;
+		color: rgba(26, 26, 26, 0.5);
 	}
 
 	/* Showcase */
@@ -600,47 +759,6 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.avatar-card {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		max-width: 110px;
-	}
-
-	.avatar {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 64px;
-		height: 64px;
-		border-radius: 50%;
-		overflow: hidden;
-		border: 3px solid;
-		background: rgba(255, 255, 255, 0.5);
-		flex-shrink: 0;
-	}
-	.avatar img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.initials {
-		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.95rem;
-		font-weight: 600;
-		color: #555;
-	}
-
-	.avatar-name {
-		font-size: 0.82rem;
-		font-weight: 700;
-		font-family: 'IBM Plex Mono', monospace;
-		text-align: center;
-		line-height: 1.3;
-	}
-
 	.committee-links {
 		font-size: 0.88rem;
 	}
@@ -667,6 +785,14 @@
 
 		.rankings-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.hero {
+			flex-direction: column;
+		}
+
+		.countdown-box {
+			width: 100%;
 		}
 
 		.hero h1 {

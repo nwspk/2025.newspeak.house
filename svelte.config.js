@@ -10,7 +10,9 @@ const config = {
 			fallback: '200.html'
 		}),
 		prerender: {
-			handleUnseenRoutes: 'ignore'
+			handleUnseenRoutes: 'ignore',
+			handleHttpError: ({ status }) => (status >= 500 ? 'warn' : undefined),
+			handleMissingId: 'warn'
 		},
 		experimental: {
 			remoteFunctions: true

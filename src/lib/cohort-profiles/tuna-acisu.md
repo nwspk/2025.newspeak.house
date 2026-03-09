@@ -7,7 +7,7 @@ description: hello world
 
 Hi! I'm Tuna! Here is some stuff you can peruse.
 
- <img src="https://64.media.tumblr.com/8354ecbadc5d0114d6789ce6f7d3c4ed/2feb9dc48456c15e-fd/s500x750/e4b3c7f191ceb9911ae89c4980e378ce4c981516.png" width="100" height="22"> 
+ <img src="https://64.media.tumblr.com/8354ecbadc5d0114d6789ce6f7d3c4ed/2feb9dc48456c15e-fd/s500x750/e4b3c7f191ceb9911ae89c4980e378ce4c981516.png" width="100" height="22">
 <details>
 <summary>Places to find me</summary>
 <ul>

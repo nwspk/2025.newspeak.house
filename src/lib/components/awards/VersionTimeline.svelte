@@ -30,11 +30,13 @@
 					onclick={() => onselect(v.version)}
 				>
 					<span class="version-btn-bar" style="background:hsl(var(--{color}))"></span>
-					<span class="version-btn-text">{v.version}</span>
+					<span class="version-btn-content">
+						<span class="version-btn-text">{v.version}</span>
+						<span class="version-btn-title">{v.title}</span>
+					</span>
 				</button>
 				{#if active && v.date}
 					<div class="version-detail" style="border-left-color:hsl(var(--{color}))">
-						<span class="version-detail-title">{v.version}</span>
 						<span class="version-detail-date">{formatDate(v.date)}</span>
 					</div>
 				{/if}
@@ -54,13 +56,15 @@
 					onclick={() => onselect(v.version)}
 				>
 					<span class="version-btn-bar" style="background:hsl(var(--{color}))"></span>
-					<span class="mobile-btn-text">{v.version}</span>
+					<span class="mobile-btn-content">
+						<span class="mobile-btn-text">{v.version}</span>
+						<span class="mobile-btn-title">{v.title}</span>
+					</span>
 				</button>
 			{/each}
 		</div>
 		{#if selectedVersionData?.date}
 			<div class="mobile-info">
-				<span class="mobile-info-title">{selectedVersion}</span>
 				<span class="mobile-info-date">{formatDate(selectedVersionData.date)}</span>
 			</div>
 		{/if}
@@ -127,8 +131,25 @@
 		bottom: 0;
 		width: 4px;
 	}
-	.version-btn-text {
+	.version-btn-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
 		margin-left: 0.25rem;
+		min-width: 0;
+	}
+	.version-btn-text {
+		font-size: 0.88rem;
+		font-weight: 600;
+	}
+	.version-btn-title {
+		font-size: 0.72rem;
+		font-weight: 500;
+		line-height: 1.3;
+		color: rgba(26, 26, 26, 0.7);
+	}
+	.version-btn.selected .version-btn-title {
+		color: rgba(208, 208, 196, 0.85);
 	}
 
 	.version-detail {
@@ -137,10 +158,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.15rem;
-	}
-	.version-detail-title {
-		font-size: 0.78rem;
-		font-weight: 700;
 	}
 	.version-detail-date {
 		font-size: 0.72rem;
@@ -180,8 +197,29 @@
 			background: #1a1a1a;
 			color: #d0d0c4;
 		}
-		.mobile-btn-text {
+		.mobile-btn-content {
+			display: flex;
+			flex-direction: column;
+			gap: 0.1rem;
 			margin-left: 0.25rem;
+			min-width: 0;
+		}
+		.mobile-btn-text {
+			font-size: 0.82rem;
+			font-weight: 600;
+		}
+		.mobile-btn-title {
+			font-size: 0.68rem;
+			font-weight: 500;
+			line-height: 1.25;
+			color: rgba(26, 26, 26, 0.7);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 140px;
+		}
+		.mobile-btn.selected .mobile-btn-title {
+			color: rgba(208, 208, 196, 0.85);
 		}
 
 		.mobile-info {
@@ -189,10 +227,6 @@
 			display: flex;
 			flex-direction: column;
 			gap: 0.15rem;
-		}
-		.mobile-info-title {
-			font-size: 0.85rem;
-			font-weight: 700;
 		}
 		.mobile-info-date {
 			font-size: 0.75rem;
