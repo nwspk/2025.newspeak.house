@@ -89,4 +89,27 @@
 		font-style: italic;
 		color: rgba(26, 26, 26, 0.75);
 	}
+
+	/* Markdown tables: bordered */
+	.markdown-prose :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 0.75rem 0;
+		font-size: 0.88rem;
+	}
+	.markdown-prose :global(th),
+	.markdown-prose :global(td) {
+		border: 1px solid rgba(26, 26, 26, 0.2);
+		padding: 0.4rem 0.6rem;
+		text-align: left;
+		vertical-align: top;
+	}
+	.markdown-prose :global(th) {
+		background: rgba(26, 26, 26, 0.06);
+		font-weight: 600;
+		color: #1a1a1a;
+	}
+	.markdown-prose :global(tr:hover td) {
+		background: rgba(26, 26, 26, 0.02);
+	}
 </style>

@@ -186,8 +186,11 @@
 							<span class="panel-meta">
 								{formatDate(selectedVersionData.date)}
 								<a href={selectedVersionData.prUrl} target="_blank" rel="noopener noreferrer" class="pr-link">
-									PR #{selectedVersionData.prUrl.split('/').pop()}
+									PR #{selectedVersionData.prNumber}
 								</a>
+								{#if selectedVersionData.prStatus}
+									<span class="pr-status pr-status--{selectedVersionData.prStatus}">{selectedVersionData.prStatus}</span>
+								{/if}
 							</span>
 						</div>
 					</div>
@@ -197,26 +200,19 @@
 							<MarkdownBlock content={selectedVersionData.markdownBody} />
 						</div>
 					{:else}
-						{#if selectedVersionData.diff.length > 0}
-							<div class="diff-block">
-								<h4 class="info-label">Changes / Limitations</h4>
-								<div class="diff-content">
-									{#each selectedVersionData.diff as change}
-										<MarkdownBlock content={change} />
-									{/each}
-								</div>
-							</div>
-						{/if}
-
-						<div class="info-fields">
+						<div class="info-fields info-fields--ordered">
 							<div class="info-field">
 								<h4 class="info-label">Heuristic</h4>
-								<p class="info-value">{selectedVersionData.heuristicSummary}</p>
+								<div class="info-value">
+									<MarkdownBlock content={selectedVersionData.heuristicSummary} />
+								</div>
 							</div>
 							<div class="info-field">
 								<h4 class="info-label">Rationale</h4>
 								{#if selectedVersionData.rationale}
-									<MarkdownBlock content={selectedVersionData.rationale} />
+									<div class="info-value">
+										<MarkdownBlock content={selectedVersionData.rationale} />
+									</div>
 								{:else}
 									<p class="info-value">(No rationale provided)</p>
 								{/if}
@@ -225,6 +221,24 @@
 								<h4 class="info-label">Data Sources</h4>
 								<p class="info-value muted">{selectedVersionData.dataSources.join(', ')}</p>
 							</div>
+							{#if selectedVersionData.diff.length > 0}
+								<div class="info-field">
+									<h4 class="info-label">Changes / Limitations</h4>
+									<div class="diff-content">
+										{#each selectedVersionData.diff as change}
+											<MarkdownBlock content={change} />
+										{/each}
+									</div>
+								</div>
+							{/if}
+							{#if selectedVersionData.assessment}
+								<div class="info-field">
+									<h4 class="info-label">Assessment</h4>
+									<div class="info-value">
+										<MarkdownBlock content={selectedVersionData.assessment} />
+									</div>
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -529,6 +543,15 @@
 	.pr-link:hover {
 		text-decoration-color: #d62828;
 		color: #d62828;
+	}
+	.pr-status {
+		margin-left: 0.35rem;
+		font-size: 0.8rem;
+		text-transform: capitalize;
+		color: rgba(26, 26, 26, 0.6);
+	}
+	.pr-status--merged {
+		color: rgba(26, 26, 26, 0.5);
 	}
 	.markdown-body-block {
 		margin-top: 0.5rem;
