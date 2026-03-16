@@ -4,6 +4,11 @@
 	import AlessandroPedoriPhoto from '$lib/assets/alessandro-pedori.jpg';
 	import AlexandraCiocanelPhoto from '$lib/assets/alexandra-ciocanel.jpg';
 	import AsilSidahmedPhoto from '$lib/assets/asil-sidahmed.jpg';
+	import HudaAbdirahimPhoto from '$lib/assets/huda.png';
+	import DavitJintcharadzePhoto from '$lib/assets/davit.png';
+	import AadiKulkarniPhoto from '$lib/assets/aadi.png';
+	import MartinaOrleaPhoto from '$lib/assets/martina.png';
+	import NickBottiPhoto from '$lib/assets/nick.png';
 	import ChrisOwenPhoto from '$lib/assets/chris-owen.jpg';
 	import ChrisOwenPhotoSide from '$lib/assets/chris-owen-side.jpg';
 	import ConnorDunlopPhoto from '$lib/assets/connor-dunlop.jpg';
@@ -173,7 +178,8 @@
 		},
 		{
 			name: 'Martina Orlea',
-			profileSlug: 'martina-orlea'
+			profileSlug: 'martina-orlea',
+			photo: MartinaOrleaPhoto
 		},
 		{
 			name: 'Nick Botti',
