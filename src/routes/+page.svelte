@@ -78,7 +78,8 @@
 	const cohort: CohortMember[] = [
 		{
 			name: 'Aadi Kulkarni',
-			photo: AadiKulkarniPhoto
+			photo: AadiKulkarniPhoto,
+			profileSlug: 'aadi-kulkarni'
 		},
 		{
 			name: 'Alex Pedori',
@@ -122,7 +123,8 @@
 		},
 		{
 			name: 'Davit Jintcharadze',
-			photo: DavitJintcharadzePhoto
+			photo: DavitJintcharadzePhoto,
+			profileSlug: 'davit-jintcharadze'
 		},
 		{
 			name: 'Emily Mayhew',
@@ -162,7 +164,8 @@
 		},
 		{
 			name: 'Huda Abdirahim',
-			photo: HudaAbdirahimPhoto
+			photo: HudaAbdirahimPhoto,
+			profileSlug: 'huda-abdirahim'
 		},
 		{
 			name: 'Jamie Coombes',
@@ -180,7 +183,8 @@
 		},
 		{
 			name: 'Nick Botti',
-			photo: NickBottiPhoto
+			photo: NickBottiPhoto,
+			profileSlug: 'nick-botti'
 		},
 		{
 			name: 'Tuna Acisu',
