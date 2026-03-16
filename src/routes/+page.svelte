@@ -72,13 +72,9 @@
 
 	const cohort: CohortMember[] = [
 		{
-<<<<<<< Updated upstream
-			name: 'Aadi Kulkarni'
-=======
 			name: 'Aadi Kulkarni',
 			photo: AadiKulkarniPhoto,
 			profileSlug: 'aadi-kulkarni'
->>>>>>> Stashed changes
 		},
 		{
 			name: 'Alex Pedori',
@@ -121,13 +117,9 @@
 			photo: DavidPowellPhoto
 		},
 		{
-<<<<<<< Updated upstream
-			name: 'Davit Jintcharadze'
-=======
 			name: 'Davit Jintcharadze',
 			photo: DavitJintcharadzePhoto,
 			profileSlug: 'davit-jintcharadze'
->>>>>>> Stashed changes
 		},
 		{
 			name: 'Emily Mayhew',
@@ -166,13 +158,9 @@
 			mediaAltText: 'gamithra holding a little drink'
 		},
 		{
-<<<<<<< Updated upstream
-			name: 'Huda Abdirahim'
-=======
 			name: 'Huda Abdirahim',
 			photo: HudaAbdirahimPhoto,
 			profileSlug: 'huda-abdirahim'
->>>>>>> Stashed changes
 		},
 		{
 			name: 'Jamie Coombes',
@@ -188,19 +176,15 @@
 			profileSlug: 'martina-orlea'
 		},
 		{
-<<<<<<< Updated upstream
-			name: 'Nick Botti'
-=======
 			name: 'Nick Botti',
 			photo: NickBottiPhoto,
 			profileSlug: 'nick-botti'
->>>>>>> Stashed changes
 		},
 		{
 			name: 'Tuna Acisu',
 			profileSlug: 'tuna-acisu',
 			photo: TunaAcisuPhoto,
-			mediaType: 'image',
+			mediaType: 'image'
 		}
 	];
 </script>
