@@ -2,6 +2,7 @@ import type { PageLoad } from './$types';
 import type { Version, Project } from '$lib/types/awards';
 
 const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
+const LOGS_BASE = `${REPO_BASE}/docs/logs`;
 
 interface RepoIteration {
 	version: string;
@@ -139,11 +140,26 @@ export const load: PageLoad = async ({ fetch }) => {
 		resultsMeta[v] = resultsMap[v].isFallback;
 	}
 
+	const [processLogRes, iterationsLogRes, dataLogRes] = await Promise.all([
+		fetch(`${LOGS_BASE}/process-log.md`),
+		fetch(`${LOGS_BASE}/iterations-log.md`),
+		fetch(`${LOGS_BASE}/data-log.md`)
+	]);
+
+	const [processLogMarkdown, iterationsLogMarkdown, dataLogMarkdown] = await Promise.all([
+		processLogRes.ok ? processLogRes.text() : Promise.resolve(''),
+		iterationsLogRes.ok ? iterationsLogRes.text() : Promise.resolve(''),
+		dataLogRes.ok ? dataLogRes.text() : Promise.resolve('')
+	]);
+
 	return {
 		versions,
 		resultsMap: resultsMapFlat,
 		resultsMeta,
 		currentVersion,
-		totalCount: fallbackProjects.length
+		totalCount: fallbackProjects.length,
+		processLogMarkdown,
+		iterationsLogMarkdown,
+		dataLogMarkdown
 	};
 };
