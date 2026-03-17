@@ -1354,9 +1354,21 @@
 		.data-grid {
 			grid-template-columns: 1fr;
 		}
+		.logs-stack {
+			margin-top: 1.5rem;
+		}
 
 		.hero {
 			flex-direction: column;
+		}
+		.hero-actions {
+			width: 100%;
+			flex-direction: column;
+			gap: 0.55rem;
+		}
+		.hero-actions .action-btn {
+			width: 100%;
+			justify-content: flex-start;
 		}
 
 		.countdown-box {
@@ -1365,6 +1377,55 @@
 
 		.hero h1 {
 			font-size: clamp(1.8rem, 6vw, 2.5rem);
+		}
+		.subtitle {
+			max-width: none;
+		}
+		.tab-info {
+			padding: 0.7rem 0.8rem;
+		}
+		.tab-info-text {
+			font-size: 0.85rem;
+			line-height: 1.5;
+		}
+		.log-group-heading {
+			font-size: 1.1rem;
+		}
+		.process-sidebar,
+		.data-sidebar {
+			position: static;
+			top: auto;
+		}
+		.process-date-btn,
+		.data-nav-btn {
+			width: 100%;
+		}
+		.meeting-card-header {
+			flex-wrap: wrap;
+		}
+		.all-rankings-item {
+			flex-wrap: wrap;
+			row-gap: 0.2rem;
+		}
+		.all-rankings-score {
+			margin-left: auto;
+		}
+		.footer-sources {
+			font-size: 0.8rem;
+			line-height: 1.5;
+		}
+		:global(.awards-page table) {
+			display: block;
+			max-width: 100%;
+			overflow-x: auto;
+		}
+		:global(.awards-page th),
+		:global(.awards-page td) {
+			white-space: nowrap;
+		}
+		:global(.awards-page pre) {
+			max-width: 100%;
+			overflow-x: auto;
 		}
 
 		.avatar-row {
