@@ -89,7 +89,7 @@ export const load: PageLoad = async ({ fetch }) => {
 	// Fetch main + all per-version results in parallel
 	const [mainRes, ...versionResponses] = await Promise.all([
 		fetch(`${REPO_BASE}/results.json`),
-		...versionIds.map((ver) => fetch(`${REPO_BASE}/results/${ver}.json`))
+		...versionIds.map((ver) => fetch(`${REPO_BASE}/iterations/${ver}/results.json`))
 	]);
 
 	const mainData = mainRes.ok ? await mainRes.json() : [];
