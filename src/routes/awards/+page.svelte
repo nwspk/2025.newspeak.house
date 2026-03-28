@@ -30,7 +30,7 @@
 	const EVALUATION_REPO = 'https://github.com/nwspk/politech-awards-2026';
 	const LUMA_SHOWCASE_URL = 'https://luma.com/4j8zzq1s';
 	const PROCESS_URL =
-		'https://github.com/nwspk/politech-awards-2026/blob/main/docs/PROCESS.md';
+		'https://github.com/nwspk/politech-awards-2026/blob/main/docs/logs/process-log.md';
 
 	const SHOWCASE_DATE = new Date('2026-03-31');
 	let daysRemaining = $state<number | null>(null);
