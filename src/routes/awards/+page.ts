@@ -1,9 +1,6 @@
 import type { PageLoad } from './$types';
 import type { Version, Project } from '$lib/types/awards';
 
-/** Always fetch iterations at request time; root layout prerenders static pages, but awards data changes when the evaluation repo updates. */
-export const prerender = false;
-
 const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
 
 interface RepoIteration {
