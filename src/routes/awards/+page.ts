@@ -15,6 +15,7 @@ interface RepoIteration {
 	title?: string | null;
 	date: string | null;
 	author: string | null;
+	authors?: string[] | null;
 	pr_number: number;
 	pr_url: string;
 	pr_status: string;
@@ -31,6 +32,10 @@ interface RepoIteration {
 interface RepoResult {
 	url: string;
 	score: number;
+	name?: string;
+	summary?: string;
+	assessment?: string;
+	assessment_synthetic?: boolean;
 }
 
 function urlToName(urlStr: string): string {
@@ -50,18 +55,15 @@ function urlToName(urlStr: string): string {
 	}
 }
 
-function stripMarkdown(text: string): string {
-	return text
-		.replace(/\*\*(.+?)\*\*/g, '$1')
-		.replace(/\n+/g, ' ')
-		.trim();
-}
-
 function toRepoResults(raw: unknown): RepoResult[] {
 	if (Array.isArray(raw)) {
 		return raw.map((x) => ({
 			url: (x as { url?: string }).url ?? (x as { link?: string }).link ?? '',
-			score: (x as { score?: number }).score ?? 0
+			score: (x as { score?: number }).score ?? 0,
+			name: (x as { name?: string }).name,
+			summary: (x as { summary?: string }).summary,
+			assessment: (x as { assessment?: string }).assessment,
+			assessment_synthetic: (x as { assessment_synthetic?: boolean }).assessment_synthetic
 		}));
 	}
 	if (raw && typeof raw === 'object' && 'projects' in raw) {
@@ -80,10 +82,11 @@ function toProjects(repoResults: RepoResult[]): Project[] {
 	return sorted.map((r, i) => ({
 		rank: i + 1,
 		score: r.score,
-		name: urlToName(r.url),
+		name: r.name ?? urlToName(r.url),
 		url: r.url,
-		summary: '',
-		assessment: ''
+		summary: r.summary ?? '',
+		assessment: r.assessment ?? '',
+		assessment_synthetic: r.assessment_synthetic ?? false
 	}));
 }
 
@@ -121,6 +124,7 @@ export const load: PageLoad = async ({ fetch }) => {
 		version: it.version,
 		title: it.title ?? it.version,
 		author: it.author ?? null,
+		authors: it.authors ?? null,
 		current: idx === repoIterations.length - 1,
 		date: it.date ?? '',
 		prNumber: it.pr_number,

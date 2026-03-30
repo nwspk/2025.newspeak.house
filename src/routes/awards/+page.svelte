@@ -56,6 +56,13 @@
 	const versionAuthorMember = $derived(
 		selectedVersionData?.author ? authorToMember(selectedVersionData.author) : null
 	);
+	const versionAuthorMembers = $derived(
+		selectedVersionData?.authors
+			? selectedVersionData.authors.map((a) => authorToMember(a)).filter(Boolean)
+			: versionAuthorMember
+				? [versionAuthorMember]
+				: []
+	);
 	const results = $derived(resultsMap[selectedVersion] ?? []);
 	const top5 = $derived(results.slice(0, 5));
 	const processLogMarkdown = $derived((data.processLogMarkdown ?? '') as string);
@@ -254,6 +261,26 @@
 		el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
+	let assessmentLogVersion = $state<string>('');
+	let assessmentLogPage = $state(0);
+	const ALOG_PAGE_SIZE = 10;
+
+	const assessmentLogVersionData = $derived(
+		versions.find(v => v.version === assessmentLogVersion) ?? versions[0]
+	);
+	const assessmentLogProjects = $derived(
+		resultsMap[assessmentLogVersionData?.version ?? ''] ?? []
+	);
+	const assessmentLogPage_projects = $derived(
+		assessmentLogProjects.slice(
+			assessmentLogPage * ALOG_PAGE_SIZE,
+			(assessmentLogPage + 1) * ALOG_PAGE_SIZE
+		)
+	);
+	const assessmentLogTotalPages = $derived(
+		Math.ceil(assessmentLogProjects.length / ALOG_PAGE_SIZE)
+	);
+
 	onMount(() => {
 		if (!browser) return;
 		const params = new URLSearchParams(window.location.search);
@@ -302,6 +329,13 @@
 					onclick={() => scrollTo('rankings')}
 				>
 					See the Evaluation
+				</button>
+				<button
+					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-5))"
+					onclick={() => scrollTo('assessment-log')}
+				>
+					Project Assessments
 				</button>
 				<button
 					class="action-btn action-btn--outline"
@@ -374,12 +408,14 @@
 				{#if selectedVersionData}
 					<div class="panel-version-info">
 						<div class="panel-header-row">
-							{#if versionAuthorMember}
-								<AvatarCard
-									name={versionAuthorMember.name}
-									photo={versionAuthorMember.photo}
-									color={chartColors[0]}
-								/>
+							{#if versionAuthorMembers.length > 0}
+								{#each versionAuthorMembers as member, mi}
+									<AvatarCard
+										name={member.name}
+										photo={member.photo}
+										color={chartColors[mi % chartColors.length]}
+									/>
+								{/each}
 							{:else if selectedVersionData.author}
 								<AvatarCard
 									name={selectedVersionData.author.replace(/^@/, '')}
@@ -490,6 +526,96 @@
 				{/if}
 			</div>
 		</div>
+
+		<hr class="divider divider--inner" />
+
+		<div id="assessment-log" class="logs-stack">
+			<h2 class="section-title">
+				<span class="title-bar" style="background:hsl(var(--chart-5))"></span>
+				Project Assessment Log
+			</h2>
+			<div class="tab-info" style="border-left-color:hsl(var(--chart-5))">
+				<p class="tab-info-text">
+					Each iteration's ranked projects with assessments. Assessments marked * were inferred from the heuristic — earlier iterations did not produce per-project rationale.
+				</p>
+			</div>
+
+			<div class="alog-timeline-nav">
+				{#each versions as ver, vi}
+					{@const hasReal = (resultsMap[ver.version] ?? []).some(p => p.assessment && !p.assessment_synthetic)}
+					<button
+						type="button"
+						class="alog-tab"
+						class:alog-tab--active={assessmentLogVersionData?.version === ver.version}
+						style="--tab-color:hsl(var(--{chartColors[vi % chartColors.length]}))"
+						onclick={() => { assessmentLogVersion = ver.version; assessmentLogPage = 0; }}
+					>
+						<span class="alog-tab-ver">{ver.version}</span>
+						{#if hasReal}
+							<span class="alog-tab-dot alog-tab-dot--real" title="jury/agent assessments available"></span>
+						{:else}
+							<span class="alog-tab-dot alog-tab-dot--synthetic" title="heuristic only"></span>
+						{/if}
+					</button>
+				{/each}
+			</div>
+
+			{#if assessmentLogVersionData}
+				{@const activeColor = chartColors[versions.findIndex(v => v.version === assessmentLogVersionData.version) % chartColors.length]}
+				{@const hasSyntheticOnPage = assessmentLogPage_projects.some(p => p.assessment_synthetic)}
+				<div class="alog-panel" style="border-left-color:hsl(var(--{activeColor}))">
+					<div class="alog-panel-header">
+						<span class="alog-panel-ver" style="color:hsl(var(--{activeColor}))">{assessmentLogVersionData.version}</span>
+						<span class="alog-panel-title">{assessmentLogVersionData.title}</span>
+						<span class="alog-panel-meta">{formatDate(assessmentLogVersionData.date)} · {assessmentLogProjects.length} projects</span>
+					</div>
+
+					<div class="alog-project-list">
+						{#each assessmentLogPage_projects as project}
+							<div class="alog-project" style="border-left-color:hsl(var(--{activeColor}))">
+								<div class="alog-project-meta">
+									<span class="alog-project-rank">#{project.rank}</span>
+									<a href={project.url} target="_blank" rel="noopener noreferrer" class="alog-project-name">{project.name}</a>
+									<span class="alog-project-score">{project.score.toFixed(1)}</span>
+								</div>
+								{#if project.summary}
+									<p class="alog-project-summary">{project.summary}</p>
+								{/if}
+								{#if project.assessment}
+									<p class="alog-project-assessment">{project.assessment}{project.assessment_synthetic ? ' *' : ''}</p>
+								{/if}
+							</div>
+						{/each}
+					</div>
+
+					{#if assessmentLogTotalPages > 1}
+						<div class="alog-pagination">
+							<button
+								type="button"
+								class="alog-page-btn"
+								disabled={assessmentLogPage === 0}
+								onclick={() => assessmentLogPage--}
+							>← prev</button>
+							<span class="alog-page-info">
+								{assessmentLogPage + 1} / {assessmentLogTotalPages}
+								<span class="alog-page-count">(#{assessmentLogPage * ALOG_PAGE_SIZE + 1}–#{Math.min((assessmentLogPage + 1) * ALOG_PAGE_SIZE, assessmentLogProjects.length)})</span>
+							</span>
+							<button
+								type="button"
+								class="alog-page-btn"
+								disabled={assessmentLogPage >= assessmentLogTotalPages - 1}
+								onclick={() => assessmentLogPage++}
+							>next →</button>
+						</div>
+					{/if}
+
+					{#if hasSyntheticOnPage}
+						<p class="alog-synthetic-note">* Assessment inferred from scoring heuristic — this iteration did not produce per-project rationale</p>
+					{/if}
+				</div>
+			{/if}
+		</div>
+
 		<hr class="divider divider--inner" />
 
 		<div id="process-log" class="logs-stack">
@@ -673,6 +799,7 @@
 				{/if}
 			</div>
 		</div>
+
 	</section>
 
 	<hr class="divider" />
@@ -1525,4 +1652,186 @@
 			gap: 1.25rem;
 		}
 	}
+
+	/* Assessment Log */
+	.alog-timeline-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		margin-bottom: 1rem;
+	}
+	.alog-tab {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.8rem;
+		font-weight: 700;
+		padding: 0.4rem 0.75rem;
+		border: 2px solid rgba(26, 26, 26, 0.18);
+		border-left: 3px solid var(--tab-color);
+		background: rgba(255, 255, 255, 0.3);
+		cursor: pointer;
+		color: rgba(26, 26, 26, 0.65);
+		transition: all 0.12s ease;
+	}
+	.alog-tab:hover {
+		background: rgba(255, 255, 255, 0.6);
+		color: #1a1a1a;
+	}
+	.alog-tab--active {
+		background: rgba(255, 255, 255, 0.7);
+		color: #1a1a1a;
+		border-color: rgba(26, 26, 26, 0.35);
+		border-left-color: var(--tab-color);
+	}
+	.alog-tab-ver {
+		line-height: 1;
+	}
+	.alog-tab-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+	.alog-tab-dot--real {
+		background: #1a6b1a;
+	}
+	.alog-tab-dot--synthetic {
+		background: rgba(26, 26, 26, 0.25);
+	}
+	.alog-panel {
+		border: 1px solid rgba(26, 26, 26, 0.12);
+		border-left: 4px solid;
+		background: rgba(255, 255, 255, 0.3);
+	}
+	.alog-panel-header {
+		display: flex;
+		align-items: baseline;
+		gap: 0.65rem;
+		padding: 0.65rem 0.85rem;
+		border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+		background: rgba(255, 255, 255, 0.4);
+		flex-wrap: wrap;
+	}
+	.alog-panel-ver {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.82rem;
+		font-weight: 700;
+	}
+	.alog-panel-title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #1a1a1a;
+		flex: 1;
+	}
+	.alog-panel-meta {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.72rem;
+		color: rgba(26, 26, 26, 0.5);
+	}
+	.alog-project-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+	.alog-project {
+		padding: 0.7rem 0.85rem;
+		border-left: 3px solid transparent;
+		border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+	.alog-project:last-child {
+		border-bottom: none;
+	}
+	.alog-project-meta {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+	.alog-project-rank {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.72rem;
+		font-weight: 700;
+		color: rgba(26, 26, 26, 0.4);
+		min-width: 1.75rem;
+	}
+	.alog-project-name {
+		font-size: 0.88rem;
+		font-weight: 700;
+		color: #1a1a1a;
+		text-decoration: none;
+		flex: 1;
+	}
+	.alog-project-name:hover {
+		color: #d62828;
+		text-decoration: underline;
+	}
+	.alog-project-score {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.72rem;
+		color: rgba(26, 26, 26, 0.4);
+	}
+	.alog-project-summary {
+		font-size: 0.8rem;
+		line-height: 1.5;
+		color: rgba(26, 26, 26, 0.55);
+		margin: 0;
+	}
+	.alog-project-assessment {
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: rgba(26, 26, 26, 0.82);
+		margin: 0;
+	}
+	.alog-pagination {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.6rem 0.85rem;
+		border-top: 1px solid rgba(26, 26, 26, 0.08);
+		background: rgba(255, 255, 255, 0.35);
+	}
+	.alog-page-btn {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.78rem;
+		font-weight: 600;
+		padding: 0.3rem 0.65rem;
+		border: 1px solid rgba(26, 26, 26, 0.2);
+		background: rgba(255, 255, 255, 0.5);
+		cursor: pointer;
+		color: #1a1a1a;
+		transition: background 0.12s ease;
+	}
+	.alog-page-btn:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 0.85);
+	}
+	.alog-page-btn:disabled {
+		opacity: 0.35;
+		cursor: default;
+	}
+	.alog-page-info {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.78rem;
+		color: rgba(26, 26, 26, 0.65);
+		flex: 1;
+		text-align: center;
+	}
+	.alog-page-count {
+		color: rgba(26, 26, 26, 0.4);
+	}
+	.alog-synthetic-note {
+		font-size: 0.75rem;
+		color: rgba(26, 26, 26, 0.45);
+		font-style: italic;
+		margin: 0;
+		padding: 0.5rem 0.85rem;
+		border-top: 1px solid rgba(26, 26, 26, 0.08);
+	}
 </style>
+
+
+
