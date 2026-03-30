@@ -27,4 +27,6 @@ export interface Project {
 	url: string;
 	summary: string;
 	assessment: string;
+	/** True when assessment was synthetically generated (not from real jury/agent data) */
+	assessment_synthetic?: boolean;
 }
