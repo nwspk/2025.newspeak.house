@@ -61,6 +61,13 @@
 	const processLogMarkdown = $derived((data.processLogMarkdown ?? '') as string);
 	const dataLogMarkdown = $derived((data.dataLogMarkdown ?? '') as string);
 	type MarkdownSection = { title: string; body: string };
+	type OpenQuestionItem = {
+		question: string;
+		area: string;
+		whyUnresolved: string;
+		potentialIdeas: string;
+		status: string;
+	};
 
 	function markdownToSections(markdown: string): MarkdownSection[] {
 		if (!markdown?.trim()) return [];
@@ -105,6 +112,46 @@
 				};
 			})
 			.filter((s) => s.body.length > 0);
+	}
+
+	function extractOpenQuestionsFromMarkdown(markdown: string): OpenQuestionItem[] {
+		if (!markdown?.trim()) return [];
+		const lines = markdown.replace(/\r\n/g, '\n').split('\n');
+		const tableStart = lines.findIndex((line) => line.trim().startsWith('|'));
+		if (tableStart < 0) return [];
+		const tableLines: string[] = [];
+		for (let i = tableStart; i < lines.length; i++) {
+			const line = lines[i].trim();
+			if (!line.startsWith('|')) break;
+			tableLines.push(line);
+		}
+		if (tableLines.length < 3) return [];
+		const headers = tableLines[0]
+			.split('|')
+			.map((x) => x.trim().toLowerCase())
+			.filter(Boolean);
+		const rows = tableLines
+			.slice(2)
+			.map((line) => line.split('|').map((x) => x.trim()).filter(Boolean))
+			.filter((cells) => cells.length > 0);
+		if (headers.length === 0 || rows.length === 0) return [];
+
+		const headerIndex = (name: string) => headers.findIndex((h) => h === name);
+		const idxStatus = headerIndex('status');
+		const idxArea = headerIndex('area');
+		const idxQuestion = headerIndex('question');
+		const idxWhy = headerIndex('why unresolved');
+		const idxNextAction = headerIndex('next action');
+
+		return rows
+			.map((cells) => ({
+				question: cells[idxQuestion] ?? '',
+				area: cells[idxArea] ?? '',
+				whyUnresolved: cells[idxWhy] ?? '',
+				potentialIdeas: cells[idxNextAction] ?? '',
+				status: cells[idxStatus] ?? ''
+			}))
+			.filter((row) => row.question.length > 0);
 	}
 
 	function parseDateFromTitle(title: string): number {
@@ -152,6 +199,15 @@
 				!s.title.toLowerCase().startsWith('logging protocol') &&
 				!s.title.toLowerCase().startsWith('meeting notes')
 		)
+	);
+	const processOpenQuestionsSection = $derived(
+		processSupportingSections.find((s) => s.title.toLowerCase().startsWith('open questions'))
+	);
+	const processOpenQuestionsItems = $derived(
+		extractOpenQuestionsFromMarkdown(processOpenQuestionsSection?.body ?? '')
+	);
+	const processSupportingSectionsOther = $derived(
+		processSupportingSections.filter((s) => s !== processOpenQuestionsSection)
 	);
 	const dataAttempts = $derived(
 		dataSections.find((s) => s.title.toLowerCase().startsWith('attempts log'))
@@ -489,10 +545,30 @@
 							Outstanding questions and unresolved tradeoffs currently shaping the evaluation process.
 						</p>
 						<div class="open-notes-list">
-							{#each processSupportingSections as section, i}
-								<details class="open-notes-item" open={i === 0}>
+							{#if processOpenQuestionsItems.length > 0}
+								{#each processOpenQuestionsItems as item, i}
+									<details class="open-notes-item" open={i === 0}>
+										<summary class="open-notes-summary">
+											<span class="open-notes-index">Q{i + 1}</span>
+											<span class="open-notes-title">{item.question}</span>
+										</summary>
+										<div
+											class="open-notes-body"
+											style={`border-left-color:hsl(var(--${chartColors[(i + 2) % chartColors.length]}))`}
+										>
+											<div class="open-notes-fields">
+												<p><strong>Area:</strong> {item.area || '—'}</p>
+												<p><strong>Why unresolved:</strong> {item.whyUnresolved || '—'}</p>
+												<p><strong>Potential ideas to resolve:</strong> {item.potentialIdeas || '—'}</p>
+											</div>
+										</div>
+									</details>
+								{/each}
+							{/if}
+							{#each processSupportingSectionsOther as section, i}
+								<details class="open-notes-item" open={processOpenQuestionsItems.length === 0 && i === 0}>
 									<summary class="open-notes-summary">
-										<span class="open-notes-index">Q{i + 1}</span>
+										<span class="open-notes-index">N{i + 1}</span>
 										<span class="open-notes-title">{section.title}</span>
 									</summary>
 									<div
@@ -1117,6 +1193,13 @@
 		padding: 0.65rem 0.8rem 0.4rem;
 		border-left: 4px solid transparent;
 		background: rgba(255, 255, 255, 0.48);
+	}
+	.open-notes-fields p {
+		margin: 0 0 0.55rem 0;
+		line-height: 1.5;
+	}
+	.open-notes-fields p:last-child {
+		margin-bottom: 0;
 	}
 	.log-group-heading {
 		font-size: 1.25rem;
