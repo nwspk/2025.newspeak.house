@@ -17,7 +17,16 @@
 		return committee.find((m) => m.github.toLowerCase() === github) ?? null;
 	}
 
-	let { data } = $props();
+	let { data }: {
+		data: {
+			versions: Version[];
+			resultsMap: Record<string, Project[]>;
+			resultsMeta?: Record<string, boolean>;
+			currentVersion: string;
+			processLogMarkdown?: string;
+			dataLogMarkdown?: string;
+		};
+	} = $props();
 
 	let versions = $state(data.versions as Version[]);
 	let resultsMap = $state(data.resultsMap as Record<string, Project[]>);
@@ -29,7 +38,8 @@
 		'https://github.com/nwspk/politech-awards-2026/blob/main/.github/CODEOWNERS';
 	const EVALUATION_REPO = 'https://github.com/nwspk/politech-awards-2026';
 	const LUMA_SHOWCASE_URL = 'https://luma.com/4j8zzq1s';
-	const PROCESS_URL = 'https://github.com/nwspk/politech-awards-2026/blob/main/docs/logs/process-log.md';
+	const PROCESS_URL =
+		'https://github.com/nwspk/politech-awards-2026/blob/main/docs/logs/process-log.md';
 	const ITERATIONS_LOG_URL =
 		'https://github.com/nwspk/politech-awards-2026/blob/main/docs/logs/iterations-log.md';
 	const DATA_LOG_URL = 'https://github.com/nwspk/politech-awards-2026/blob/main/docs/logs/data-log.md';
