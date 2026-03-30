@@ -364,6 +364,13 @@
 				>
 					See the data
 				</button>
+				<button
+					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-5))"
+					onclick={() => scrollTo('assessment-log')}
+				>
+					Project Assessments
+				</button>
 				<a
 					class="action-btn action-btn--outline"
 					style="border-left-color: hsl(var(--chart-4))"
@@ -537,6 +544,67 @@
 				{/if}
 			</div>
 		</div>
+
+		<hr class="divider divider--inner" />
+
+		<div id="assessment-log" class="logs-stack">
+			<h2 class="section-title">
+				<span class="title-bar" style="background:hsl(var(--chart-5))"></span>
+				Project Assessment Log
+			</h2>
+			<div class="tab-info" style="border-left-color:hsl(var(--chart-5))">
+				<p class="tab-info-text">
+					Track how individual projects were assessed across every iteration. Projects that appeared in the top 20 of any version are shown here. Assessments marked * were synthetically inferred from scoring heuristics — earlier iterations did not produce per-project rationale.
+				</p>
+			</div>
+
+			<div class="assessment-log-wrap">
+				{#each assessmentLog as entry, i}
+					<div class="alog-row" class:alog-row--expanded={assessmentLogExpanded === entry.url}>
+						<button
+							class="alog-header"
+							type="button"
+							onclick={() => assessmentLogExpanded = assessmentLogExpanded === entry.url ? null : entry.url}
+						>
+							<span class="alog-rank">#{entry.bestRank}</span>
+							<span class="alog-name">{entry.name}</span>
+							<span class="alog-chips">
+								{#each entry.trajectory as t}
+									<span
+										class="alog-chip"
+										class:alog-chip--top5={t.rank <= 5}
+										class:alog-chip--top20={t.rank > 5 && t.rank <= 20}
+										class:alog-chip--lower={t.rank > 20}
+										title="{t.version}: rank #{t.rank}, score {t.score.toFixed(1)}"
+									>{t.version}</span>
+								{/each}
+							</span>
+							<span class="alog-toggle">{assessmentLogExpanded === entry.url ? '▲' : '▼'}</span>
+						</button>
+						{#if assessmentLogExpanded === entry.url}
+							<div class="alog-body">
+								<a href={entry.url} target="_blank" rel="noopener noreferrer" class="alog-url">{entry.url}</a>
+								<div class="alog-timeline">
+									{#each entry.trajectory as t, ti}
+										<div class="alog-iter" style="border-left-color:hsl(var(--{chartColors[ti % chartColors.length]}))">
+											<span class="alog-iter-ver">{t.version}</span>
+											<span class="alog-iter-rank">rank #{t.rank}</span>
+											<span class="alog-iter-score">score {t.score.toFixed(1)}</span>
+											{#if t.assessment}
+												<p class="alog-iter-assessment">
+													{t.assessment}{t.assessment_synthetic ? ' *' : ''}
+												</p>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		</div>
+
 		<hr class="divider divider--inner" />
 
 		<div id="process-log" class="logs-stack">
@@ -721,65 +789,6 @@
 			</div>
 		</div>
 
-		<hr class="divider divider--inner" />
-
-		<div id="assessment-log" class="logs-stack">
-			<h2 class="section-title">
-				<span class="title-bar" style="background:hsl(var(--chart-5))"></span>
-				Project Assessment Log
-			</h2>
-			<div class="tab-info" style="border-left-color:hsl(var(--chart-5))">
-				<p class="tab-info-text">
-					Track how individual projects were assessed across every iteration. Projects that appeared in the top 20 of any version are shown here. Assessments marked * were synthetically inferred from scoring heuristics — earlier iterations did not produce per-project rationale.
-				</p>
-			</div>
-
-			<div class="assessment-log-wrap">
-				{#each assessmentLog as entry, i}
-					<div class="alog-row" class:alog-row--expanded={assessmentLogExpanded === entry.url}>
-						<button
-							class="alog-header"
-							type="button"
-							onclick={() => assessmentLogExpanded = assessmentLogExpanded === entry.url ? null : entry.url}
-						>
-							<span class="alog-rank">#{entry.bestRank}</span>
-							<span class="alog-name">{entry.name}</span>
-							<span class="alog-chips">
-								{#each entry.trajectory as t}
-									<span
-										class="alog-chip"
-										class:alog-chip--top5={t.rank <= 5}
-										class:alog-chip--top20={t.rank > 5 && t.rank <= 20}
-										class:alog-chip--lower={t.rank > 20}
-										title="{t.version}: rank #{t.rank}, score {t.score.toFixed(1)}"
-									>{t.version}</span>
-								{/each}
-							</span>
-							<span class="alog-toggle">{assessmentLogExpanded === entry.url ? '▲' : '▼'}</span>
-						</button>
-						{#if assessmentLogExpanded === entry.url}
-							<div class="alog-body">
-								<a href={entry.url} target="_blank" rel="noopener noreferrer" class="alog-url">{entry.url}</a>
-								<div class="alog-timeline">
-									{#each entry.trajectory as t, ti}
-										<div class="alog-iter" style="border-left-color:hsl(var(--{chartColors[ti % chartColors.length]}))">
-											<span class="alog-iter-ver">{t.version}</span>
-											<span class="alog-iter-rank">rank #{t.rank}</span>
-											<span class="alog-iter-score">score {t.score.toFixed(1)}</span>
-											{#if t.assessment}
-												<p class="alog-iter-assessment">
-													{t.assessment}{t.assessment_synthetic ? ' *' : ''}
-												</p>
-											{/if}
-										</div>
-									{/each}
-								</div>
-							</div>
-						{/if}
-					</div>
-				{/each}
-			</div>
-		</div>
 	</section>
 
 	<hr class="divider" />
