@@ -307,6 +307,13 @@
 				</button>
 				<button
 					class="action-btn action-btn--outline"
+					style="border-left-color: hsl(var(--chart-5))"
+					onclick={() => scrollTo('assessment-log')}
+				>
+					Project Assessments
+				</button>
+				<button
+					class="action-btn action-btn--outline"
 					style="border-left-color: hsl(var(--chart-2))"
 					onclick={() => scrollTo('process-log')}
 				>
@@ -318,13 +325,6 @@
 					onclick={() => scrollTo('data-log')}
 				>
 					See the data
-				</button>
-				<button
-					class="action-btn action-btn--outline"
-					style="border-left-color: hsl(var(--chart-5))"
-					onclick={() => scrollTo('assessment-log')}
-				>
-					Project Assessments
 				</button>
 				<a
 					class="action-btn action-btn--outline"
@@ -1750,4 +1750,5 @@
 		border-top: 1px solid rgba(26, 26, 26, 0.08);
 	}
 </style>
+
 
