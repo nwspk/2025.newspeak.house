@@ -5,6 +5,7 @@ import type { Version, Project } from '$lib/types/awards';
 export const prerender = false;
 
 const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
+const LOGS_BASE = `${REPO_BASE}/docs/logs`;
 
 /** Avoid stale cached JSON from raw.githubusercontent.com or intermediaries. */
 const FETCH_OPTS: RequestInit = { cache: 'no-store' };
@@ -147,11 +148,26 @@ export const load: PageLoad = async ({ fetch }) => {
 		resultsMeta[v] = resultsMap[v].isFallback;
 	}
 
+	const [processLogRes, iterationsLogRes, dataLogRes] = await Promise.all([
+		fetch(`${LOGS_BASE}/process-log.md`, FETCH_OPTS),
+		fetch(`${LOGS_BASE}/iterations-log.md`, FETCH_OPTS),
+		fetch(`${LOGS_BASE}/data-log.md`, FETCH_OPTS)
+	]);
+
+	const [processLogMarkdown, iterationsLogMarkdown, dataLogMarkdown] = await Promise.all([
+		processLogRes.ok ? processLogRes.text() : Promise.resolve(''),
+		iterationsLogRes.ok ? iterationsLogRes.text() : Promise.resolve(''),
+		dataLogRes.ok ? dataLogRes.text() : Promise.resolve('')
+	]);
+
 	return {
 		versions,
 		resultsMap: resultsMapFlat,
 		resultsMeta,
 		currentVersion,
-		totalCount: fallbackProjects.length
+		totalCount: fallbackProjects.length,
+		processLogMarkdown,
+		iterationsLogMarkdown,
+		dataLogMarkdown
 	};
 };
