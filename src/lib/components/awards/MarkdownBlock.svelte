@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { marked } from 'marked';
-	import DOMPurify from 'isomorphic-dompurify';
+	import sanitizeHtml from 'sanitize-html';
 
 	interface Props {
 		content: string;
@@ -8,8 +8,54 @@
 
 	let { content }: Props = $props();
 
+	/** No jsdom — Netlify SSR crashes on isomorphic-dompurify (ERR_REQUIRE_ESM in html-encoding-sniffer). */
+	const sanitizeOpts: sanitizeHtml.IOptions = {
+		allowedTags: [
+			'p',
+			'br',
+			'strong',
+			'em',
+			'b',
+			'i',
+			'a',
+			'ul',
+			'ol',
+			'li',
+			'h1',
+			'h2',
+			'h3',
+			'h4',
+			'h5',
+			'h6',
+			'blockquote',
+			'code',
+			'pre',
+			'hr',
+			'table',
+			'thead',
+			'tbody',
+			'tr',
+			'th',
+			'td'
+		],
+		allowedAttributes: {
+			a: ['href', 'name', 'target', 'rel'],
+			th: ['colspan', 'rowspan', 'align'],
+			td: ['colspan', 'rowspan', 'align']
+		},
+		allowedSchemes: ['http', 'https', 'mailto'],
+		transformTags: {
+			a: (tagName, attribs) => {
+				if (attribs.target === '_blank' && !attribs.rel) {
+					attribs.rel = 'noopener noreferrer';
+				}
+				return { tagName, attribs };
+			}
+		}
+	};
+
 	const html = $derived(
-		content ? DOMPurify.sanitize(marked.parse(content) as string) : ''
+		content ? sanitizeHtml(marked.parse(content) as string, sanitizeOpts) : ''
 	);
 </script>
 
