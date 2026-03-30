@@ -31,6 +31,10 @@ interface RepoIteration {
 interface RepoResult {
 	url: string;
 	score: number;
+	name?: string;
+	summary?: string;
+	assessment?: string;
+	assessment_synthetic?: boolean;
 }
 
 function urlToName(urlStr: string): string {
@@ -50,18 +54,15 @@ function urlToName(urlStr: string): string {
 	}
 }
 
-function stripMarkdown(text: string): string {
-	return text
-		.replace(/\*\*(.+?)\*\*/g, '$1')
-		.replace(/\n+/g, ' ')
-		.trim();
-}
-
 function toRepoResults(raw: unknown): RepoResult[] {
 	if (Array.isArray(raw)) {
 		return raw.map((x) => ({
 			url: (x as { url?: string }).url ?? (x as { link?: string }).link ?? '',
-			score: (x as { score?: number }).score ?? 0
+			score: (x as { score?: number }).score ?? 0,
+			name: (x as { name?: string }).name,
+			summary: (x as { summary?: string }).summary,
+			assessment: (x as { assessment?: string }).assessment,
+			assessment_synthetic: (x as { assessment_synthetic?: boolean }).assessment_synthetic
 		}));
 	}
 	if (raw && typeof raw === 'object' && 'projects' in raw) {
@@ -80,10 +81,11 @@ function toProjects(repoResults: RepoResult[]): Project[] {
 	return sorted.map((r, i) => ({
 		rank: i + 1,
 		score: r.score,
-		name: urlToName(r.url),
+		name: r.name ?? urlToName(r.url),
 		url: r.url,
-		summary: '',
-		assessment: ''
+		summary: r.summary ?? '',
+		assessment: r.assessment ?? '',
+		assessment_synthetic: r.assessment_synthetic ?? false
 	}));
 }
 
