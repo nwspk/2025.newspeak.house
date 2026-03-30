@@ -1,8 +1,14 @@
 import type { PageLoad } from './$types';
 import type { Version, Project } from '$lib/types/awards';
 
+/** Do not bake /awards at build time — always reflect current iterations.json from the evaluation repo. */
+export const prerender = false;
+
 const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
 const LOGS_BASE = `${REPO_BASE}/docs/logs`;
+
+/** Avoid stale cached JSON from raw.githubusercontent.com or intermediaries. */
+const FETCH_OPTS: RequestInit = { cache: 'no-store' };
 
 interface RepoIteration {
 	version: string;
@@ -82,15 +88,17 @@ function toProjects(repoResults: RepoResult[]): Project[] {
 }
 
 export const load: PageLoad = async ({ fetch }) => {
-	const iterationsRes = await fetch(`${REPO_BASE}/iterations.json`);
+	const iterationsRes = await fetch(`${REPO_BASE}/iterations.json`, FETCH_OPTS);
 	if (!iterationsRes.ok) throw new Error('Failed to fetch iterations');
 	const repoIterations: RepoIteration[] = await iterationsRes.json();
 	const versionIds = repoIterations.map((it) => it.version);
 
 	// Fetch main + all per-version results in parallel
 	const [mainRes, ...versionResponses] = await Promise.all([
-		fetch(`${REPO_BASE}/results.json`),
-		...versionIds.map((ver) => fetch(`${REPO_BASE}/iterations/${ver}/results.json`))
+		fetch(`${REPO_BASE}/results.json`, FETCH_OPTS),
+		...versionIds.map((ver) =>
+			fetch(`${REPO_BASE}/iterations/${ver}/results.json`, FETCH_OPTS)
+		)
 	]);
 
 	const mainData = mainRes.ok ? await mainRes.json() : [];
