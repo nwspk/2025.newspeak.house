@@ -40,6 +40,17 @@
 			<p class="card-desc" class:card-desc--muted={!isTop}>{project.summary}</p>
 		{/if}
 		<p class="card-score" class:card-score--muted={!isTop}>Score: {project.score.toFixed(2)}</p>
+		{#if project.assessment}
+			<details class="card-assessment">
+				<summary class="card-assessment-summary" class:card-assessment-summary--muted={!isTop}>
+					Assessment{project.assessment_synthetic ? ' *' : ''}
+				</summary>
+				<div class="card-assessment-body">{project.assessment}</div>
+			</details>
+			{#if project.assessment_synthetic}
+				<p class="card-assessment-note">* Synthetic: inferred from scoring heuristic</p>
+			{/if}
+		{/if}
 	</div>
 </div>
 
@@ -106,7 +117,6 @@
 	.card-url--muted:hover {
 		color: rgba(26, 26, 26, 0.6);
 	}
-
 	.card-desc {
 		font-size: 0.78rem;
 		color: rgba(26, 26, 26, 0.6);
@@ -125,5 +135,47 @@
 	}
 	.card-score--muted {
 		color: rgba(26, 26, 26, 0.3);
+	}
+
+	.card-assessment {
+		margin-top: 0.35rem;
+	}
+	.card-assessment-summary {
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: rgba(26, 26, 26, 0.55);
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+	}
+	.card-assessment-summary::-webkit-details-marker {
+		display: none;
+	}
+	.card-assessment-summary::before {
+		content: '▶ ';
+		font-size: 0.6rem;
+	}
+	details[open] .card-assessment-summary::before {
+		content: '▼ ';
+	}
+	.card-assessment-summary--muted {
+		color: rgba(26, 26, 26, 0.4);
+	}
+	.card-assessment-body {
+		font-size: 0.8rem;
+		line-height: 1.55;
+		color: rgba(26, 26, 26, 0.72);
+		margin-top: 0.35rem;
+		max-height: 180px;
+		overflow-y: auto;
+		padding-right: 0.25rem;
+	}
+	.card-assessment-note {
+		font-size: 0.7rem;
+		color: rgba(26, 26, 26, 0.4);
+		font-style: italic;
+		margin: 0.1rem 0 0;
 	}
 </style>
