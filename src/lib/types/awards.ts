@@ -2,6 +2,7 @@ export interface Version {
 	version: string;
 	title: string;
 	author: string | null;
+	authors?: string[] | null;
 	current: boolean;
 	date: string;
 	prNumber: number;
