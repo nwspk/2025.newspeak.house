@@ -15,6 +15,7 @@ interface RepoIteration {
 	title?: string | null;
 	date: string | null;
 	author: string | null;
+	authors?: string[] | null;
 	pr_number: number;
 	pr_url: string;
 	pr_status: string;
@@ -123,6 +124,7 @@ export const load: PageLoad = async ({ fetch }) => {
 		version: it.version,
 		title: it.title ?? it.version,
 		author: it.author ?? null,
+		authors: it.authors ?? null,
 		current: idx === repoIterations.length - 1,
 		date: it.date ?? '',
 		prNumber: it.pr_number,
