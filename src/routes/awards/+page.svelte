@@ -254,6 +254,53 @@
 		el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
+	// Assessment Log: projects appearing in top 20 of any iteration, with cross-iteration trajectory
+	const TOP_N = 20;
+	const assessmentLog = $derived((() => {
+		// Collect all project URLs that appeared in top N of any iteration
+		const allVersionIds = versions.map((v) => v.version);
+		const urlSet = new Set<string>();
+		for (const ver of allVersionIds) {
+			const vResults = resultsMap[ver] ?? [];
+			for (const p of vResults.slice(0, TOP_N)) urlSet.add(p.url);
+		}
+
+		// For each URL, build trajectory across all iterations
+		return Array.from(urlSet).map((url) => {
+			const trajectory: Array<{ version: string; rank: number; score: number; assessment: string; assessment_synthetic: boolean }> = [];
+			let latestName = '';
+			let latestAssessment = '';
+			let latestSynthetic = true;
+			let bestRank = Infinity;
+
+			for (const ver of allVersionIds) {
+				const found = (resultsMap[ver] ?? []).find((p) => p.url === url);
+				if (found) {
+					trajectory.push({
+						version: ver,
+						rank: found.rank,
+						score: found.score,
+						assessment: found.assessment ?? '',
+						assessment_synthetic: found.assessment_synthetic ?? true
+					});
+					if (!latestName) latestName = found.name;
+					if (found.assessment && !found.assessment_synthetic) {
+						latestAssessment = found.assessment;
+						latestSynthetic = false;
+					} else if (!latestAssessment && found.assessment) {
+						latestAssessment = found.assessment;
+					}
+					if (found.rank < bestRank) bestRank = found.rank;
+				}
+			}
+
+			return { url, name: latestName || url, trajectory, latestAssessment, latestSynthetic, bestRank };
+		}).sort((a, b) => a.bestRank - b.bestRank);
+	})());
+
+	let assessmentLogOpen = $state(false);
+	let assessmentLogExpanded = $state<string | null>(null);
+
 	onMount(() => {
 		if (!browser) return;
 		const params = new URLSearchParams(window.location.search);
@@ -671,6 +718,66 @@
 						<a href={DATA_LOG_URL} target="_blank" rel="noopener noreferrer">View on GitHub →</a>
 					</p>
 				{/if}
+			</div>
+		</div>
+
+		<hr class="divider divider--inner" />
+
+		<div id="assessment-log" class="logs-stack">
+			<h2 class="section-title">
+				<span class="title-bar" style="background:hsl(var(--chart-5))"></span>
+				Project Assessment Log
+			</h2>
+			<div class="tab-info" style="border-left-color:hsl(var(--chart-5))">
+				<p class="tab-info-text">
+					Track how individual projects were assessed across every iteration. Projects that appeared in the top 20 of any version are shown here. Assessments marked * were synthetically inferred from scoring heuristics — earlier iterations did not produce per-project rationale.
+				</p>
+			</div>
+
+			<div class="assessment-log-wrap">
+				{#each assessmentLog as entry, i}
+					<div class="alog-row" class:alog-row--expanded={assessmentLogExpanded === entry.url}>
+						<button
+							class="alog-header"
+							type="button"
+							onclick={() => assessmentLogExpanded = assessmentLogExpanded === entry.url ? null : entry.url}
+						>
+							<span class="alog-rank">#{entry.bestRank}</span>
+							<span class="alog-name">{entry.name}</span>
+							<span class="alog-chips">
+								{#each entry.trajectory as t}
+									<span
+										class="alog-chip"
+										class:alog-chip--top5={t.rank <= 5}
+										class:alog-chip--top20={t.rank > 5 && t.rank <= 20}
+										class:alog-chip--lower={t.rank > 20}
+										title="{t.version}: rank #{t.rank}, score {t.score.toFixed(1)}"
+									>{t.version}</span>
+								{/each}
+							</span>
+							<span class="alog-toggle">{assessmentLogExpanded === entry.url ? '▲' : '▼'}</span>
+						</button>
+						{#if assessmentLogExpanded === entry.url}
+							<div class="alog-body">
+								<a href={entry.url} target="_blank" rel="noopener noreferrer" class="alog-url">{entry.url}</a>
+								<div class="alog-timeline">
+									{#each entry.trajectory as t, ti}
+										<div class="alog-iter" style="border-left-color:hsl(var(--{chartColors[ti % chartColors.length]}))">
+											<span class="alog-iter-ver">{t.version}</span>
+											<span class="alog-iter-rank">rank #{t.rank}</span>
+											<span class="alog-iter-score">score {t.score.toFixed(1)}</span>
+											{#if t.assessment}
+												<p class="alog-iter-assessment">
+													{t.assessment}{t.assessment_synthetic ? ' *' : ''}
+												</p>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
+					</div>
+				{/each}
 			</div>
 		</div>
 	</section>
@@ -1524,5 +1631,146 @@
 		.avatar-row {
 			gap: 1.25rem;
 		}
+	}
+
+	/* Assessment Log */
+	.assessment-log-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		border: 1px solid rgba(26, 26, 26, 0.12);
+	}
+	.alog-row {
+		border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+	}
+	.alog-row:last-child {
+		border-bottom: none;
+	}
+	.alog-header {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		width: 100%;
+		padding: 0.6rem 0.85rem;
+		background: rgba(255, 255, 255, 0.35);
+		border: none;
+		cursor: pointer;
+		text-align: left;
+		transition: background 0.12s ease;
+		flex-wrap: wrap;
+	}
+	.alog-header:hover {
+		background: rgba(255, 255, 255, 0.6);
+	}
+	.alog-row--expanded .alog-header {
+		background: rgba(255, 255, 255, 0.55);
+		border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+	}
+	.alog-rank {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: rgba(26, 26, 26, 0.45);
+		min-width: 2.25rem;
+	}
+	.alog-name {
+		font-size: 0.88rem;
+		font-weight: 700;
+		color: #1a1a1a;
+		flex: 1;
+		min-width: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.alog-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		align-items: center;
+	}
+	.alog-chip {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.65rem;
+		font-weight: 700;
+		padding: 0.1rem 0.3rem;
+		border-radius: 2px;
+	}
+	.alog-chip--top5 {
+		background: rgba(34, 139, 34, 0.15);
+		color: #1a6b1a;
+		border: 1px solid rgba(34, 139, 34, 0.3);
+	}
+	.alog-chip--top20 {
+		background: rgba(200, 150, 0, 0.12);
+		color: #7a5800;
+		border: 1px solid rgba(200, 150, 0, 0.25);
+	}
+	.alog-chip--lower {
+		background: rgba(26, 26, 26, 0.05);
+		color: rgba(26, 26, 26, 0.45);
+		border: 1px solid rgba(26, 26, 26, 0.12);
+	}
+	.alog-toggle {
+		font-size: 0.65rem;
+		color: rgba(26, 26, 26, 0.4);
+		margin-left: auto;
+		flex-shrink: 0;
+	}
+	.alog-body {
+		padding: 0.75rem 0.85rem 0.85rem;
+		background: rgba(255, 255, 255, 0.48);
+		display: flex;
+		flex-direction: column;
+		gap: 0.65rem;
+	}
+	.alog-url {
+		font-size: 0.78rem;
+		color: rgba(26, 26, 26, 0.5);
+		text-decoration: none;
+		word-break: break-all;
+	}
+	.alog-url:hover {
+		color: #d62828;
+		text-decoration: underline;
+	}
+	.alog-timeline {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.alog-iter {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.4rem 0.65rem;
+		padding: 0.45rem 0.6rem;
+		border-left: 3px solid;
+		background: rgba(255, 255, 255, 0.35);
+	}
+	.alog-iter-ver {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.72rem;
+		font-weight: 700;
+		color: rgba(26, 26, 26, 0.7);
+	}
+	.alog-iter-rank {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.72rem;
+		color: rgba(26, 26, 26, 0.55);
+	}
+	.alog-iter-score {
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.72rem;
+		color: rgba(26, 26, 26, 0.45);
+	}
+	.alog-iter-assessment {
+		width: 100%;
+		font-size: 0.8rem;
+		line-height: 1.5;
+		color: rgba(26, 26, 26, 0.72);
+		margin: 0.2rem 0 0;
+		max-height: 120px;
+		overflow-y: auto;
 	}
 </style>
