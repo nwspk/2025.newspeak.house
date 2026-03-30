@@ -10,6 +10,8 @@ import FredOBrienPhoto from '$lib/assets/fred-obrien.jpg';
 import GamithraMargaPhoto from '$lib/assets/gamithra.jpg';
 import JamieCoombesPhoto from '$lib/assets/jamie-coombes.jpg';
 import AlexandraCiocanelPhoto from '$lib/assets/alexandra-ciocanel.jpg';
+import HudaAbdirahimPhoto from '$lib/assets/huda.png';
+import NickBottiPhoto from '$lib/assets/nick.png';
 
 export interface CommitteeMember {
 	github: string;
@@ -41,5 +43,7 @@ export const committee: CommitteeMember[] = [
 		name: 'Davit Jintcharadze',
 		photo: DavitJintcharadzePhoto,
 		profileSlug: 'davit-jintcharadze'
-	}
+	},
+	{ github: 'nbotti', name: 'Nick Botti', photo: NickBottiPhoto, profileSlug: 'nick-botti' },
+	{ github: 'hudlerrr', name: 'Huda Abdirahim', photo: HudaAbdirahimPhoto, profileSlug: 'huda-abdirahim' }
 ];
