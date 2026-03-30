@@ -56,6 +56,13 @@
 	const versionAuthorMember = $derived(
 		selectedVersionData?.author ? authorToMember(selectedVersionData.author) : null
 	);
+	const versionAuthorMembers = $derived(
+		selectedVersionData?.authors
+			? selectedVersionData.authors.map((a) => authorToMember(a)).filter(Boolean)
+			: versionAuthorMember
+				? [versionAuthorMember]
+				: []
+	);
 	const results = $derived(resultsMap[selectedVersion] ?? []);
 	const top5 = $derived(results.slice(0, 5));
 	const processLogMarkdown = $derived((data.processLogMarkdown ?? '') as string);
@@ -401,12 +408,14 @@
 				{#if selectedVersionData}
 					<div class="panel-version-info">
 						<div class="panel-header-row">
-							{#if versionAuthorMember}
-								<AvatarCard
-									name={versionAuthorMember.name}
-									photo={versionAuthorMember.photo}
-									color={chartColors[0]}
-								/>
+							{#if versionAuthorMembers.length > 0}
+								{#each versionAuthorMembers as member, mi}
+									<AvatarCard
+										name={member.name}
+										photo={member.photo}
+										color={chartColors[mi % chartColors.length]}
+									/>
+								{/each}
 							{:else if selectedVersionData.author}
 								<AvatarCard
 									name={selectedVersionData.author.replace(/^@/, '')}
