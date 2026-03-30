@@ -149,9 +149,9 @@ export const load: PageLoad = async ({ fetch }) => {
 	}
 
 	const [processLogRes, iterationsLogRes, dataLogRes] = await Promise.all([
-		fetch(`${LOGS_BASE}/process-log.md`),
-		fetch(`${LOGS_BASE}/iterations-log.md`),
-		fetch(`${LOGS_BASE}/data-log.md`)
+		fetch(`${LOGS_BASE}/process-log.md`, FETCH_OPTS),
+		fetch(`${LOGS_BASE}/iterations-log.md`, FETCH_OPTS),
+		fetch(`${LOGS_BASE}/data-log.md`, FETCH_OPTS)
 	]);
 
 	const [processLogMarkdown, iterationsLogMarkdown, dataLogMarkdown] = await Promise.all([
