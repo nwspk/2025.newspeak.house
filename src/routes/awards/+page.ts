@@ -2,8 +2,9 @@ import type { PageLoad } from './$types';
 import type { Version } from '$lib/types/awards';
 import { AWARDS_REPO_RAW, parseRawResults, toProjects, urlToName } from '$lib/utils/awards-results';
 
-/** Do not bake /awards at build time — always reflect current iterations.json from the evaluation repo. */
-export const prerender = false;
+/** Pre-render at build time — no SSR Lambda, no runtime timeout/payload limits.
+ *  Other-version results and assessment text lazy-load client-side on demand. */
+export const prerender = true;
 
 const LOGS_BASE = `${AWARDS_REPO_RAW}/docs/logs`;
 
