@@ -60,15 +60,19 @@ export const load: PageLoad = async ({ fetch }) => {
 		}))
 		.reverse();
 
+	// The latest version is always the last entry in repoIterations (before reversing)
 	const currentVersion =
-		versions.find((v) => v.current)?.version ?? versions[0]?.version ?? versionIds[0];
+		versionIds[versionIds.length - 1] ??
+		versions.find((v) => v.current)?.version ??
+		versions[0]?.version;
 
-	// Only fetch the current (latest) version's results server-side.
-	// All other versions are lazy-loaded client-side on first access.
-	const currentRes = await fetch(
-		`${AWARDS_REPO_RAW}/iterations/${currentVersion}/results.json`,
-		FETCH_OPTS
-	);
+	// Fetch current version's results + log files in parallel — do NOT await sequentially.
+	// (GitHub raw can take 3-5s per file; sequential awaits would exceed the 10s Lambda limit.)
+	const [currentRes, processLogRes, dataLogRes] = await Promise.all([
+		fetch(`${AWARDS_REPO_RAW}/iterations/${currentVersion}/results.json`, FETCH_OPTS),
+		fetch(`${LOGS_BASE}/process-log.md`, FETCH_OPTS),
+		fetch(`${LOGS_BASE}/data-log.md`, FETCH_OPTS)
+	]);
 
 	const resultsMap: Record<string, import('$lib/types/awards').Project[]> = {};
 	// Pre-fill all versions as empty so the client knows which ones need loading
@@ -83,23 +87,18 @@ export const load: PageLoad = async ({ fetch }) => {
 		hasAssessments[it.version] = (it.assessment?.length ?? 0) > 500;
 	}
 
-	if (currentRes.ok) {
-		const raw = await currentRes.json();
-		const rr = parseRawResults(raw);
+	const [currentData, processLogMarkdown, dataLogMarkdown] = await Promise.all([
+		currentRes.ok ? currentRes.json() : Promise.resolve(null),
+		processLogRes.ok ? processLogRes.text() : Promise.resolve(''),
+		dataLogRes.ok ? dataLogRes.text() : Promise.resolve('')
+	]);
+
+	if (currentData) {
+		const rr = parseRawResults(currentData);
 		// Override hasAssessments for current version based on actual data
 		hasAssessments[currentVersion] = rr.some((r) => r.assessment && !r.assessment_synthetic);
 		resultsMap[currentVersion] = toProjects(rr);
 	}
-
-	const [processLogRes, dataLogRes] = await Promise.all([
-		fetch(`${LOGS_BASE}/process-log.md`, FETCH_OPTS),
-		fetch(`${LOGS_BASE}/data-log.md`, FETCH_OPTS)
-	]);
-
-	const [processLogMarkdown, dataLogMarkdown] = await Promise.all([
-		processLogRes.ok ? processLogRes.text() : Promise.resolve(''),
-		dataLogRes.ok ? dataLogRes.text() : Promise.resolve('')
-	]);
 
 	return {
 		versions,
