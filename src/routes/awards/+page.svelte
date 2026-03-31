@@ -3,6 +3,7 @@
 	import { browser } from '$app/environment';
 	import { committee, type CommitteeMember } from '$lib/data/committee';
 	import type { Version, Project } from '$lib/types/awards';
+	import { AWARDS_REPO_RAW, parseRawResults, toProjects } from '$lib/utils/awards-results';
 	import AvatarCard from '$lib/components/awards/AvatarCard.svelte';
 	import MarkdownBlock from '$lib/components/awards/MarkdownBlock.svelte';
 	import ProjectCard from '$lib/components/awards/ProjectCard.svelte';
@@ -21,7 +22,6 @@
 		data: {
 			versions: Version[];
 			resultsMap: Record<string, Project[]>;
-			resultsMeta?: Record<string, boolean>;
 			hasAssessments?: Record<string, boolean>;
 			currentVersion: string;
 			processLogMarkdown?: string;
@@ -31,7 +31,6 @@
 
 	let versions = $state(data.versions as Version[]);
 	let resultsMap = $state(data.resultsMap as Record<string, Project[]>);
-	let resultsMeta = $state((data.resultsMeta ?? {}) as Record<string, boolean>);
 	const hasAssessments = data.hasAssessments ?? {};
 
 	let selectedVersion = $state(data.currentVersion as string);
@@ -251,6 +250,7 @@
 
 	function setVersion(v: string) {
 		selectedVersion = v;
+		ensureVersionLoaded(v);
 		if (browser) {
 			const u = new URL(window.location.href);
 			u.searchParams.set('version', v);
@@ -283,17 +283,18 @@
 		Math.ceil(assessmentLogProjects.length / ALOG_PAGE_SIZE)
 	);
 
-	// Assessment text is lazy-loaded client-side to keep the server payload small.
-	// Cache: version → map of url → { assessment, assessment_synthetic }
+	// Version data is lazy-loaded client-side to keep the server payload small.
+	// A single fetch populates both project scores (resultsMap) and assessment text (assessmentCache).
 	type AssessmentEntry = { assessment: string; assessment_synthetic: boolean };
 	let assessmentCache = $state<Record<string, Record<string, AssessmentEntry>>>({});
-	let assessmentLoading = $state(false);
+	let versionLoading = $state<string | null>(null);
 
-	const AWARDS_REPO_RAW = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
+	async function ensureVersionLoaded(version: string) {
+		const hasScores = (resultsMap[version]?.length ?? 0) > 0;
+		const hasAssessmentData = assessmentCache[version] !== undefined;
+		if (hasScores && hasAssessmentData) return;
 
-	async function loadAssessments(version: string) {
-		if (assessmentCache[version] !== undefined) return;
-		assessmentLoading = true;
+		versionLoading = version;
 		try {
 			const res = await fetch(
 				`${AWARDS_REPO_RAW}/iterations/${version}/results.json`,
@@ -301,28 +302,32 @@
 			);
 			if (res.ok) {
 				const raw: unknown = await res.json();
-				const items: unknown[] = Array.isArray(raw)
-					? raw
-					: (raw as { projects?: unknown[] })?.projects ?? [];
-				const byUrl: Record<string, AssessmentEntry> = {};
-				for (const x of items) {
-					const item = x as Record<string, unknown>;
-					const url = (item.url ?? item.link ?? '') as string;
-					if (url) {
-						byUrl[url] = {
-							assessment: (item.assessment ?? '') as string,
-							assessment_synthetic: (item.assessment_synthetic ?? false) as boolean
-						};
-					}
+				const rr = parseRawResults(raw);
+
+				if (!hasScores) {
+					resultsMap = { ...resultsMap, [version]: toProjects(rr) };
 				}
-				assessmentCache = { ...assessmentCache, [version]: byUrl };
+				if (!hasAssessmentData) {
+					const byUrl: Record<string, AssessmentEntry> = {};
+					for (const r of rr) {
+						if (r.url) {
+							byUrl[r.url] = {
+								assessment: r.assessment ?? '',
+								assessment_synthetic: r.assessment_synthetic ?? false
+							};
+						}
+					}
+					assessmentCache = { ...assessmentCache, [version]: byUrl };
+				}
 			} else {
-				assessmentCache = { ...assessmentCache, [version]: {} };
+				if (!hasScores) resultsMap = { ...resultsMap, [version]: [] };
+				if (!hasAssessmentData) assessmentCache = { ...assessmentCache, [version]: {} };
 			}
 		} catch {
-			assessmentCache = { ...assessmentCache, [version]: {} };
+			if (!hasScores) resultsMap = { ...resultsMap, [version]: [] };
+			if (!hasAssessmentData) assessmentCache = { ...assessmentCache, [version]: {} };
 		}
-		assessmentLoading = false;
+		versionLoading = null;
 	}
 
 	onMount(() => {
@@ -344,9 +349,9 @@
 		const diffMs = end.getTime() - today.getTime();
 		daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 
-		// Pre-load assessments for the default assessment-log version
+		// Pre-load assessment text for the default assessment-log version (latest = versions[0])
 		const initialAssessmentVersion = versions[0]?.version;
-		if (initialAssessmentVersion) loadAssessments(initialAssessmentVersion);
+		if (initialAssessmentVersion) ensureVersionLoaded(initialAssessmentVersion);
 	});
 </script>
 
@@ -543,6 +548,8 @@
 									<ProjectCard {project} variant="top" color={chartColors[i % chartColors.length]} />
 								{/each}
 							</div>
+						{:else if versionLoading === selectedVersion}
+							<p class="empty">Loading…</p>
 						{:else}
 							<p class="empty">No data for this version.</p>
 						{/if}
@@ -595,7 +602,7 @@
 						class="alog-tab"
 						class:alog-tab--active={assessmentLogVersionData?.version === ver.version}
 						style="--tab-color:hsl(var(--{chartColors[vi % chartColors.length]}))"
-						onclick={() => { assessmentLogVersion = ver.version; assessmentLogPage = 0; loadAssessments(ver.version); }}
+						onclick={() => { assessmentLogVersion = ver.version; assessmentLogPage = 0; ensureVersionLoaded(ver.version); }}
 					>
 						<span class="alog-tab-ver">{ver.version}</span>
 						{#if hasAssessments[ver.version]}
@@ -634,7 +641,7 @@
 								{/if}
 								{#if cached?.assessment}
 									<p class="alog-project-assessment">{cached.assessment}{cached.assessment_synthetic ? ' *' : ''}</p>
-								{:else if versionAssessmentMap === undefined && assessmentLoading}
+								{:else if versionAssessmentMap === undefined && versionLoading === assessmentLogVersionData?.version}
 									<p class="alog-project-assessment alog-loading">Loading assessments…</p>
 								{/if}
 							</div>
