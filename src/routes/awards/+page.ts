@@ -85,8 +85,9 @@ function toProjects(repoResults: RepoResult[]): Project[] {
 		name: r.name ?? urlToName(r.url),
 		url: r.url,
 		summary: r.summary ?? '',
-		assessment: r.assessment ?? '',
-		assessment_synthetic: r.assessment_synthetic ?? false
+		// assessment text omitted from server payload — loaded client-side on demand
+		assessment: '',
+		assessment_synthetic: false
 	}));
 }
 
@@ -108,13 +109,19 @@ export const load: PageLoad = async ({ fetch }) => {
 	const fallbackProjects = toProjects(toRepoResults(mainData));
 
 	const resultsMap: Record<string, { projects: Project[]; isFallback: boolean }> = {};
+	// Track which versions have real (non-synthetic) per-project assessments
+	const hasAssessments: Record<string, boolean> = {};
+
 	for (let i = 0; i < versionIds.length; i++) {
 		const ver = versionIds[i];
 		const res = versionResponses[i];
 		if (res?.ok) {
 			const data = await res.json();
-			resultsMap[ver] = { projects: toProjects(toRepoResults(data)), isFallback: false };
+			const rr = toRepoResults(data);
+			hasAssessments[ver] = rr.some((r) => r.assessment && !r.assessment_synthetic);
+			resultsMap[ver] = { projects: toProjects(rr), isFallback: false };
 		} else {
+			hasAssessments[ver] = false;
 			resultsMap[ver] = { projects: fallbackProjects, isFallback: true };
 		}
 	}
@@ -152,15 +159,13 @@ export const load: PageLoad = async ({ fetch }) => {
 		resultsMeta[v] = resultsMap[v].isFallback;
 	}
 
-	const [processLogRes, iterationsLogRes, dataLogRes] = await Promise.all([
+	const [processLogRes, dataLogRes] = await Promise.all([
 		fetch(`${LOGS_BASE}/process-log.md`, FETCH_OPTS),
-		fetch(`${LOGS_BASE}/iterations-log.md`, FETCH_OPTS),
 		fetch(`${LOGS_BASE}/data-log.md`, FETCH_OPTS)
 	]);
 
-	const [processLogMarkdown, iterationsLogMarkdown, dataLogMarkdown] = await Promise.all([
+	const [processLogMarkdown, dataLogMarkdown] = await Promise.all([
 		processLogRes.ok ? processLogRes.text() : Promise.resolve(''),
-		iterationsLogRes.ok ? iterationsLogRes.text() : Promise.resolve(''),
 		dataLogRes.ok ? dataLogRes.text() : Promise.resolve('')
 	]);
 
@@ -168,10 +173,9 @@ export const load: PageLoad = async ({ fetch }) => {
 		versions,
 		resultsMap: resultsMapFlat,
 		resultsMeta,
+		hasAssessments,
 		currentVersion,
-		totalCount: fallbackProjects.length,
 		processLogMarkdown,
-		iterationsLogMarkdown,
 		dataLogMarkdown
 	};
 };

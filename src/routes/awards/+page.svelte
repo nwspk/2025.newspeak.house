@@ -22,6 +22,7 @@
 			versions: Version[];
 			resultsMap: Record<string, Project[]>;
 			resultsMeta?: Record<string, boolean>;
+			hasAssessments?: Record<string, boolean>;
 			currentVersion: string;
 			processLogMarkdown?: string;
 			dataLogMarkdown?: string;
@@ -31,6 +32,7 @@
 	let versions = $state(data.versions as Version[]);
 	let resultsMap = $state(data.resultsMap as Record<string, Project[]>);
 	let resultsMeta = $state((data.resultsMeta ?? {}) as Record<string, boolean>);
+	const hasAssessments = data.hasAssessments ?? {};
 
 	let selectedVersion = $state(data.currentVersion as string);
 
@@ -281,6 +283,48 @@
 		Math.ceil(assessmentLogProjects.length / ALOG_PAGE_SIZE)
 	);
 
+	// Assessment text is lazy-loaded client-side to keep the server payload small.
+	// Cache: version → map of url → { assessment, assessment_synthetic }
+	type AssessmentEntry = { assessment: string; assessment_synthetic: boolean };
+	let assessmentCache = $state<Record<string, Record<string, AssessmentEntry>>>({});
+	let assessmentLoading = $state(false);
+
+	const AWARDS_REPO_RAW = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
+
+	async function loadAssessments(version: string) {
+		if (assessmentCache[version] !== undefined) return;
+		assessmentLoading = true;
+		try {
+			const res = await fetch(
+				`${AWARDS_REPO_RAW}/iterations/${version}/results.json`,
+				{ cache: 'no-store' }
+			);
+			if (res.ok) {
+				const raw: unknown = await res.json();
+				const items: unknown[] = Array.isArray(raw)
+					? raw
+					: (raw as { projects?: unknown[] })?.projects ?? [];
+				const byUrl: Record<string, AssessmentEntry> = {};
+				for (const x of items) {
+					const item = x as Record<string, unknown>;
+					const url = (item.url ?? item.link ?? '') as string;
+					if (url) {
+						byUrl[url] = {
+							assessment: (item.assessment ?? '') as string,
+							assessment_synthetic: (item.assessment_synthetic ?? false) as boolean
+						};
+					}
+				}
+				assessmentCache = { ...assessmentCache, [version]: byUrl };
+			} else {
+				assessmentCache = { ...assessmentCache, [version]: {} };
+			}
+		} catch {
+			assessmentCache = { ...assessmentCache, [version]: {} };
+		}
+		assessmentLoading = false;
+	}
+
 	onMount(() => {
 		if (!browser) return;
 		const params = new URLSearchParams(window.location.search);
@@ -299,6 +343,10 @@
 		end.setHours(0, 0, 0, 0);
 		const diffMs = end.getTime() - today.getTime();
 		daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+
+		// Pre-load assessments for the default assessment-log version
+		const initialAssessmentVersion = versions[0]?.version;
+		if (initialAssessmentVersion) loadAssessments(initialAssessmentVersion);
 	});
 </script>
 
@@ -542,16 +590,15 @@
 
 			<div class="alog-timeline-nav">
 				{#each versions as ver, vi}
-					{@const hasReal = (resultsMap[ver.version] ?? []).some(p => p.assessment && !p.assessment_synthetic)}
 					<button
 						type="button"
 						class="alog-tab"
 						class:alog-tab--active={assessmentLogVersionData?.version === ver.version}
 						style="--tab-color:hsl(var(--{chartColors[vi % chartColors.length]}))"
-						onclick={() => { assessmentLogVersion = ver.version; assessmentLogPage = 0; }}
+						onclick={() => { assessmentLogVersion = ver.version; assessmentLogPage = 0; loadAssessments(ver.version); }}
 					>
 						<span class="alog-tab-ver">{ver.version}</span>
-						{#if hasReal}
+						{#if hasAssessments[ver.version]}
 							<span class="alog-tab-dot alog-tab-dot--real" title="jury/agent assessments available"></span>
 						{:else}
 							<span class="alog-tab-dot alog-tab-dot--synthetic" title="heuristic only"></span>
@@ -562,7 +609,10 @@
 
 			{#if assessmentLogVersionData}
 				{@const activeColor = chartColors[versions.findIndex(v => v.version === assessmentLogVersionData.version) % chartColors.length]}
-				{@const hasSyntheticOnPage = assessmentLogPage_projects.some(p => p.assessment_synthetic)}
+				{@const versionAssessmentMap = assessmentCache[assessmentLogVersionData.version]}
+				{@const hasSyntheticOnPage = versionAssessmentMap
+					? assessmentLogPage_projects.some(p => versionAssessmentMap[p.url]?.assessment_synthetic)
+					: false}
 				<div class="alog-panel" style="border-left-color:hsl(var(--{activeColor}))">
 					<div class="alog-panel-header">
 						<span class="alog-panel-ver" style="color:hsl(var(--{activeColor}))">{assessmentLogVersionData.version}</span>
@@ -572,6 +622,7 @@
 
 					<div class="alog-project-list">
 						{#each assessmentLogPage_projects as project}
+							{@const cached = versionAssessmentMap?.[project.url]}
 							<div class="alog-project" style="border-left-color:hsl(var(--{activeColor}))">
 								<div class="alog-project-meta">
 									<span class="alog-project-rank">#{project.rank}</span>
@@ -581,8 +632,10 @@
 								{#if project.summary}
 									<p class="alog-project-summary">{project.summary}</p>
 								{/if}
-								{#if project.assessment}
-									<p class="alog-project-assessment">{project.assessment}{project.assessment_synthetic ? ' *' : ''}</p>
+								{#if cached?.assessment}
+									<p class="alog-project-assessment">{cached.assessment}{cached.assessment_synthetic ? ' *' : ''}</p>
+								{:else if versionAssessmentMap === undefined && assessmentLoading}
+									<p class="alog-project-assessment alog-loading">Loading assessments…</p>
 								{/if}
 							</div>
 						{/each}
@@ -1786,6 +1839,10 @@
 		line-height: 1.6;
 		color: rgba(26, 26, 26, 0.82);
 		margin: 0;
+	}
+	.alog-loading {
+		color: rgba(26, 26, 26, 0.4);
+		font-style: italic;
 	}
 	.alog-pagination {
 		display: flex;
