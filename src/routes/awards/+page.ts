@@ -1,11 +1,11 @@
 import type { PageLoad } from './$types';
-import type { Version, Project } from '$lib/types/awards';
+import type { Version } from '$lib/types/awards';
+import { AWARDS_REPO_RAW, parseRawResults, toProjects, urlToName } from '$lib/utils/awards-results';
 
 /** Do not bake /awards at build time — always reflect current iterations.json from the evaluation repo. */
 export const prerender = false;
 
-const REPO_BASE = 'https://raw.githubusercontent.com/nwspk/politech-awards-2026/main';
-const LOGS_BASE = `${REPO_BASE}/docs/logs`;
+const LOGS_BASE = `${AWARDS_REPO_RAW}/docs/logs`;
 
 /** Avoid stale cached JSON from raw.githubusercontent.com or intermediaries. */
 const FETCH_OPTS: RequestInit = { cache: 'no-store' };
@@ -29,134 +29,66 @@ interface RepoIteration {
 	vote_result?: string | null;
 }
 
-interface RepoResult {
-	url: string;
-	score: number;
-	name?: string;
-	summary?: string;
-	assessment?: string;
-	assessment_synthetic?: boolean;
-}
-
-function urlToName(urlStr: string): string {
-	try {
-		const u = new URL(urlStr);
-		// Prefer hostname, strip www.
-		let name = u.hostname.replace(/^www\./, '');
-		// If path is meaningful (not just /), append first segment
-		const path = u.pathname.replace(/^\/|\/$/g, '');
-		if (path && path !== '' && !path.startsWith('?')) {
-			const first = path.split('/')[0];
-			if (first && first.length < 40) name = first + '.' + name;
-		}
-		return name || urlStr;
-	} catch {
-		return urlStr;
-	}
-}
-
-function toRepoResults(raw: unknown): RepoResult[] {
-	if (Array.isArray(raw)) {
-		return raw.map((x) => ({
-			url: (x as { url?: string }).url ?? (x as { link?: string }).link ?? '',
-			score: (x as { score?: number }).score ?? 0,
-			name: (x as { name?: string }).name,
-			summary: (x as { summary?: string }).summary,
-			assessment: (x as { assessment?: string }).assessment,
-			assessment_synthetic: (x as { assessment_synthetic?: boolean }).assessment_synthetic
-		}));
-	}
-	if (raw && typeof raw === 'object' && 'projects' in raw) {
-		return toRepoResults((raw as { projects: unknown }).projects);
-	}
-	return [];
-}
-
-function toProjects(repoResults: RepoResult[]): Project[] {
-	const sorted = [...repoResults].sort((a, b) => {
-		const scoreA = a.score ?? 0;
-		const scoreB = b.score ?? 0;
-		if (scoreB !== scoreA) return scoreB - scoreA;
-		return (a.url ?? '').localeCompare(b.url ?? '');
-	});
-	return sorted.map((r, i) => ({
-		rank: i + 1,
-		score: r.score,
-		name: r.name ?? urlToName(r.url),
-		url: r.url,
-		summary: r.summary ?? '',
-		// assessment text omitted from server payload — loaded client-side on demand
-		assessment: '',
-		assessment_synthetic: false
-	}));
-}
-
 export const load: PageLoad = async ({ fetch }) => {
-	const iterationsRes = await fetch(`${REPO_BASE}/iterations.json`, FETCH_OPTS);
+	const iterationsRes = await fetch(`${AWARDS_REPO_RAW}/iterations.json`, FETCH_OPTS);
 	if (!iterationsRes.ok) throw new Error('Failed to fetch iterations');
 	const repoIterations: RepoIteration[] = await iterationsRes.json();
 	const versionIds = repoIterations.map((it) => it.version);
 
-	// Fetch main + all per-version results in parallel
-	const [mainRes, ...versionResponses] = await Promise.all([
-		fetch(`${REPO_BASE}/results.json`, FETCH_OPTS),
-		...versionIds.map((ver) =>
-			fetch(`${REPO_BASE}/iterations/${ver}/results.json`, FETCH_OPTS)
-		)
-	]);
+	// Transform iterations metadata (cheaply — no results.json needed here)
+	const versions: Version[] = repoIterations
+		.map((it, idx) => ({
+			version: it.version,
+			title: it.title ?? it.version,
+			author: it.author ?? null,
+			authors: it.authors ?? null,
+			current: idx === repoIterations.length - 1,
+			date: it.date ?? '',
+			prNumber: it.pr_number,
+			prUrl: it.pr_url,
+			prStatus: it.pr_status,
+			heuristicSummary: it.heuristic,
+			rationale: it.rationale ?? '',
+			dataSources: it.data_sources ?? [],
+			topProject: {
+				name: it.top_project?.name ?? urlToName(it.top_project?.url ?? ''),
+				score: it.top_project?.score ?? 0
+			},
+			diff: it.limitations ? [it.limitations] : [],
+			assessment: it.assessment ?? undefined,
+			voteResult: it.vote_result ?? undefined
+		}))
+		.reverse();
 
-	const mainData = mainRes.ok ? await mainRes.json() : [];
-	const fallbackProjects = toProjects(toRepoResults(mainData));
+	const currentVersion =
+		versions.find((v) => v.current)?.version ?? versions[0]?.version ?? versionIds[0];
 
-	const resultsMap: Record<string, { projects: Project[]; isFallback: boolean }> = {};
-	// Track which versions have real (non-synthetic) per-project assessments
-	const hasAssessments: Record<string, boolean> = {};
+	// Only fetch the current (latest) version's results server-side.
+	// All other versions are lazy-loaded client-side on first access.
+	const currentRes = await fetch(
+		`${AWARDS_REPO_RAW}/iterations/${currentVersion}/results.json`,
+		FETCH_OPTS
+	);
 
-	for (let i = 0; i < versionIds.length; i++) {
-		const ver = versionIds[i];
-		const res = versionResponses[i];
-		if (res?.ok) {
-			const data = await res.json();
-			const rr = toRepoResults(data);
-			hasAssessments[ver] = rr.some((r) => r.assessment && !r.assessment_synthetic);
-			resultsMap[ver] = { projects: toProjects(rr), isFallback: false };
-		} else {
-			hasAssessments[ver] = false;
-			resultsMap[ver] = { projects: fallbackProjects, isFallback: true };
-		}
+	const resultsMap: Record<string, import('$lib/types/awards').Project[]> = {};
+	// Pre-fill all versions as empty so the client knows which ones need loading
+	for (const v of versionIds) {
+		resultsMap[v] = [];
 	}
 
-	// Transform iterations to our Version schema (newest first for display)
-	const versions: Version[] = repoIterations.map((it, idx) => ({
-		version: it.version,
-		title: it.title ?? it.version,
-		author: it.author ?? null,
-		authors: it.authors ?? null,
-		current: idx === repoIterations.length - 1,
-		date: it.date ?? '',
-		prNumber: it.pr_number,
-		prUrl: it.pr_url,
-		prStatus: it.pr_status,
-		heuristicSummary: it.heuristic,
-		rationale: it.rationale ?? '',
-		dataSources: it.data_sources ?? [],
-		topProject: {
-			name: it.top_project?.name ?? urlToName(it.top_project?.url ?? ''),
-			score: it.top_project?.score ?? 0
-		},
-		diff: it.limitations ? [it.limitations] : [],
-		assessment: it.assessment ?? undefined,
-		voteResult: it.vote_result ?? undefined
-	})).reverse();
+	// Derive hasAssessments from iteration metadata:
+	// Any version whose assessment text in iterations.json is substantial has per-project assessments.
+	const hasAssessments: Record<string, boolean> = {};
+	for (const it of repoIterations) {
+		hasAssessments[it.version] = (it.assessment?.length ?? 0) > 500;
+	}
 
-	const currentVersion = versions.find((v) => v.current)?.version ?? versions[0]?.version ?? 'v4';
-
-	// Flatten for page (page expects Record<string, Project[]>)
-	const resultsMapFlat: Record<string, Project[]> = {};
-	const resultsMeta: Record<string, boolean> = {};
-	for (const v of versionIds) {
-		resultsMapFlat[v] = resultsMap[v].projects;
-		resultsMeta[v] = resultsMap[v].isFallback;
+	if (currentRes.ok) {
+		const raw = await currentRes.json();
+		const rr = parseRawResults(raw);
+		// Override hasAssessments for current version based on actual data
+		hasAssessments[currentVersion] = rr.some((r) => r.assessment && !r.assessment_synthetic);
+		resultsMap[currentVersion] = toProjects(rr);
 	}
 
 	const [processLogRes, dataLogRes] = await Promise.all([
@@ -171,8 +103,7 @@ export const load: PageLoad = async ({ fetch }) => {
 
 	return {
 		versions,
-		resultsMap: resultsMapFlat,
-		resultsMeta,
+		resultsMap,
 		hasAssessments,
 		currentVersion,
 		processLogMarkdown,
