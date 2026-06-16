@@ -258,6 +258,7 @@
 					rel="noopener noreferrer">Ration Club</a
 				>.
 			</p>
+			<a href="/room-booking" class="cohort-link">/// cohort →</a>
 		</div>
 	</div>
 
@@ -862,5 +863,21 @@
 		font-size: 0.85rem;
 		font-family: 'IBM Plex Mono', monospace;
 		text-align: center;
+	}
+
+	.cohort-link {
+		position: absolute;
+		bottom: 1.5rem;
+		right: 2rem;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.8rem;
+		color: #888;
+		letter-spacing: 0.08em;
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.cohort-link:hover {
+		color: #d62828;
 	}
 </style>
