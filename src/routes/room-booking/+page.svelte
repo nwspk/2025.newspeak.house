@@ -438,7 +438,7 @@
 					Go to <a href={snapshotUrl} target="_blank" rel="noopener noreferrer">snapshot.box</a> and open
 					our space.
 				</li>
-				<li>Sign in with <strong>Sequence</strong> or <strong>email</strong>.</li>
+				<li>Sign in with <strong>Sequence</strong> then <strong>email</strong>.</li>
 				<li>Once you're logged in, copy your wallet address from your profile.</li>
 				<li>
 					<button type="button" class="inline-link" onclick={openWalletModal}>
@@ -491,7 +491,7 @@
 		{#if modalMode === 'wallet'}
 			<h2 id="modal-title">Register for voting</h2>
 			<p class="modal-copy">
-				Sign in on Snapshot with Sequence or email, copy your wallet address, and save it here so we
+				Sign in on Snapshot with Sequence then choose email, copy your wallet address, and save it here so we
 				can add you for voting.
 			</p>
 
@@ -659,8 +659,8 @@
 					bind:value={tradeNote}
 					rows="3"
 					placeholder={tradeKind === 'irl_offer'
-						? 'e.g. cook dinner for the house, cover a shift'
-						: 'e.g. happy to be flexible on timing'}
+						? 'e.g. coffee + cake, cook for ration club'
+						: 'e.g. hosting a friend'}
 				></textarea>
 			</label>
 
