@@ -1,9 +1,13 @@
-import { getStore } from '@netlify/blobs';
+import { dev } from '$app/environment';
+import { env } from '$env/dynamic/private';
+import { getStore, type Store } from '@netlify/blobs';
 import {
 	ALLOCATION_ORDER,
 	BOOKING_STORE_KEY,
 	POOL_LEAD_DAYS,
 	createInitialState,
+	daysUntilDate,
+	isPastDate,
 	type BookingState,
 	type CohortMember,
 	type DayState,
@@ -13,6 +17,8 @@ import {
 } from '$lib/data/room-booking';
 
 let memoryState: BookingState | null = null;
+let storeClient: Store | null | undefined;
+let loggedDevFallback = false;
 
 function cloneState(state: BookingState): BookingState {
 	return structuredClone(state);
@@ -24,21 +30,56 @@ function getToday(): Date {
 	return today;
 }
 
-function parseDate(dateKey: string): Date {
-	return new Date(`${dateKey}T12:00:00`);
-}
-
 function daysUntil(dateKey: string): number {
-	const target = parseDate(dateKey);
-	const today = getToday();
-	return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+	return daysUntilDate(dateKey, getToday());
 }
 
-function getStoreClient() {
+async function persistState(state: BookingState): Promise<BookingState> {
+	const withTransitions = applyAutomaticTransitions(state);
+	await writeRawState(withTransitions);
+	return withTransitions;
+}
+
+function assertNotPast(dateKey: string) {
+	if (isPastDate(dateKey)) {
+		throw new Error('This day has already passed');
+	}
+}
+
+function getStoreClient(): Store | null {
+	if (storeClient !== undefined) return storeClient;
+
+	const siteID = env.NETLIFY_SITE_ID ?? env.SITE_ID;
+	const token = env.NETLIFY_BLOBS_TOKEN ?? env.NETLIFY_AUTH_TOKEN;
+
+	if (siteID && token) {
+		try {
+			storeClient = getStore({ name: BOOKING_STORE_KEY, siteID, token });
+			return storeClient;
+		} catch (error) {
+			if (!dev) {
+				console.error('Netlify Blobs store unavailable:', error);
+				throw new Error('Booking storage is unavailable. Please try again later.');
+			}
+		}
+	}
+
 	try {
-		return getStore(BOOKING_STORE_KEY);
+		storeClient = getStore(BOOKING_STORE_KEY);
+		return storeClient;
 	} catch {
-		return null;
+		if (dev) {
+			if (!loggedDevFallback) {
+				console.info(
+					'Room booking: using in-memory state locally. Use `netlify dev` or set NETLIFY_SITE_ID + NETLIFY_BLOBS_TOKEN for real persistence.'
+				);
+				loggedDevFallback = true;
+			}
+			storeClient = null;
+			return null;
+		}
+
+		throw new Error('Booking storage is unavailable. Please try again later.');
 	}
 }
 
@@ -74,15 +115,19 @@ async function writeRawState(state: BookingState): Promise<void> {
 	const store = getStoreClient();
 	memoryState = cloneState(state);
 
-	if (store) {
-		await store.setJSON('state', state);
+	if (!store) {
+		if (dev) return;
+		throw new Error('Booking storage is unavailable. Please try again later.');
 	}
+
+	await store.setJSON('state', state);
 }
 
 function applyPoolTransitions(state: BookingState): BookingState {
 	const next = cloneState(state);
 
 	for (const [dateKey, day] of Object.entries(next.days)) {
+		if (isPastDate(dateKey)) continue;
 		if (day.status !== 'unconfirmed') continue;
 		if (daysUntil(dateKey) > POOL_LEAD_DAYS) continue;
 
@@ -102,6 +147,7 @@ function applyPoolAssignments(state: BookingState): BookingState {
 	const next = cloneState(state);
 
 	for (const [dateKey, day] of Object.entries(next.days)) {
+		if (isPastDate(dateKey)) continue;
 		if (day.status !== 'pool') continue;
 		if (daysUntil(dateKey) !== 1) continue;
 
@@ -184,6 +230,7 @@ export async function loadBookingState(): Promise<BookingState> {
 
 export async function claimDay(dateKey: string, member: string): Promise<BookingState> {
 	assertMember(member);
+	assertNotPast(dateKey);
 	const state = await loadBookingState();
 	const day = getDay(state, dateKey);
 
@@ -203,8 +250,7 @@ export async function claimDay(dateKey: string, member: string): Promise<Booking
 		day.holder = member;
 		day.status = 'claimed';
 		day.claimed_at = new Date().toISOString();
-		await writeRawState(state);
-		return state;
+		return persistState(state);
 	}
 
 	if (day.status === 'pool') {
@@ -213,8 +259,7 @@ export async function claimDay(dateKey: string, member: string): Promise<Booking
 			claims.push(member);
 			state.pool_claims[dateKey] = claims;
 		}
-		await writeRawState(state);
-		return state;
+		return persistState(state);
 	}
 
 	throw new Error('Unable to claim this day');
@@ -222,6 +267,7 @@ export async function claimDay(dateKey: string, member: string): Promise<Booking
 
 export async function swapDay(dateKey: string, member: string): Promise<BookingState> {
 	assertMember(member);
+	assertNotPast(dateKey);
 	const state = await loadBookingState();
 	const day = getDay(state, dateKey);
 
@@ -237,8 +283,7 @@ export async function swapDay(dateKey: string, member: string): Promise<BookingS
 		state.pool_claims[dateKey] = [];
 	}
 
-	await writeRawState(state);
-	return state;
+	return persistState(state);
 }
 
 export async function requestTrade(input: {
@@ -260,6 +305,11 @@ export async function requestTrade(input: {
 
 	if (input.type === 'day_swap' && !input.initiator_date) {
 		throw new Error('Choose the day you are offering');
+	}
+
+	assertNotPast(input.counterpart_date);
+	if (input.type === 'day_swap' && input.initiator_date) {
+		assertNotPast(input.initiator_date);
 	}
 
 	const state = await loadBookingState();
@@ -322,8 +372,7 @@ export async function requestTrade(input: {
 
 	markTradePending(state, trade.counterpart_date);
 
-	await writeRawState(state);
-	return state;
+	return persistState(state);
 }
 
 export async function respondToTrade(
@@ -349,8 +398,7 @@ export async function respondToTrade(
 			restoreDayAfterTrade(state, trade.initiator_date);
 		}
 		restoreDayAfterTrade(state, trade.counterpart_date);
-		await writeRawState(state);
-		return state;
+		return persistState(state);
 	}
 
 	if (responder !== trade.counterpart) {
@@ -363,8 +411,7 @@ export async function respondToTrade(
 		counterpartDay.status = 'claimed';
 		counterpartDay.claimed_at = new Date().toISOString();
 		trade.status = 'accepted';
-		await writeRawState(state);
-		return state;
+		return persistState(state);
 	}
 
 	const initiatorDay = getDay(state, trade.initiator_date);
@@ -380,8 +427,7 @@ export async function respondToTrade(
 	counterpartDay.claimed_at = new Date().toISOString();
 
 	trade.status = 'accepted';
-	await writeRawState(state);
-	return state;
+	return persistState(state);
 }
 
 function assertWalletAddress(address: string): string {

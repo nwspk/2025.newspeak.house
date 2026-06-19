@@ -1,5 +1,6 @@
 export const POOL_LEAD_DAYS = 2;
-export const BOOKING_STORE_KEY = 'guest-room-bookings';
+export const BOOKING_START_DATE = '2026-06-22';
+export const BOOKING_STORE_KEY = `guest-room-bookings-${BOOKING_START_DATE}`;
 export const IDENTITY_STORAGE_KEY = 'guest-room-identity';
 export const SNAPSHOT_URL = 'https://snapshot.box/#/s:nwspk.eth';
 
@@ -80,7 +81,7 @@ export interface CalendarDay {
 	weekday: string;
 }
 
-const START_DATE = new Date('2026-06-18T12:00:00');
+const START_DATE = new Date(`${BOOKING_START_DATE}T12:00:00`);
 
 function dateKeyForAllocationIndex(index: number): string {
 	const date = new Date(START_DATE);
@@ -139,6 +140,37 @@ export function formatCalendarDay(dateKey: string): CalendarDay {
 
 export function getCalendarDays(): CalendarDay[] {
 	return getBookingDates().map(formatCalendarDay);
+}
+
+export function getBookingPeriodLabel(): string {
+	const dates = getBookingDates();
+	if (dates.length === 0) return '';
+
+	const first = formatCalendarDay(dates[0]);
+	const last = formatCalendarDay(dates[dates.length - 1]);
+	return `${first.monthLabel} ${first.dayNumber} – ${last.monthLabel} ${last.dayNumber}`;
+}
+
+export function getBookingStartLabel(): string {
+	return new Date(`${BOOKING_START_DATE}T12:00:00`).toLocaleDateString('en-GB', {
+		day: 'numeric',
+		month: 'long'
+	});
+}
+
+export function bookingToday(): Date {
+	const today = new Date();
+	today.setHours(12, 0, 0, 0);
+	return today;
+}
+
+export function daysUntilDate(dateKey: string, today: Date = bookingToday()): number {
+	const target = new Date(`${dateKey}T12:00:00`);
+	return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function isPastDate(dateKey: string): boolean {
+	return daysUntilDate(dateKey) < 0;
 }
 
 function allocatedDateForMember(member: CohortMember): string | undefined {
