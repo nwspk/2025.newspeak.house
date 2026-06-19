@@ -2,8 +2,11 @@
 	import { onMount } from 'svelte';
 	import {
 		IDENTITY_STORAGE_KEY,
+		getBookingPeriodLabel,
+		getBookingStartLabel,
 		getHeldDateForMember,
 		getPendingTradesForDate,
+		isPastDate,
 		tradeSummary,
 		type BookingState,
 		type CalendarDay,
@@ -37,6 +40,8 @@
 	const calendarDays = data.calendarDays as CalendarDay[];
 	const poolLeadDays = data.poolLeadDays;
 	const snapshotUrl = data.snapshotUrl;
+	const bookingPeriod = getBookingPeriodLabel();
+	const bookingStartLabel = getBookingStartLabel();
 
 	onMount(() => {
 		const saved = localStorage.getItem(IDENTITY_STORAGE_KEY);
@@ -90,6 +95,8 @@
 	}
 
 	function openDay(date: string) {
+		if (isPastDate(date)) return;
+
 		selectedDate = date;
 		errorMessage = '';
 
@@ -330,7 +337,7 @@
 		<div class="hero">
 			<p class="eyebrow">/// guest room</p>
 			<h1>Who's in the guest room?</h1>
-			<p class="subtitle">Jun 18 – Jul 5 · iteration one · cohort only</p>
+			<p class="subtitle">{bookingPeriod} · iteration one · cohort only</p>
 			<p class="lede">
 				One day each. Claim your slot, release it back to the pool, or trade with someone else. If a day
 				isn't claimed {poolLeadDays} days before, it opens up for anyone — and if you're the only one
@@ -361,6 +368,7 @@
 			<span><i class="swatch claimed"></i> Claimed</span>
 			<span><i class="swatch pool"></i> Pool</span>
 			<span><i class="swatch trade"></i> Trade pending</span>
+			<span><i class="swatch past"></i> Past</span>
 		</div>
 	</section>
 
@@ -369,9 +377,13 @@
 			{#each calendarDays as day (day.date)}
 				{@const dayState = getDay(day.date)}
 				{@const trades = pendingTrades(day.date)}
+				{@const past = isPastDate(day.date)}
 				<button
 					type="button"
 					class="day-card status-{dayState.status}"
+					class:is-past={past}
+					disabled={past}
+					aria-disabled={past}
 					onclick={() => openDay(day.date)}
 				>
 					<div class="day-meta">
@@ -397,7 +409,7 @@
 		<details class="info-dropdown" open={rulesOpen} ontoggle={(event) => (rulesOpen = event.currentTarget.open)}>
 			<summary>Rules</summary>
 			<ul>
-				<li>Each fellow gets one day from 18 June.</li>
+				<li>Each fellow gets one day from {bookingStartLabel}.</li>
 				<li>Click your amber day to claim it. We're relying on honesty — only claim your own day.</li>
 				<li>
 					<strong>Release to pool</strong> gives up your claimed day for others. To trade, click
@@ -405,7 +417,7 @@
 				</li>
 				<li>
 					Unclaimed days move to the pool {poolLeadDays} days before the date. If exactly one person
-					has registered interest the day before, they get it automatically.
+					has registered interest by the day before, they get it automatically.
 				</li>
 			</ul>
 		</details>
@@ -1003,6 +1015,10 @@
 		border: 2px dashed #f4b942;
 	}
 
+	.swatch.past {
+		background: #b8b8b0;
+	}
+
 	.calendar-wrap {
 		max-width: 1200px;
 		margin: 0 auto;
@@ -1036,6 +1052,29 @@
 		transform: translateY(-3px);
 		box-shadow: 0 10px 24px rgba(26, 26, 26, 0.08);
 		border-color: rgba(214, 40, 40, 0.35);
+	}
+
+	.day-card.is-past {
+		cursor: default;
+		opacity: 0.72;
+		background: rgba(255, 255, 255, 0.35);
+	}
+
+	.day-card.is-past .event-bar {
+		background: #9a9a92 !important;
+		color: #f5f5f0;
+	}
+
+	.day-card.is-past .day-number,
+	.day-card.is-past .weekday,
+	.day-card.is-past .month {
+		color: #888;
+	}
+
+	.day-card.is-past:hover {
+		transform: none;
+		box-shadow: none;
+		border-color: rgba(26, 26, 26, 0.12);
 	}
 
 	.day-meta {

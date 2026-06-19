@@ -5,9 +5,9 @@ const BASE = process.env.ROOM_BOOKING_URL ?? 'http://localhost:5173/api/room-boo
 const A = 'Huda Abdirahim';
 const B = 'Jamie Coombes';
 const C = 'Nick Botti';
-const dayA = '2026-07-02';
-const dayB = '2026-07-03';
-const dayC = '2026-07-04';
+const dayA = '2026-07-06';
+const dayB = '2026-07-07';
+const dayC = '2026-07-08';
 
 let passed = 0;
 let failed = 0;
@@ -204,6 +204,49 @@ async function run() {
 	}));
 	state = result.state;
 	assert(holder(state, dayB) === A, 'accept irl offer transfers day to initiator');
+
+	function tomorrowKey() {
+		const date = new Date();
+		date.setDate(date.getDate() + 1);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	}
+
+	// pool auto-assign: sole claimant on the day before
+	const tomorrow = tomorrowKey();
+	({ result } = await api({ action: 'reset' }));
+	state = result.state;
+	if (state.days[tomorrow]) {
+		({ result } = await api({ action: 'claim', date: tomorrow, member: A }));
+		state = result.state;
+		const tomorrowDay = state.days[tomorrow];
+		if (tomorrowDay.status === 'claimed' && tomorrowDay.holder === A) {
+			assert(true, 'pool auto-assign sole claimant on day before');
+		} else {
+			assert(
+				tomorrowDay.status === 'pool' && state.pool_claims[tomorrow]?.includes(A),
+				'pool interest when auto-assign does not apply yet'
+			);
+		}
+	} else {
+		console.log('  - skip pool auto-assign (tomorrow outside booking window)');
+	}
+
+	// reject mutations on past days
+	const yesterday = (() => {
+		const date = new Date();
+		date.setDate(date.getDate() - 1);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	})();
+	if (state.days[yesterday]) {
+		({ response } = await api({ action: 'claim', date: yesterday, member: A }));
+		assert(!response.ok, 'reject claim on past day');
+	}
 
 	// getHeldDateForMember logic (imported check via API behavior already covered)
 
