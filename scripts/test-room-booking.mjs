@@ -5,9 +5,9 @@ const BASE = process.env.ROOM_BOOKING_URL ?? 'http://localhost:5173/api/room-boo
 const A = 'Huda Abdirahim';
 const B = 'Jamie Coombes';
 const C = 'Nick Botti';
-const dayA = '2026-07-27';
-const dayB = '2026-07-28';
-const dayC = '2026-07-29';
+const dayA = '2026-08-13';
+const dayB = '2026-08-14';
+const dayC = '2026-08-15';
 
 let passed = 0;
 let failed = 0;

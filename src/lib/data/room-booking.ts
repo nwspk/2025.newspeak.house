@@ -1,5 +1,5 @@
 export const POOL_LEAD_DAYS = 2;
-export const BOOKING_START_DATE = '2026-07-13';
+export const BOOKING_START_DATE = '2026-07-30';
 export const BOOKING_STORE_KEY = `guest-room-bookings-${BOOKING_START_DATE}`;
 export const IDENTITY_STORAGE_KEY = 'guest-room-identity';
 export const SNAPSHOT_URL = 'https://snapshot.box/#/s:nwspk.eth';
